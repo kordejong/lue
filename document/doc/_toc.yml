@@ -24,7 +24,11 @@ parts:
     - file: manual/glossary.md
   - caption: Reference
     chapters:
+    - file: reference/c/index.md
+    - file: reference/cpp/index.md
+    - file: reference/java/index.md
     - file: reference/python/index.md
+    - file: reference/r/index.md
     #   sections:
     #   - file: reference/python/data_model/index.rst
     #   - file: reference/python/data_model/hdf5/index.rst
@@ -41,7 +45,6 @@ parts:
     #   - file: reference/python/data_model/hdf5/file.rst
     #   chapters:
     #   - file: genindex.html
-    - file: reference/cpp/index.md
     #   sections:
     #   - file: reference/cpp/dataset.md
     - file: reference/utility/index.md

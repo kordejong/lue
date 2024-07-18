@@ -27,8 +27,10 @@ parts:
     - file: reference/c/index.md
     - file: reference/cpp/index.md
     - file: reference/java/index.md
+    - file: reference/julia/index.md
     - file: reference/python/index.md
     - file: reference/r/index.md
+    - file: reference/rust/index.md
     #   sections:
     #   - file: reference/python/data_model/index.rst
     #   - file: reference/python/data_model/hdf5/index.rst

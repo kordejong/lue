@@ -107,11 +107,13 @@ foreach(name IN ITEMS
     reference/c/index.md
     reference/cpp/index.md
     reference/java/index.md
+    reference/julia/index.md
     # reference/python/data_model/index.rst
     # reference/python/data_model/hdf5/index.rst
     # reference/python/framework/index.rst
     reference/python/index.md
     reference/r/index.md
+    reference/rust/index.md
     references.bib
     short_description.md
     pcraster/port.md

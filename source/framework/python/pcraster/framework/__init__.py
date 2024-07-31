@@ -6,6 +6,7 @@ See the `PCRaster Python Modelling Framework documentation`_ for more informatio
 .. _PCRaster Python Modelling Framework documentation:
    https://pcraster.geo.uu.nl/pcraster/latest/documentation/python_modelling_framework/index.html
 """
+
 import os.path
 import re
 
@@ -100,8 +101,14 @@ class DynamicFramework(lfr.DynamicModelRunner):
         super().__init__(model, last_time_step, first_time_step)
 
     def setQuiet(self, quiet=True):
-        # Skip for now
-        pass
+        self.quiet = quiet
+
+    def run(self):
+        if self.quiet:
+            progressor = lfr.SilentProgressor()
+        else:
+            progressor = lfr.DefaultProgressor()
+        super().run(progressor=progressor)
 
 
 class MonteCarloModel(lfr.MonteCarloModel):

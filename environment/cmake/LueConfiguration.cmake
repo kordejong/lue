@@ -2,27 +2,6 @@ include(CheckCXXSymbolExists)
 
 
 # Options to be set by the user ------------------------------------------------
-if(PROJECT_IS_TOP_LEVEL)
-    option(LUE_ENABLE_IWYU
-        "Enable include-what-you-use"
-        FALSE)
-
-    if(LUE_ENABLE_IWYU)
-        set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-
-        find_program(INCLUDE_WHAT_YOU_USE_EXECUTABLE include-what-you-use REQUIRED)
-
-        # Revisit once it is easy to use include-what-you-use >= 0.18 (try: include-what-you-use --version)
-        # set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE
-        #     ${INCLUDE_WHAT_YOU_USE_EXECUTABLE}
-        #     -Xiwyu --mapping-file=...
-        #     -Xiwyu --error
-        #     CACHE STRING "Include-what-you-use command"
-        # )
-    endif()
-endif()
-
-
 option(LUE_BUILD_DATA_MODEL
     "Build LUE data model API"
     TRUE)
@@ -265,15 +244,6 @@ if(LUE_BUILD_DOCUMENTATION)
     if(NOT EDIT_DOT_GRAPH)
         message(FATAL_ERROR "edit_dot_graph.py not found")
     endif()
-
-    # find_package(LATEX)
-
-    # if(NOT LATEX_FOUND)
-    #     message(WARNING
-    #         "LaTeX could not be found. Latex documents will not be generated")
-    # else()
-    #     include(UseLATEX)
-    # endif()
 endif()
 
 

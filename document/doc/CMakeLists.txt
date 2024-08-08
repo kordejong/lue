@@ -30,8 +30,10 @@ foreach(name IN ITEMS
     about/license.md
     about/project.md
     about/publication.md
+    about/reference.md
     about/related.md
     about/release.md
+    about/short_description.md
     contribute/documentation.md
     contribute/index.md
     contribute/release.md
@@ -54,6 +56,7 @@ foreach(name IN ITEMS
     pcraster/index.md
     pcraster/port.md
     pcraster/status.md
+    publication.bib
     quick_start/cpp.md
     quick_start/index.md
     quick_start/python.md
@@ -73,7 +76,6 @@ foreach(name IN ITEMS
     reference/utility/lue_translate.md
     reference/utility/lue_validate.md
     reference/utility/lue_view.md
-    short_description.md
     _toc.yml
 )
     configure_file(${name} ${name} COPYONLY)

@@ -9,8 +9,8 @@ LUE is an acronym for "Life, the Universe and Everything". It is pronounced as t
 Louis (`LU-EE`).
 :::
 
-The LUE data model is described in more detail in {cite}`DeBakker:2017` and {cite}`DeJong:2019`. Details
-about the LUE framework can be found in {cite}`DeJong:2021` and {cite}`DeJong:2022`.
+The LUE data model is described in more detail in {cite:p}`DeBakker:2017` and {cite:p}`DeJong:2019`. Details
+about the LUE framework can be found in {cite:p}`DeJong:2021` and {cite:p}`DeJong:2022`.
 
 LUE is the result of multiple research projects performed by the [Computational
 Geography](https://www.computationalgeography.org) group at Utrecht University in The Netherlands. One of the

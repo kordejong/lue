@@ -221,6 +221,7 @@ BOOST_AUTO_TEST_CASE(dry_cell)
 }
 
 
+// Doesn't pass since we handle extraction differently
 // BOOST_AUTO_TEST_CASE(crashed_in_pcraster1)
 // {
 //     double const new_discharge{lue::detail::iterate_to_new_discharge<double>(
@@ -249,7 +250,7 @@ BOOST_AUTO_TEST_CASE(crashed_in_pcraster2)
         15,            // time_step_duration
         10)};          // channel_length
 
-    double const discharge_we_want{std::numeric_limits<double>::min()};
+    double const discharge_we_want{0};
 
     BOOST_TEST(new_discharge == discharge_we_want, tt::tolerance(1e-6));
 }
@@ -264,8 +265,8 @@ BOOST_AUTO_TEST_CASE(random_input)
 
     std::uniform_real_distribution<FloatElement> discharge_distribution{0, 1000};
     std::uniform_real_distribution<FloatElement> lateral_inflow_distribution{-1000, 1000};
-    std::uniform_real_distribution<FloatElement> alpha_distribution{0.5, 6.0};
-    std::uniform_real_distribution<FloatElement> beta_distribution{0.5, 2.0};
+    std::uniform_real_distribution<FloatElement> alpha_distribution{1e-30, 50};
+    std::uniform_real_distribution<FloatElement> beta_distribution{1e-30, 1.0 - 1e-30};
     std::uniform_real_distribution<FloatElement> time_step_duration_distribution{1, 100};
     std::uniform_real_distribution<FloatElement> channel_length_distribution{1, 100};
 

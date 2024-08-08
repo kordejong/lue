@@ -43,6 +43,7 @@ namespace lue {
                     lue_hpx_assert(_upstream_discharge + _current_discharge + _lateral_inflow > Float{0});
                     lue_hpx_assert(_alpha > Float{0});
                     lue_hpx_assert(_beta > Float{0});
+                    lue_hpx_assert(_beta < Float{1});
                     lue_hpx_assert(_time_step_duration > Float{0});
                     lue_hpx_assert(channel_length > Float{0});
 
@@ -63,12 +64,10 @@ namespace lue {
                 */
                 auto guess() const -> Float
                 {
-                    // Small, but not zero!
-                    static Float const min_discharge{std::numeric_limits<Float>::min()};
-                    Float discharge_guess{min_discharge};
+                    Float discharge_guess{1};
 
                     // pow(0, -) is not defined
-                    if ((_current_discharge + _upstream_discharge != Float{0}) || _beta >= Float{1})
+                    if ((_current_discharge + _upstream_discharge != Float{0}))
                     {
                         Float const a_b_pq =
                             _alpha_beta *
@@ -82,8 +81,6 @@ namespace lue {
                             (_time_step_duration_over_channel_length + a_b_pq);
 
                         lue_hpx_assert(!std::isnan(discharge_guess));
-
-                        discharge_guess = std::max<Float>(discharge_guess, min_discharge);
                     }
 
                     lue_hpx_assert(discharge_guess > Float{0});
@@ -129,7 +126,6 @@ namespace lue {
 
                 Float _alpha;
 
-                //! Momentum coefficient / Boussinesq coefficient [1.01, 1.33] (Chow, p278)
                 Float _beta;
 
                 Float _alpha_beta;
@@ -154,8 +150,9 @@ namespace lue {
         {
             lue_hpx_assert(upstream_discharge >= Float{0});
             lue_hpx_assert(current_discharge >= Float{0});
-            lue_hpx_assert(alpha >= Float{0});
-            lue_hpx_assert(beta >= Float{0});
+            lue_hpx_assert(alpha > Float{0});
+            lue_hpx_assert(beta > Float{0});
+            lue_hpx_assert(beta < Float{1});
             lue_hpx_assert(time_step_duration > Float{0});
             lue_hpx_assert(channel_length > Float{0});
 
@@ -197,8 +194,7 @@ namespace lue {
                 int const digits = static_cast<int>(std::numeric_limits<Float>::digits * 0.6);
 
                 // In general, 2-3 iterations are enough. In rare cases more are needed. The unit tests don't
-                // seem to reach 8, so max 10 should be enough. This max is used in special cases:
-                // - upstream_discharge + current_discharge == 0 and beta <  1
+                // seem to reach 8, so max 10 should be enough.
                 std::uintmax_t const max_nr_iterations{10};
                 std::uintmax_t actual_nr_iterations{max_nr_iterations};
 
@@ -212,31 +208,31 @@ namespace lue {
                     digits,
                     actual_nr_iterations);
 
-                // TODO We can't throw an exception as this actually happens once in a while
-                // https://github.com/computationalgeography/lue/issues/703
-                // if (actual_nr_iterations == max_nr_iterations)
-                // {
-                //     // This only seems to happen when upstream_discharge == 0, current_discharge == 0, and
-                //     // lateral_inflow > 0
-                //     throw std::runtime_error(fmt::format(
-                //         "Iterating to a solution took more iterations than expected: "
-                //         "    upstream discharge: {}, "
-                //         "    current discharge: {}, "
-                //         "    lateral inflow: {}, "
-                //         "    alpha: {}, "
-                //         "    beta: {}, "
-                //         "    time step duration: {}, "
-                //         "    channel length: {}, "
-                //         "    initial guess: {}",
-                //         upstream_discharge,
-                //         current_discharge,
-                //         inflow,
-                //         alpha,
-                //         beta,
-                //         time_step_duration,
-                //         channel_length,
-                //         discharge_guess));
-                // }
+                // TODO This should never happen, except when inconsistent input values are provided.
+                //      Set no-data?!
+                if (actual_nr_iterations == max_nr_iterations)
+                {
+                    // This only seems to happen when upstream_discharge == 0, current_discharge == 0, and
+                    // lateral_inflow > 0
+                    throw std::runtime_error(fmt::format(
+                        "Iterating to a solution took more iterations than expected: "
+                        "    upstream discharge: {}, "
+                        "    current discharge: {}, "
+                        "    lateral inflow: {}, "
+                        "    alpha: {}, "
+                        "    beta: {}, "
+                        "    time step duration: {}, "
+                        "    channel length: {}, "
+                        "    initial guess: {}",
+                        upstream_discharge,
+                        current_discharge,
+                        inflow,
+                        alpha,
+                        beta,
+                        time_step_duration,
+                        channel_length,
+                        discharge_guess));
+                }
             }
 
             if (lateral_inflow < Float{0})
@@ -915,6 +911,22 @@ namespace lue {
     }  // namespace detail
 
 
+    /*!
+        @brief      Compute discharge using the kinematic wave flow routing model
+        @param      policies Operation policies
+        @param      flow_direction Flow direction field
+        @param      current_discharge Discharge at start of time step [m³ / s]
+        @param      lateral_inflow External source of water (positive values) or internal sink of water
+                    (negative values) [m³ / s]
+        @param      alpha Coefficient: > 0 [-]
+        @param      beta Coefficient: (0, 1) [-]
+        @param      time_step_duration Duration [s]
+        @param      channel_length Length [m]
+        @return     Discharge at end of time step [m³ / s]
+        @ingroup    routing_operation
+
+        The algorithm is based on the nonlinear kinematic wave scheme described in {cite:p}`Chow:1988`.
+    */
     template<typename Policies, typename FlowDirectionElement, typename Element, Rank rank>
     PartitionedArray<Element, rank> kinematic_wave(
         Policies const& policies,

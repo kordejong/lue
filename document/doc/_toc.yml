@@ -96,5 +96,6 @@ parts:
     - file: about/release.md
     - file: example/index.md
     - file: about/publication.md
+    - file: about/reference.md
     - file: about/license.md
     - file: about/related.md

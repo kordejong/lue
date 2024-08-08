@@ -1,6 +1,6 @@
 # Publications
 
-```{bibliography}
+```{bibliography} ../publication.bib
 :all:
 :style: plain
 ```

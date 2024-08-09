@@ -108,6 +108,7 @@ foreach(name IN ITEMS
     framework/algorithm/doc/grouped_operation/random_number_operation.md
 
     framework/partitioned_array/doc/index.md
+    framework/partitioned_raster/doc/index.md
     framework/partitioned_route/doc/index.md
 
     framework/doc/index.md

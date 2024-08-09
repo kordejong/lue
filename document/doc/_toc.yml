@@ -64,6 +64,7 @@ parts:
       - file: source/framework/doc/index.md
         sections:
         - file: source/framework/partitioned_array/doc/index.md
+        - file: source/framework/partitioned_raster/doc/index.md
         - file: source/framework/partitioned_route/doc/index.md
         - file: source/framework/algorithm/doc/index.md
           sections:

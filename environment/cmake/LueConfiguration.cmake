@@ -132,6 +132,13 @@ if(LUE_BUILD_DOCUMENTATION)
 endif()
 
 
+if(LUE_BUILD_GDAL)
+    # TODO Try again once modern GDAL and PROJ versions are available and work
+    #      well with CMake
+    set(LUE_BUILD_PROJ FALSE)
+endif()
+
+
 set(LUE_TEMPLATIZE "${PROJECT_SOURCE_DIR}/environment/script/templatize.py")
 
 # NOTE These can be made configurable later on
@@ -167,7 +174,6 @@ if(LUE_BUILD_DATA_MODEL)
 
     if(LUE_DATA_MODEL_WITH_UTILITIES)
         set(LUE_DOCOPT_REQUIRED TRUE)
-        set(LUE_GDAL_REQUIRED TRUE)
         set(LUE_NLOHMANN_JSON_REQUIRED TRUE)
     endif()
 
@@ -182,7 +188,6 @@ if(LUE_BUILD_FRAMEWORK)
     set(LUE_BOOST_REQUIRED TRUE)
     set(LUE_DOCOPT_REQUIRED TRUE)
     set(LUE_FMT_REQUIRED TRUE)
-    set(LUE_GDAL_REQUIRED TRUE)
     set(LUE_HPX_REQUIRED TRUE)
     set(LUE_MDSPAN_REQUIRED TRUE)
     set(LUE_PYTHON_REQUIRED TRUE)  # templatize.py
@@ -194,6 +199,16 @@ if(LUE_BUILD_FRAMEWORK)
     if(LUE_FRAMEWORK_WITH_PYTHON_API)
         set(LUE_PYBIND11_REQUIRED TRUE)
     endif()
+endif()
+
+
+if(LUE_BUILD_GDAL)
+    set(LUE_GDAL_REQUIRED TRUE)
+endif()
+
+
+if(LUE_BUILD_PROJ)
+    set(LUE_PROJ_REQUIRED TRUE)
 endif()
 
 
@@ -574,20 +589,6 @@ if(LUE_DOXYGEN_REQUIRED)
     find_package(Doxygen REQUIRED dot)
 endif()
 
-
-if(LUE_GDAL_REQUIRED)
-    find_package(GDAL REQUIRED)
-endif()
-
-
-if(LUE_GRAPHVIZ_REQUIRED)
-    find_package(Graphviz REQUIRED)
-
-    if(GRAPHVIZ_FOUND)
-        include(GraphvizMacro)
-    endif()
-endif()
-
 if(LUE_FMT_REQUIRED)
     # In fmt, install rules are disabled if it's a subproject
     set(FMT_INSTALL ON)
@@ -600,6 +601,23 @@ if(LUE_FMT_REQUIRED)
     FetchContent_MakeAvailable(fmt)
 endif()
 
+if(LUE_GDAL_REQUIRED)
+    FetchContent_Declare(GDAL
+        GIT_REPOSITORY https://github.com/OSGeo/gdal
+        GIT_TAG 01ac70772b997ab87d2312e2036eb66faf6b0508  # 3.9.1
+        SYSTEM
+        FIND_PACKAGE_ARGS 3
+    )
+endif()
+
+
+if(LUE_GRAPHVIZ_REQUIRED)
+    find_package(Graphviz REQUIRED)
+
+    if(GRAPHVIZ_FOUND)
+        include(GraphvizMacro)
+    endif()
+endif()
 
 if(LUE_HDF5_REQUIRED)
     # Explicitly use Module Mode, to prevent the use of HDF5's own CMake find logic. This latter
@@ -622,6 +640,27 @@ if(LUE_NLOHMANN_JSON_REQUIRED)
         FIND_PACKAGE_ARGS
     )
     FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
+if(LUE_PROJ_REQUIRED)
+    set(BUILD_TESTING FALSE)
+
+    FetchContent_Declare(PROJ
+        GIT_REPOSITORY https://github.com/OSGeo/PROJ
+        GIT_TAG 875a485fa5ef435c57f7682f904dd31ca92253ab  # 9.4.1
+        SYSTEM
+        FIND_PACKAGE_ARGS 6
+    )
+endif()
+
+if(LUE_GDAL_REQUIRED)
+    if(LUE_PROJ_REQUIRED)
+        FetchContent_MakeAvailable(PROJ GDAL)
+    else()
+        FetchContent_MakeAvailable(GDAL)
+    endif()
+elseif(LUE_PROJ_REQUIRED)
+    FetchContent_MakeAvailable(PROJ)
 endif()
 
 if(LUE_SPAN_LITE_REQUIRED)

@@ -38,6 +38,7 @@ parts:
       sections:
       - file: reference/operation/index.md
         sections:
+        - file: reference/operation/add/add.md
         - file: reference/operation/uniform.md
       - file: source/framework/api/doc/index.md
         sections:

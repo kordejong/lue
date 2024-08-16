@@ -2,6 +2,8 @@ set(LUE_TITLE "LUE documentation")
 set(LUE_AUTHOR "Computational Geography R&D Team")
 set(LUE_BOOK_BASENAME "lue-${CMAKE_PROJECT_VERSION}")
 
+add_subdirectory(reference)
+
 set(DOXYGEN_HAVE_DOT YES)
 set(DOXYGEN_DOT_MULTI_TARGETS YES)
 set(DOXYGEN_EXCLUDE_PATTERNS
@@ -78,6 +80,8 @@ foreach(name IN ITEMS
     # reference/java/index.md
     # reference/julia/index.md
     reference/operation/index.md
+    reference/operation/add/add.md
+    reference/operation/add/add.cpp
     reference/operation/uniform.md
     # reference/python/data_model/index.rst
     # reference/python/data_model/hdf5/index.rst

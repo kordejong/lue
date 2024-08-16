@@ -32,12 +32,6 @@ namespace lue {
 
     namespace api {
 
-        /*!
-            @brief      Meh1
-            @param      .
-            @return     .
-            @exception  .
-        */
         auto uniform(
             Shape<Count, 2> const& array_shape,
             Shape<Count, 2> const& partition_shape,
@@ -53,12 +47,6 @@ namespace lue {
         }
 
 
-        /*!
-            @brief      Meh2
-            @param      .
-            @return     .
-            @exception  .
-        */
         auto uniform(Shape<Count, 2> const& array_shape, Field const& min_value, Field const& max_value)
             -> Field
         {

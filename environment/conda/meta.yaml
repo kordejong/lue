@@ -53,6 +53,7 @@ test:
     - lue                                        # [not (osx and arm64)]
     - lue.data_model                             # [not (osx and arm64)]
     - lue.framework                              # [not (osx and arm64)]
+    - lue.framework_x                            # [not (osx and arm64)]
     - lue.pcraster                               # [not (osx and arm64)]
     - lue.qa.scalability                         # [not (osx and arm64)]
   commands:

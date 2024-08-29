@@ -15,6 +15,7 @@ add_library(lue_py_framework_x SHARED
     # source/io.cpp
     source/local_operation.cpp
     source/scalar.cpp
+    source/stream.cpp
     source/submodule.cpp
 )
 
@@ -30,11 +31,6 @@ set_target_properties(lue_py_framework_x
         VERSION ${LUE_VERSION}
         SOVERSION ${LUE_VERSION_MAJOR}
 )
-
-# set_target_properties(lue_py_framework_x
-#     PROPERTIES
-#         LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}
-# )
 
 target_include_directories(lue_py_framework_x
     PRIVATE
@@ -78,10 +74,9 @@ if(LUE_PYTHON_FROM_CONDA AND NOT DEFINED ENV{CONDA_BUILD})
     )
 endif()
 
-# TODO
-# install(
-#     DIRECTORY
-#         ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/framework
-#     DESTINATION ${LUE_INSTALL_PYTHON_PACKAGE_DIR}
-#     COMPONENT lue_runtime
-# )
+install(
+    DIRECTORY
+        ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/framework_x
+    DESTINATION ${LUE_INSTALL_PYTHON_PACKAGE_DIR}
+    COMPONENT lue_runtime
+)

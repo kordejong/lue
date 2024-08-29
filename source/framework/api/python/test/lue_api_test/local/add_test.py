@@ -1,24 +1,15 @@
-import numpy as np
-
-import lue.framework as lfr
-import lue.framework_x as lfrx
-import lue_test
+from ..lue_test import OperationTest, setUpModule, tearDownModule, test_case
 
 
-def setUpModule():
-    lue_test.start_hpx_runtime()
+class AddTest(OperationTest):
+    # TODO
 
-
-def tearDownModule():
-    lue_test.stop_hpx_runtime()
-
-
-class AddTest(lue_test.TestCase):
-    @lue_test.framework_test_case
+    @test_case
     def test_add_raster_raster(self):
-        array_shape = (60, 40)
-        element_type = np.int32
-        fill_value = 5
+        pass
+        # array_shape = (60, 40)
+        # element_type = np.int32
+        # fill_value = 5
 
         # Create field?
         # Create array in lfrx

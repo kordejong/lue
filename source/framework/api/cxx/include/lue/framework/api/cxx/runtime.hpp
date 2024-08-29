@@ -1,10 +1,11 @@
 #pragma once
+#include "lue/framework/api/cxx/export.hpp"
 #include <hpx/hpx.hpp>
 
 
-namespace lue {
+namespace lue::api {
 
-    class Runtime
+    class LUE_FAPI_EXPORT Runtime
     {
 
         public:
@@ -15,11 +16,17 @@ namespace lue {
 
             Runtime(Runtime&&) = delete;
 
-            ~Runtime();
-
             auto operator=(Runtime const&) -> Runtime& = delete;
 
             auto operator=(Runtime&&) -> Runtime& = delete;
+
+        protected:
+
+            ~Runtime();
+
+            virtual void startup() {};
+
+            virtual void shutdown() {};
 
         private:
 
@@ -38,4 +45,4 @@ namespace lue {
             hpx::condition_variable_any _shutdown_condition_variable;
     };
 
-}  // namespace lue
+}  // namespace lue::api

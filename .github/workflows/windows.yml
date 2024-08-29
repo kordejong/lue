@@ -225,7 +225,7 @@ jobs:
 
               ${{ env.lue_runtime_install_directory }}/bin/lue_calculate.py --version
               ${{ env.lue_runtime_install_directory }}/bin/lue_scalability.py --version
-              python -c "import lue, lue.data_model, lue.framework, lue.pcraster, lue.qa.scalability; print(lue.__version__)"
+              python -c "import lue, lue.data_model, lue.framework, lue.framework_x, lue.pcraster, lue.qa.scalability; print(lue.__version__)"
 
         - name: consume
           run: |

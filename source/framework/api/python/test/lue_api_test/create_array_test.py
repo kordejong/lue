@@ -8,9 +8,6 @@ class CreateArrayTest(OperationTest):
     # @lue_test.framework_test_case
     # def test_create_array(self):
 
-
-
-
     #     # array_shape = (60, 40)
     #     # partition_shape = (6, 4)
     #     # element_type = np.int32

@@ -1,5 +1,5 @@
-#include "stream.hpp"
 #include "lue/py/framework_x/submodule.hpp"
+#include "stream.hpp"
 #include "lue/framework/api/cxx/runtime.hpp"
 #include "lue/assert.hpp"
 #include <pybind11/stl.h>  // vector<string>
@@ -117,7 +117,6 @@ namespace lue::api {
             private:
 
                 std::unique_ptr<ScopedOstreamRedirect> stream{};
-
         };
 
 
@@ -133,7 +132,8 @@ namespace lue::api {
             {
                 pybind11::gil_scoped_release release;
                 CommandLine command_line{};
-                runtime = std::make_unique<PyRuntime>(command_line.argc(), command_line.argv(), configuration);
+                runtime =
+                    std::make_unique<PyRuntime>(command_line.argc(), command_line.argv(), configuration);
             }
         }
 

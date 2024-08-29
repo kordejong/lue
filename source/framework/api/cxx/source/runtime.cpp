@@ -1,8 +1,8 @@
-#include "lue/framework/core/runtime.hpp"
+#include "lue/framework/api/cxx/runtime.hpp"
 #include <hpx/hpx_start.hpp>
 
 
-namespace lue {
+namespace lue::api {
 
     Runtime::Runtime(int const argc, char* argv[], std::vector<std::string> configuration):
 
@@ -68,6 +68,9 @@ namespace lue {
 
         _startup_condition_variable.notify_one();
 
+        // Allow specialization to execute startup code
+        startup();
+
         // Wait for destructor to be called
         {
             std::unique_lock<hpx::spinlock> lock{_shutdown_mutex};
@@ -78,8 +81,11 @@ namespace lue {
             }
         }
 
+        // Allow specialization to execute shutdown code
+        shutdown();
+
         // Tell the runtime it's OK to exit
         return hpx::finalize();
     }
 
-}  // namespace lue
+}  // namespace lue::api

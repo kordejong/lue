@@ -53,6 +53,7 @@ add_library(lue_framework_api_cxx SHARED
     source/io.cpp
     source/local/add.cpp
     source/local/uniform.cpp
+    source/runtime.cpp
 )
 
 add_library(lue::framework_api_cxx ALIAS lue_framework_api_cxx)

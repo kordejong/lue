@@ -45,7 +45,6 @@ namespace lue::api {
             auto overflow(int chr) -> int override;
 
             auto sync() -> int override;
-
     };
 
 
@@ -55,8 +54,7 @@ namespace lue::api {
         public:
 
             ScopedOstreamRedirect(
-                std::ostream& costream = std::cout,
-                pybind11::object pyostream = import_stdout());
+                std::ostream& costream = std::cout, pybind11::object pyostream = import_stdout());
 
             ScopedOstreamRedirect(const ScopedOstreamRedirect&) = delete;
 
@@ -78,7 +76,6 @@ namespace lue::api {
             PythonBuffer _buffer;
 
             static auto import_stdout() -> pybind11::object;
-
     };
 
 }  // namespace lue::api

@@ -74,9 +74,7 @@ namespace lue::api {
     }
 
 
-    ScopedOstreamRedirect::ScopedOstreamRedirect(
-        std::ostream& costream,
-        pybind11::object pyostream):
+    ScopedOstreamRedirect::ScopedOstreamRedirect(std::ostream& costream, pybind11::object pyostream):
 
         _costream(costream),
         _buffer(std::move(pyostream))

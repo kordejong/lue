@@ -1,6 +1,7 @@
 import lue.framework_x as lfrx
+
 from . import type as type_
-from . test_case import TestCase, test_case
+from .test_case import TestCase, test_case
 
 
 def setUpModule():

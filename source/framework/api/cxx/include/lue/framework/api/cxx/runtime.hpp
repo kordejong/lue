@@ -24,9 +24,9 @@ namespace lue::api {
 
             ~Runtime();
 
-            virtual void startup() {};
+            virtual void startup(){};
 
-            virtual void shutdown() {};
+            virtual void shutdown(){};
 
         private:
 

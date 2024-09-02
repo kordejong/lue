@@ -134,6 +134,8 @@ namespace lue::api {
                 CommandLine command_line{};
                 runtime =
                     std::make_unique<PyRuntime>(command_line.argc(), command_line.argv(), configuration);
+                // TODO
+                (void)runtime->start();
             }
         }
 
@@ -148,16 +150,12 @@ namespace lue::api {
                 // API: release the GIL
                 pybind11::gil_scoped_release release;
 
+                // TODO
+                (void)runtime->stop();
                 runtime.reset();
 
                 lue_assert(!runtime);
             }
-        }
-
-
-        auto on_root_locality() -> bool
-        {
-            return hpx::find_here() == hpx::find_root_locality();
         }
 
     }  // Anonymous namespace
@@ -169,13 +167,13 @@ namespace lue::api {
 
         submodule.def("start_hpx_runtime", &start_hpx_runtime);
         submodule.def("stop_hpx_runtime", &stop_hpx_runtime);
-        submodule.def("on_root_locality", &on_root_locality);
+        submodule.def("on_root_locality", &Runtime::on_root_locality);
 
         bind_array(submodule);
         bind_field(submodule);
         bind_scalar(submodule);
 
-        // bind_io(submodule);
+        bind_io(submodule);
         bind_local_operations(submodule);
 
         // Unless the user calls stop_hpx_runtime explicitly, we will do it automatically upon module unload

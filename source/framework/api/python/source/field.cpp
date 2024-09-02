@@ -2,6 +2,9 @@
 #include <pybind11/operators.h>
 
 
+// TODO Add function to C++ api which returns the type name of a field as a string. Use this function in the
+//      __str__ / __repr__
+
 namespace lue::api {
 
     void bind_field(pybind11::module& module)

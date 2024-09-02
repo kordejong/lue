@@ -12,7 +12,7 @@ add_library(lue_py_framework_x SHARED
     source/array.cpp
     source/extension.cpp
     source/field.cpp
-    # source/io.cpp
+    source/io.cpp
     source/local_operation.cpp
     source/scalar.cpp
     source/stream.cpp

@@ -2,177 +2,78 @@ from ..lue_test import OperationTest, setUpModule, tearDownModule, test_case
 
 
 class AddTest(OperationTest):
-    # TODO
 
     @test_case
-    def test_add_raster_raster(self):
+    def test_add_array_array(self):
+        for type_ in self.numeric_types:
+            array = self.array[type_]
+            _ = array + array
+            array += array
+
+    @test_case
+    def test_add_array_scalar(self):
+        for type_ in self.numeric_types:
+            array = self.array[type_]
+            scalar = self.array[type_]
+
+            _ = array + scalar
+            array += scalar
+
+    @test_case
+    def test_add_scalar_array(self):
+        for type_ in self.numeric_types:
+            array = self.array[type_]
+            scalar = self.array[type_]
+
+            _ = scalar + array
+            scalar += array
+
+    @test_case
+    def test_add_scalar_scalar(self):
+        for type_ in self.numeric_types:
+            scalar = self.array[type_]
+
+            _ = scalar + scalar
+            scalar += scalar
+
+    @test_case
+    def test_add_array_value(self):
+        # TODO This only works in specific cases, where the type of value equals the type of the elements in
+        #      the array. Doc this in the Python-specific docs. Guideline: use Scalar.
         pass
-        # array_shape = (60, 40)
-        # element_type = np.int32
-        # fill_value = 5
+        # for type_ in self.numeric_types:
+        #     array = self.array[type_]
+        #     value = self.value[type_]
 
-        # Create field?
-        # Create array in lfrx
-        # Also test operators
+        #     _ = array + value
+        #     array += value
 
-        # raster1 = lfr.create_array(array_shape, element_type, fill_value)
-        # raster2 = lfr.create_array(array_shape, element_type, fill_value)
+    @test_case
+    def test_add_value_array(self):
+        pass
+        # for type_ in self.numeric_types:
+        #     array = self.array[type_]
+        #     value = self.value[type_]
 
-        # result = lfrx.add(raster1, raster2);
+        #     _ = value + array
+        #     value += array
 
-        # print(result)
+    @test_case
+    def test_add_scalar_value(self):
+        pass
+        # for type_ in self.numeric_types:
+        #     scalar = self.scalar[type_]
+        #     value = self.value[type_]
 
-        # TODO Mirror c++ tests
+        #     _ = scalar + value
+        #     scalar += value
 
-        # self.assertTrue(False)
+    @test_case
+    def test_add_value_scalar(self):
+        pass
+        # for type_ in self.numeric_types:
+        #     scalar = self.scalar[type_]
+        #     value = self.value[type_]
 
-        # for input_type in [
-        #     np.uint8,
-        #     np.uint32,
-        #     np.int32,
-        #     np.uint64,
-        #     np.int64,
-        #     np.float32,
-        #     np.float64,
-        # ]:
-        #     input_array = lfr.create_array(array_shape, input_type, fill_value)
-
-        #     for output_type in [
-        #         np.uint8,
-        #         np.uint32,
-        #         np.int32,
-        #         np.uint64,
-        #         np.int64,
-        #         np.float32,
-        #         np.float64,
-        #     ]:
-        #         _ = lfr.cast(input_array, output_type)
-
-
-# BOOST_AUTO_TEST_CASE(add_raster_raster)
-# {
-#     using Element = std::int32_t;
-#     using Raster = lue::PartitionedArray<Element, 2>;
-#
-#     lue::Field const raster1 = Raster{};
-#     lue::Field const raster2 = Raster{};
-#
-#     lue::Field result = lue::add(raster1, raster2);
-#
-#     BOOST_CHECK(std::holds_alternative<Raster>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_raster_scalar)
-# {
-#     using Element = std::int32_t;
-#     using Raster = lue::PartitionedArray<Element, 2>;
-#     using Scalar = lue::Scalar<Element>;
-#
-#     lue::Field const raster = Raster{};
-#     lue::Field const scalar = Scalar{};
-#
-#     lue::Field result = lue::add(raster, scalar);
-#
-#     BOOST_CHECK(std::holds_alternative<Raster>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_scalar_raster)
-# {
-#     using Element = std::int32_t;
-#     using Scalar = lue::Scalar<Element>;
-#     using Raster = lue::PartitionedArray<Element, 2>;
-#
-#     lue::Field const scalar = Scalar{};
-#     lue::Field const raster = Raster{};
-#
-#     lue::Field result = lue::add(scalar, raster);
-#
-#     BOOST_CHECK(std::holds_alternative<Raster>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_scalar_scalar)
-# {
-#     using Element = std::int32_t;
-#     using Scalar = lue::Scalar<Element>;
-#
-#     lue::Field const scalar1 = Scalar{};
-#     lue::Field const scalar2 = Scalar{};
-#
-#     lue::Field result = lue::add(scalar1, scalar2);
-#
-#     BOOST_CHECK(std::holds_alternative<Scalar>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_raster_value)
-# {
-#     using Element = std::int32_t;
-#     using Raster = lue::PartitionedArray<Element, 2>;
-#     using Element = Element;
-#
-#     lue::Field const raster = Raster{};
-#     lue::Field const value = Element{};
-#
-#     lue::Field result = lue::add(raster, value);
-#
-#     BOOST_CHECK(std::holds_alternative<Raster>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_value_raster)
-# {
-#     using Element = std::int32_t;
-#     using Raster = lue::PartitionedArray<std::int32_t, 2>;
-#
-#     lue::Field const value = Element{};
-#     lue::Field const raster = Raster{};
-#
-#     lue::Field result = lue::add(value, raster);
-#
-#     BOOST_CHECK(std::holds_alternative<Raster>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_scalar_value)
-# {
-#     using Element = std::int32_t;
-#     using Scalar = lue::Scalar<Element>;
-#
-#     lue::Field const scalar = Scalar{};
-#     lue::Field const value = Element{};
-#
-#     lue::Field result = lue::add(scalar, value);
-#
-#     BOOST_CHECK(std::holds_alternative<Scalar>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_value_scalar)
-# {
-#     using Element = std::int32_t;
-#     using Scalar = lue::Scalar<Element>;
-#
-#     lue::Field const scalar = Scalar{};
-#     lue::Field const value = Element{};
-#
-#     lue::Field result = lue::add(value, scalar);
-#
-#     BOOST_CHECK(std::holds_alternative<Scalar>(result));
-# }
-#
-#
-# BOOST_AUTO_TEST_CASE(add_value_value)
-# {
-#     using Element = std::int32_t;
-#     using Scalar = lue::Scalar<Element>;
-#
-#     lue::Field const value1 = Element{};
-#     lue::Field const value2 = Element{};
-#
-#     lue::Field result = lue::add(value1, value2);
-#
-#     BOOST_CHECK(std::holds_alternative<Scalar>(result));
-# }
+        #     _ = value + scalar
+        #     value += scalar

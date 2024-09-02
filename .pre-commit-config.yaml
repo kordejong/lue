@@ -1,11 +1,13 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+
+# Skip the files that must be kept as they are
 exclude: |
   (?x)^(
     environment/cmake/.*\.patch|
     environment/cmake/UseLATEX\.cmake|
     environment/cmake/conan-.*\.cmake|
-    source/view/imgui/include/lue/imgui/font/.*
+    source/view/imgui/include/lue/imgui/font/.*|
   )$
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks

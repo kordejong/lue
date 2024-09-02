@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE lue framework api cxx create_array
+#include "test_suite.hpp"
 #include "lue/framework/api/cxx/create_array.hpp"
-#include "lue/framework/test/hpx_unit_test.hpp"
-#include "lue/framework.hpp"
 
 
 BOOST_AUTO_TEST_CASE(create_array)
@@ -16,7 +15,6 @@ BOOST_AUTO_TEST_CASE(create_array)
 
     {
         lue::api::Field const fill_value = Element{};
-
         lue::api::Field result = lue::api::create_array(array_shape, partition_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
@@ -24,7 +22,6 @@ BOOST_AUTO_TEST_CASE(create_array)
 
     {
         lue::api::Field const fill_value = Scalar{};
-
         lue::api::Field result = lue::api::create_array(array_shape, partition_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
@@ -43,7 +40,6 @@ BOOST_AUTO_TEST_CASE(create_array_without_partition_shape)
 
     {
         lue::api::Field const fill_value = Element{};
-
         lue::api::Field result = lue::api::create_array(array_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
@@ -51,7 +47,6 @@ BOOST_AUTO_TEST_CASE(create_array_without_partition_shape)
 
     {
         lue::api::Field const fill_value = Scalar{};
-
         lue::api::Field result = lue::api::create_array(array_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));

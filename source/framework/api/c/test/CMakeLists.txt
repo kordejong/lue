@@ -1,4 +1,10 @@
-set(scope lue_framework_api_c)
+# add_library(lue_framework_api_c_test
+#     fixture.cpp
+# )
+#
+# add_library(lue::framework_api_c_test ALIAS lue_framework_api_c_test)
+#
+# set(scope lue_framework_api_c)
 
 set(names
     io
@@ -14,8 +20,8 @@ foreach(name ${names})
 
     target_link_libraries(${test_name}
         PRIVATE
+            # lue::framework_api_c_test
             lue::framework_api_c
-            lue::framework_test
             Boost::headers
     )
 

@@ -1,10 +1,11 @@
 #define BOOST_TEST_MODULE lue framework api c local_operation
+#include "test_suite.hpp"
 #include "lue/framework/api/c/local_operation.h"
-#include "lue/framework/test/hpx_unit_test.hpp"
 
 
-BOOST_AUTO_TEST_CASE(add_raster_raster)
+BOOST_AUTO_TEST_CASE(add_array_array)
 {
+    // TODO
     BOOST_CHECK(true);
 }
 

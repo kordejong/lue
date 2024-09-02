@@ -1,10 +1,25 @@
 #define BOOST_TEST_MODULE lue framework api cxx io
+#include "test_suite.hpp"
 #include "lue/framework/api/cxx/create_array.hpp"
 #include "lue/framework/api/cxx/io.hpp"
-#include "lue/framework/test/hpx_unit_test.hpp"
+#include "lue/gdal.hpp"
 
 
-BOOST_AUTO_TEST_CASE(round_trip)
+namespace {
+
+    struct Fixture
+    {
+
+            Fixture()
+            {
+                lue::gdal::register_gdal_drivers();
+            }
+    };
+
+}  // Anonymous namespace
+
+
+BOOST_FIXTURE_TEST_CASE(round_trip, Fixture)
 {
     using Element = std::int32_t;
     using Array = lue::PartitionedArray<Element, 2>;

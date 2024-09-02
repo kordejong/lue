@@ -1,10 +1,12 @@
 add_test_conditionally(test)
 
 add_library(lue_framework_api_c SHARED
+    src/c_runtime.cpp
     src/field.cpp
     src/future.cpp
     src/io.cpp
     src/local_operation.cpp
+    src/runtime.cpp
 )
 
 add_library(lue::framework_api_c ALIAS lue_framework_api_c)

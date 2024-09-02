@@ -8,7 +8,7 @@ set(local_operation_names
 set(names
     create_array
     create_scalar
-    # io
+    io
     ${local_operation_names}
 )
 
@@ -21,11 +21,17 @@ foreach(name ${names})
     target_link_libraries(${test_name}
         PRIVATE
             lue::framework_api_cxx
-            lue_framework_algorithm_test
+            lue::gdal
+            # lue_framework_algorithm_test
             # lue::framework_algorithm
             # lue::framework_global_operation  # unique
-            lue::framework_test
+            # lue::framework_test
             Boost::headers
+    )
+
+    target_include_directories(${test_name}
+        PRIVATE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 
     add_test(NAME ${test_name}

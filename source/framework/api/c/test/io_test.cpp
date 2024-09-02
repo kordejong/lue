@@ -18,8 +18,8 @@
 
 
 #define BOOST_TEST_MODULE lue framework api c io
+#include "test_suite.hpp"
 #include "lue/framework/api/c/io.h"
-#include "lue/framework/test/hpx_unit_test.hpp"
 
 
 BOOST_AUTO_TEST_CASE(round_trip)

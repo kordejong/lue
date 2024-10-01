@@ -1,6 +1,7 @@
 add_test_conditionally(test)
 
 add_library(lue_framework_api_c SHARED
+    src/array.cpp
     src/c_runtime.cpp
     src/field.cpp
     src/future.cpp

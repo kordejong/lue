@@ -5,7 +5,7 @@ sections = "FUTURE,STDLIB,THIRDPARTY,LUE,FIRSTPARTY,LOCALFOLDER"
 profile = "black"
 
 [tool.codespell]
-skip = "*.cpp,*.hpp,*.tex,*_test.py,pyproject.toml"
+skip = "*.cpp,*.cpp.in,*.hpp,*.hpp.in,*.tex,*_test.py,pyproject.toml"
 ignore-words-list = "nD"
 
 [tool.typos]

@@ -8,6 +8,7 @@ set(names
     index_util
     linear_curve
     math
+    merging_map
     shape
     span
 )

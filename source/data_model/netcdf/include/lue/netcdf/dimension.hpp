@@ -10,7 +10,7 @@ namespace lue::netcdf {
 
         public:
 
-            Dimension(int id);
+            Dimension(int dimension_id);
 
             Dimension(Dimension const& other) = delete;
 
@@ -21,6 +21,8 @@ namespace lue::netcdf {
             auto operator=(Dimension const& other) -> Dimension& = delete;
 
             auto operator=(Dimension&& other) noexcept -> Dimension&;
+
+            [[nodiscard]] auto id() const -> int;
 
         private:
 

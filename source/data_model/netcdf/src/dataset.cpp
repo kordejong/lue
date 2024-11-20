@@ -16,14 +16,15 @@ namespace lue::netcdf {
     auto Dataset::create(std::string const& name, int create_mode) -> Dataset
     {
         // TODO Force use of NC_NETCDF4?
-        int id{};
+        int dataset_id{};
 
-        if (int status = nc_create(name.c_str(), create_mode, &id); status != NC_NOERR)
+        if (int status = nc_create(name.c_str(), create_mode, &dataset_id); status != NC_NOERR)
         {
-            throw std::runtime_error(std::format("Cannot create {}: {}", name, error_message(status)));
+            throw std::runtime_error(
+                std::format("Cannot create dataset {}: {}", name, error_message(status)));
         }
 
-        return id;
+        return dataset_id;
     }
 
 
@@ -36,31 +37,30 @@ namespace lue::netcdf {
     */
     auto Dataset::open(std::string const& name, int open_mode) -> Dataset
     {
-        int id{};
+        int dataset_id{};
 
-        if (int status = nc_open(name.c_str(), open_mode, &id); status != NC_NOERR)
+        if (int status = nc_open(name.c_str(), open_mode, &dataset_id); status != NC_NOERR)
         {
-            throw std::runtime_error(std::format("Cannot open {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot open dataset {}: {}", name, error_message(status)));
         }
 
-        return id;
+        return dataset_id;
     }
 
 
-    Dataset::Dataset(int id):
+    Dataset::Dataset(int const dataset_id):
 
-        _id{id}
+        Group{dataset_id}
 
     {
-        // TODO Verify id is a valid ID of an open dataset. Don't create instances for invalid IDs.
     }
 
 
     Dataset::~Dataset() noexcept
     {
-        if (int status = nc_close(_id); status != NC_NOERR)
+        if (int status = nc_close(Group::id()); status != NC_NOERR)
         {
-            // TODO Can't throw here. Log an error?
+            // TODO Can't throw here. Log an error? Abort? Forget about it?
         }
     }
 

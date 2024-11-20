@@ -5,12 +5,13 @@
 
 namespace lue::netcdf {
 
-    Attribute::Attribute(int id):
+    Attribute::Attribute(int const group_id, std::string name):
 
-        _id{id}
+        _group_id{group_id},
+        _variable_id{NC_GLOBAL},
+        _name{std::move(name)}
 
     {
-        // TODO Verify id is a valid ID of an open attribute. Don't create instances for invalid IDs.
     }
 
 }  // namespace lue::netcdf

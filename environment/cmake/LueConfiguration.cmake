@@ -386,6 +386,7 @@ if(LUE_BUILD_DATA_MODEL)
     if(LUE_DATA_MODEL_WITH_UTILITIES)
         set(LUE_CXXOPTS_REQUIRED TRUE)
         set(LUE_GDAL_REQUIRED TRUE)
+        set(LUE_NETCDF_REQUIRED TRUE)
         set(LUE_NLOHMANN_JSON_REQUIRED TRUE)
     endif()
 
@@ -402,6 +403,7 @@ if(LUE_BUILD_FRAMEWORK)
     set(LUE_GDAL_REQUIRED TRUE)
     set(LUE_HPX_REQUIRED TRUE)
     set(LUE_MDSPAN_REQUIRED TRUE)
+    set(LUE_NETCDF_REQUIRED TRUE)
     set(LUE_PYTHON_REQUIRED TRUE)  # templatize.py
 
     # if(LUE_BUILD_HPX AND LUE_BUILD_OTF2 AND LUE_OTF2_WITH_PYTHON)
@@ -836,6 +838,7 @@ if(LUE_HDF5_REQUIRED)
     message(STATUS "HDF5_IS_THREADSAFE            : ${HDF5_IS_THREADSAFE}")
 endif()
 
+
 if(LUE_JUPYTER_BOOK_REQUIRED)
     find_package(JupyterBook REQUIRED)
 endif()
@@ -843,6 +846,11 @@ endif()
 
 if(LUE_MPI_REQUIRED)
     find_package(MPI REQUIRED)
+endif()
+
+if(LUE_NETCDF_REQUIRED)
+    find_package(netCDF REQUIRED)
+    message(STATUS "netCDF_HAS_PARALLEL           : ${netCDF_HAS_PARALLEL}")
 endif()
 
 

@@ -1,0 +1,11 @@
+#include "lue/netcdf/version.hpp"
+
+
+namespace lue::netcdf {
+
+    auto netcdf_version() -> std::string
+    {
+        return "${netCDF_VERSION}";
+    }
+
+}  // namespace lue::netcdf

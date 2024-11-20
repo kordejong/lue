@@ -10,7 +10,7 @@ namespace lue::netcdf {
 
         public:
 
-            Attribute(int id);
+            Attribute(int group_id, std::string name);
 
             Attribute(Attribute const& other) = delete;
 
@@ -24,7 +24,14 @@ namespace lue::netcdf {
 
         private:
 
-            int _id;
+            //! ID of the group
+            int _group_id;
+
+            //! ID of the variable
+            int _variable_id;
+
+            //! Name of the attribute
+            std::string _name;
     };
 
 }  // namespace lue::netcdf

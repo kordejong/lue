@@ -1,11 +1,21 @@
 #pragma once
+#include "lue/netcdf/group.hpp"
 #include <netcdf.h>
 #include <string>
 
 
 namespace lue::netcdf {
 
-    class Dataset
+    /*!
+        @brief      .
+        @param      .
+        @return     .
+        @exception  .
+
+        A Dataset is a Group: the root group. A dataset instance can be used anywhere a Group instance can be
+        used.
+    */
+    class Dataset: public Group
     {
 
         public:
@@ -14,7 +24,7 @@ namespace lue::netcdf {
 
             static auto open(std::string const& name, int open_mode = NC_NOWRITE) -> Dataset;
 
-            Dataset(int id);
+            Dataset(int dataset_id);
 
             Dataset(Dataset const& other) = delete;
 
@@ -27,8 +37,6 @@ namespace lue::netcdf {
             auto operator=(Dataset&& other) noexcept -> Dataset&;
 
         private:
-
-            int _id;
     };
 
 }  // namespace lue::netcdf

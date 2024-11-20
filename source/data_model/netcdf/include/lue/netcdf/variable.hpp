@@ -1,6 +1,5 @@
 #pragma once
 #include <netcdf.h>
-#include <string>
 
 
 namespace lue::netcdf {
@@ -10,7 +9,7 @@ namespace lue::netcdf {
 
         public:
 
-            Variable(int id);
+            Variable(int group_id, int variable_id);
 
             Variable(Variable const& other) = delete;
 
@@ -24,7 +23,11 @@ namespace lue::netcdf {
 
         private:
 
-            int _id;
+            //! ID of the group
+            int _group_id;
+
+            //! ID of the variable
+            int _variable_id;
     };
 
 }  // namespace lue::netcdf

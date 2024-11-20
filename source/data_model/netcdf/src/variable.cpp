@@ -1,16 +1,16 @@
 #include "lue/netcdf/variable.hpp"
-#include "lue/netcdf/error.hpp"
-#include <format>
+// #include "lue/netcdf/error.hpp"
+// #include <format>
 
 
 namespace lue::netcdf {
 
-    Variable::Variable(int id):
+    Variable::Variable(int const group_id, int const variable_id):
 
-        _id{id}
+        _group_id{group_id},
+        _variable_id{variable_id}
 
     {
-        // TODO Verify id is a valid ID of an open variable. Don't create instances for invalid IDs.
     }
 
 }  // namespace lue::netcdf

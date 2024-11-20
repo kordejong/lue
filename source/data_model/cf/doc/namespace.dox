@@ -1,0 +1,8 @@
+namespace lue {
+
+    /*!
+        @brief      Namespace containing all code related to the CF data model implementation
+    */
+    namespace cf {
+    }
+}

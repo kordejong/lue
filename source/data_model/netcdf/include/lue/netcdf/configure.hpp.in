@@ -1,0 +1,24 @@
+#pragma once
+
+
+#cmakedefine netCDF_HAS_PARALLEL
+
+
+namespace lue::netcdf {
+
+    class BuildOptions
+    {
+
+        public:
+
+            static constexpr bool netcdf_is_parallel{
+#ifdef netCDF_HAS_PARALLEL
+                    true
+#else
+                    false
+#endif
+                };
+
+        };
+
+} // namespace lue::netcdf

@@ -1,4 +1,4 @@
-#include "lue/netcdf/version.hpp"
+#include "lue/netcdf4/version.hpp"
 
 
 namespace lue::netcdf {

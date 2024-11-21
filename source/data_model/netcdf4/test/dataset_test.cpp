@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE lue netcdf dataset
-#include "lue/netcdf/dataset.hpp"
+#define BOOST_TEST_MODULE lue netcdf4 dataset
+#include "lue/netcdf4/dataset.hpp"
 #include <boost/test/included/unit_test.hpp>
 
 

@@ -1,6 +1,5 @@
-#include "lue/netcdf/group.hpp"
-#include "lue/netcdf/error.hpp"
-#include <format>
+#include "lue/netcdf4/group.hpp"
+#include "lue/netcdf4/error.hpp"
 #include <ranges>
 
 
@@ -55,30 +54,11 @@ namespace lue::netcdf {
             status != NC_NOERR)
         {
             throw std::runtime_error(
-                std::format("Cannot define variable {}: {}", name, error_message(status)));
+                fmt::format("Cannot define variable {}: {}", name, error_message(status)));
         }
 
         return {_id, variable_id};
     }
 
-
-    template<>
-    auto Group::put_attribute(std::string name, std::vector<int> const& values) -> Attribute
-    {
-        if (int status = nc_put_att_int(_id, NC_GLOBAL, name.c_str(), NC_INT, values.size(), values.data());
-            status != NC_NOERR)
-        {
-            throw std::runtime_error(std::format("Cannot put attribute {}: {}", name, error_message(status)));
-        }
-
-        // TODO
-        // An attribute is always:
-        // - A member of a group (global attribute)
-        // - A member of a variable (local attribute)
-        // An attribute always has a name
-        //
-        // This member returns a global attribute
-        return {_id, std::move(name)};
-    }
 
 }  // namespace lue::netcdf

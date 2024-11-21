@@ -1,4 +1,4 @@
-#include "lue/netcdf/error.hpp"
+#include "lue/netcdf4/error.hpp"
 #include <netcdf.h>
 
 

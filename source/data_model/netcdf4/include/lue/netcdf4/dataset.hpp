@@ -1,5 +1,5 @@
 #pragma once
-#include "lue/netcdf/group.hpp"
+#include "lue/netcdf4/group.hpp"
 #include <netcdf.h>
 #include <string>
 

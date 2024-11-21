@@ -3,8 +3,8 @@ list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/doc)
 add_subdirectory(hdf5)
 list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/hdf5)
 
-add_subdirectory(netcdf)
-list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/netcdf)
+add_subdirectory(netcdf4)
+list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/netcdf4)
 
 add_subdirectory(cf)
 list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/cf)

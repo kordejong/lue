@@ -1,6 +1,5 @@
 #pragma once
 #include <netcdf.h>
-#include <string>
 
 
 namespace lue::netcdf {

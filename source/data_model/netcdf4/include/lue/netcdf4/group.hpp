@@ -1,10 +1,7 @@
 #pragma once
-#include "lue/netcdf/attribute.hpp"
-#include "lue/netcdf/dimension.hpp"
-#include "lue/netcdf/variable.hpp"
-#include <netcdf.h>
-#include <string>
-#include <vector>
+#include "lue/netcdf4/attribute.hpp"
+#include "lue/netcdf4/dimension.hpp"
+#include "lue/netcdf4/variable.hpp"
 
 
 namespace lue::netcdf {
@@ -41,13 +38,16 @@ namespace lue::netcdf {
                 @exception  std::runtime_error In case the attribute cannot be written
             */
             template<typename T>
-            [[nodiscard]] auto put_attribute(std::string name, std::vector<T> const& values) -> Attribute;
+            [[nodiscard]] auto put_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            {
+                return Attribute::put_attribute(_id, NC_GLOBAL, std::move(name), values);
+            }
 
 
             template<typename T>
-            [[nodiscard]] auto put_attribute(std::string name, T const& value) -> Attribute
+            [[nodiscard]] auto put_attribute(std::string name, T&& value) -> Attribute
             {
-                return put_attribute(std::move(name), std::vector<T>{value});
+                return Attribute::put_attribute(_id, NC_GLOBAL, std::move(name), std::forward<T>(value));
             }
 
         private:

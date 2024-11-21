@@ -1,8 +1,8 @@
 add_test_conditionally(test)
 
 configure_file(
-    include/lue/netcdf/configure.hpp.in
-    include/lue/netcdf/configure.hpp
+    include/lue/netcdf4/configure.hpp.in
+    include/lue/netcdf4/configure.hpp
 )
 
 configure_file(
@@ -20,11 +20,11 @@ add_library(lue_netcdf STATIC
     ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
 )
 
-add_library(lue::netcdf ALIAS lue_netcdf)
+add_library(lue::netcdf4 ALIAS lue_netcdf)
 
 set_target_properties(lue_netcdf
     PROPERTIES
-        EXPORT_NAME netcdf
+        EXPORT_NAME netcdf4
 )
 
 target_include_directories(lue_netcdf
@@ -41,15 +41,13 @@ target_sources(lue_netcdf
             ${CMAKE_CURRENT_BINARY_DIR}/include
         FILES
             include/lue
-            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/netcdf/configure.hpp
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/netcdf4/configure.hpp
 )
 
 target_link_libraries(lue_netcdf
     PUBLIC
         lue::shared
         netCDF::netcdf
-    # PRIVATE
-    #     Boost::headers
 )
 
 lue_install_development_libraries(

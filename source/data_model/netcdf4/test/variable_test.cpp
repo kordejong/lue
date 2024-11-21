@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE lue netcdf variable
-#include "lue/netcdf/variable.hpp"
+#define BOOST_TEST_MODULE lue netcdf4 variable
+#include "lue/netcdf4/variable.hpp"
 #include <boost/test/included/unit_test.hpp>
 
 

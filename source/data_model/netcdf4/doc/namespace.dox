@@ -4,6 +4,6 @@ namespace lue {
         @brief      Namespace containing a nicer API around the netCDF C-API and additional
                     code that makes working with the netCDF library a nicer experience
     */
-    namespace netcdf {
+    namespace netcdf4 {
     }
 }

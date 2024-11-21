@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE lue netcdf group
-#include "lue/netcdf/group.hpp"
+#define BOOST_TEST_MODULE lue netcdf4 attribute
+#include "lue/netcdf4/attribute.hpp"
 #include <boost/test/included/unit_test.hpp>
 
 

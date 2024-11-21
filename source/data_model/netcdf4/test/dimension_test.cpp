@@ -1,5 +1,5 @@
-#define BOOST_TEST_MODULE lue netcdf dimension
-#include "lue/netcdf/dimension.hpp"
+#define BOOST_TEST_MODULE lue netcdf4 dimension
+#include "lue/netcdf4/dimension.hpp"
 #include <boost/test/included/unit_test.hpp>
 
 

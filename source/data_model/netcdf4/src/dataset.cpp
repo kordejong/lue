@@ -1,5 +1,6 @@
 #include "lue/netcdf4/dataset.hpp"
 #include "lue/netcdf4/error.hpp"
+#include <fmt/format.h>
 
 
 namespace lue::netcdf {
@@ -7,16 +8,14 @@ namespace lue::netcdf {
     /*!
         @brief      Create dataset
         @param      name Name of dataset
-        @param      create_mode One of NC_CLOBBER, NC_NOCLOBBER, NC_64BIT_OFFSET, NC_64BIT_DATA,
-                    NC_DISKLESS, NC_PERSIST. To force the use of netCDF4 format, create mode NC_NETCDF4 is
-                    added unconditionally, so the caller doesn't have to.
-        @return     Created dataset
+        @param      create_mode One of NC_CLOBBER, NC_NOCLOBBER, NC_DISKLESS, NC_PERSIST. To force the use
+                    of netCDF4 format, create mode NC_NETCDF4 is added unconditionally, so the caller doesn't
+                    have to.
+        @return     Created dataset, in define mode
         @exception  std::runtime_error In case the dataset cannot be created
     */
     auto Dataset::create(std::string const& name, int create_mode) -> Dataset
     {
-        // TODO Figure out which create modes we want to support. Get rid of the others. Throw if they are
-        //      passed anyway.
         create_mode |= NC_NETCDF4;
 
         int dataset_id{};
@@ -35,7 +34,7 @@ namespace lue::netcdf {
         @brief      Open dataset
         @param      open_mode NC_NOWRITE, NC_WRITE, NC_SHARE, NC_WRITE | NC_SHARE
         @param      name Name of dataset
-        @return     Open dataset
+        @return     Open dataset, in define mode if @a open_mode contains NC_WRITE
         @exception  std::runtime_error In case the dataset cannot be opened
     */
     auto Dataset::open(std::string const& name, int open_mode) -> Dataset
@@ -66,5 +65,18 @@ namespace lue::netcdf {
             // TODO Can't throw here. Log an error? Abort? Forget about it?
         }
     }
+
+
+    // /*!
+    //     @brief      Leave define mode
+    //     @exception  std::runtime_error In case define mode cannot be left
+    // */
+    // void Dataset::end_define()
+    // {
+    //     if (int status = nc_enddef(Group::id()); status != NC_NOERR)
+    //     {
+    //         throw std::runtime_error(fmt::format("Cannot leave define mode: {}", error_message(status)));
+    //     }
+    // }
 
 }  // namespace lue::netcdf

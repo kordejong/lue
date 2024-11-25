@@ -3,6 +3,9 @@ namespace lue {
     /*!
         @brief      Namespace containing a nicer API around the netCDF C-API and additional
                     code that makes working with the netCDF library a nicer experience
+
+        The library focuses on performing I/O to netCDF-4 format files. Other netCDF file formats are not
+        (explicitly) supported.
     */
     namespace netcdf4 {
     }

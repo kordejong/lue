@@ -36,6 +36,9 @@ namespace lue::netcdf {
 
             auto operator=(Dataset&& other) noexcept -> Dataset&;
 
+            // Not needed for netCDF-4 format files
+            // void end_define();
+
         private:
     };
 

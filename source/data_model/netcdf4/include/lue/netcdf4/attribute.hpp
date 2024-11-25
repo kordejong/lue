@@ -38,7 +38,7 @@ namespace lue::netcdf {
         public:
 
             template<typename T>
-            static auto put_attribute(
+            static auto add_attribute(
                 int const group_id, int const variable_id, std::string name, std::vector<T> const& values)
                 -> Attribute
             {
@@ -53,10 +53,10 @@ namespace lue::netcdf {
             }
 
             template<typename T>
-            static auto put_attribute(int const group_id, int const variable_id, std::string name, T&& value)
+            static auto add_attribute(int const group_id, int const variable_id, std::string name, T&& value)
                 -> Attribute
             {
-                return put_attribute(
+                return add_attribute(
                     group_id, variable_id, std::move(name), std::vector<T>{std::forward<T>(value)});
             }
 

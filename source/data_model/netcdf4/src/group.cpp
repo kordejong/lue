@@ -19,6 +19,55 @@ namespace lue::netcdf {
     }
 
 
+    auto Group::add_dimension(std::string const& name, size_t const length) const -> Dimension
+    {
+        int dimension_id{};
+
+        if (int status = nc_def_dim(_id, name.c_str(), length, &dimension_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                fmt::format("Cannot define dimension {}: {}", name, error_message(status)));
+        }
+
+        return {_id, dimension_id};
+    }
+
+
+    auto Group::has_dimension(std::string const& name) const -> bool
+    {
+        int dimension_id{};
+
+        return nc_inq_dimid(_id, name.c_str(), &dimension_id) == NC_NOERR;
+    }
+
+
+    auto Group::dimension(std::string const& name) const -> Dimension
+    {
+        int dimension_id{};
+
+        if (int status = nc_inq_dimid(_id, name.c_str(), &dimension_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get dimension {}: {}", name, error_message(status)));
+        }
+
+        return {_id, dimension_id};
+    }
+
+
+    auto Group::nr_dimensions() const -> int
+    {
+        int nr_dimensions{0};
+
+        if (int status = nc_inq_ndims(_id, &nr_dimensions); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                fmt::format("Cannot get number of dimensions: {}", error_message(status)));
+        }
+
+        return nr_dimensions;
+    }
+
+
     /*!
         @brief      Define a variable
         @param      name Variable name
@@ -27,7 +76,7 @@ namespace lue::netcdf {
         @return     Defined variable
         @exception  std::runtime_error In case the variable cannot be defined
     */
-    auto Group::define_variable(
+    auto Group::add_variable(
         std::string const& name,
         nc_type const data_type,
         std::vector<Dimension> const& dimensions) const -> Variable
@@ -60,5 +109,44 @@ namespace lue::netcdf {
         return {_id, variable_id};
     }
 
+
+    /*!
+        @brief      Define a sub-group
+        @param      .
+        @return     .
+        @exception  .
+    */
+    auto Group::add_sub_group(std::string const& name) const -> Group
+    {
+        int group_id{};
+
+        if (int status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot define group {}: {}", name, error_message(status)));
+        }
+
+        return group_id;
+    }
+
+
+    auto Group::has_sub_group(std::string const& name) const -> bool
+    {
+        int group_id{};
+
+        return nc_inq_grp_ncid(_id, name.c_str(), &group_id) == NC_NOERR;
+    }
+
+
+    auto Group::sub_group(std::string const& name) const -> Group
+    {
+        int group_id{};
+
+        if (int status = nc_inq_grp_ncid(_id, name.c_str(), &group_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get sub-group {}: {}", name, error_message(status)));
+        }
+
+        return group_id;
+    }
 
 }  // namespace lue::netcdf

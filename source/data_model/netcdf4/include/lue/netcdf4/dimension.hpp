@@ -1,5 +1,6 @@
 #pragma once
 #include <netcdf.h>
+#include <string>
 
 
 namespace lue::netcdf {
@@ -9,7 +10,7 @@ namespace lue::netcdf {
 
         public:
 
-            Dimension(int dimension_id);
+            Dimension(int group_id, int dimension_id);
 
             Dimension(Dimension const& other) = delete;
 
@@ -23,9 +24,17 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto id() const -> int;
 
+            [[nodiscard]] auto name() const -> std::string;
+
+            [[nodiscard]] auto length() const -> std::size_t;
+
         private:
 
-            int _id;
+            //! ID of the group
+            int _group_id;
+
+            //! ID of the variable
+            int _dimension_id;
     };
 
 }  // namespace lue::netcdf

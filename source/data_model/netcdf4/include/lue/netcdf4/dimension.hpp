@@ -12,15 +12,15 @@ namespace lue::netcdf {
 
             Dimension(int group_id, int dimension_id);
 
-            Dimension(Dimension const& other) = delete;
+            Dimension(Dimension const& other) = default;
 
-            Dimension(Dimension&& other) noexcept;
+            Dimension(Dimension&& other) noexcept = default;
 
             ~Dimension() = default;
 
-            auto operator=(Dimension const& other) -> Dimension& = delete;
+            auto operator=(Dimension const& other) -> Dimension& = default;
 
-            auto operator=(Dimension&& other) noexcept -> Dimension&;
+            auto operator=(Dimension&& other) noexcept -> Dimension& = default;
 
             [[nodiscard]] auto id() const -> int;
 

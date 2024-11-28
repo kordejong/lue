@@ -67,5 +67,24 @@ BOOST_AUTO_TEST_CASE(variable)
 
     auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
 
-    // auto variable = dataset.add_variable("variable1", NC_INT, dimensions);
+    {
+        auto dimension1 = dataset.add_dimension("dimension1", 6);
+        auto dimension2 = dataset.add_dimension("dimension2", 4);
+        auto variable1 = dataset.add_variable(
+            "variable1", NC_INT, std::vector<lue::netcdf::Dimension>{dimension1, dimension2});
+    }
+
+    BOOST_REQUIRE(dataset.has_variable("variable1"));
+    auto variable1 = dataset.variable("variable1");
+    BOOST_CHECK_EQUAL(variable1.type(), NC_INT);
+
+    auto variables = dataset.variables();
+    BOOST_CHECK_EQUAL(variables.size(), 1);
+    BOOST_CHECK_EQUAL(variables[0].name(), "variable1");
+    BOOST_CHECK_EQUAL(variables[0].type(), NC_INT);
+
+    auto dimensions = variable1.dimensions();
+    BOOST_CHECK_EQUAL(dimensions.size(), 2);
+    BOOST_CHECK_EQUAL(dimensions[0].name(), "dimension1");
+    BOOST_CHECK_EQUAL(dimensions[1].name(), "dimension2");
 }

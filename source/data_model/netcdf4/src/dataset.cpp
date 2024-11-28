@@ -1,6 +1,7 @@
 #include "lue/netcdf4/dataset.hpp"
 #include "lue/netcdf4/error.hpp"
 #include <fmt/format.h>
+#include <cassert>
 
 
 namespace lue::netcdf {
@@ -12,11 +13,25 @@ namespace lue::netcdf {
                     of netCDF4 format, create mode NC_NETCDF4 is added unconditionally, so the caller doesn't
                     have to.
         @return     Created dataset, in define mode
-        @exception  std::runtime_error In case the dataset cannot be created
+        @exception  std::runtime_error In case @a create_mode is not compatible with netCDF-4 format or in
+                    case the dataset cannot be created
     */
     auto Dataset::create(std::string const& name, int create_mode) -> Dataset
     {
         create_mode |= NC_NETCDF4;
+
+        // if(create_mode &
+        //
+        // NC_SHARE
+        // NC_64BIT_OFFSET
+        // NC_64BIT_DATA
+        // NC_CLASSIC_MODEL
+        //
+        // TODO Throw exception, invalid format
+        //
+        // NC_MMAP
+        //
+        // TODO Throw exception, deprecated create_mode
 
         int dataset_id{};
 
@@ -58,11 +73,23 @@ namespace lue::netcdf {
     }
 
 
+    Dataset::Dataset(Dataset&& other) noexcept:
+
+        Group{std::move(other)}
+
+    {
+        assert(id() < 0);
+    }
+
+
     Dataset::~Dataset() noexcept
     {
-        if (int status = nc_close(Group::id()); status != NC_NOERR)
+        if (Group::id() >= 0)
         {
-            // TODO Can't throw here. Log an error? Abort? Forget about it?
+            if (int status = nc_close(Group::id()); status != NC_NOERR)
+            {
+                // TODO Can't throw here. Log an error? Abort? Forget about it?
+            }
         }
     }
 

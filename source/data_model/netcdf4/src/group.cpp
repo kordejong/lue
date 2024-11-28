@@ -13,6 +13,13 @@ namespace lue::netcdf {
     }
 
 
+    Group::Group(Group&& other) noexcept:
+        _id{other._id}
+    {
+        other._id = -1;
+    }
+
+
     auto Group::id() const -> int
     {
         return _id;
@@ -75,6 +82,8 @@ namespace lue::netcdf {
         @param      dimensions Variable dimensions
         @return     Defined variable
         @exception  std::runtime_error In case the variable cannot be defined
+
+        A default fill value will be set (as per netCDF convention), which is dependent on the data type.
     */
     auto Group::add_variable(
         std::string const& name,
@@ -85,7 +94,7 @@ namespace lue::netcdf {
 
         // TODO C++23
         // auto dimension_ids = dimensions
-        //     | std::views::transform([](auto const& dimension) { return dimension.id(); })
+        //     | std::views::transform(...)
         //     | std::ranges::to<std::vector>();
 
         auto dimension_ids_view =
@@ -106,7 +115,65 @@ namespace lue::netcdf {
                 fmt::format("Cannot define variable {}: {}", name, error_message(status)));
         }
 
+        Variable variable{_id, variable_id};
+
+        // If this fails, update the doc
+        assert(variable.has_fill_value());
+
+        return variable;
+    }
+
+
+    auto Group::has_variable(std::string const& name) const -> bool
+    {
+        int variable_id{};
+
+        return nc_inq_varid(_id, name.c_str(), &variable_id) == NC_NOERR;
+    }
+
+
+    auto Group::variable(std::string const& name) const -> Variable
+    {
+        int variable_id{};
+
+        if (int status = nc_inq_varid(_id, name.c_str(), &variable_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get variable {}: {}", name, error_message(status)));
+        }
+
         return {_id, variable_id};
+    }
+
+
+    auto Group::variables() const -> std::vector<Variable>
+    {
+        int nr_variables{0};
+
+        if (int status = nc_inq_varids(_id, &nr_variables, nullptr); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                fmt::format("Cannot get number of variables: {}", error_message(status)));
+        }
+
+        std::vector<int> variable_ids(nr_variables);
+
+        if (int status = nc_inq_varids(_id, nullptr, variable_ids.data()); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get variable IDs: {}", error_message(status)));
+        }
+
+        // TODO C++23
+        // auto variables = variable_ids
+        //     | std::views::transform(...)
+        //     | std::ranges::to<std::vector>();
+
+        auto variables_view =
+            variable_ids | std::views::transform([group_id = _id](auto const variable_id)
+                                                 { return Variable{group_id, variable_id}; });
+
+        std::vector<Variable> variables(variables_view.begin(), variables_view.end());
+
+        return variables;
     }
 
 

@@ -19,7 +19,7 @@ namespace lue::netcdf {
 
             ~Group() = default;
 
-            auto operator=(Group const& other) -> Group& = delete;
+            auto operator=(Group const& other) -> Group& = delete;  // TODO
 
             auto operator=(Group&& other) noexcept -> Group&;
 
@@ -36,7 +36,13 @@ namespace lue::netcdf {
             [[nodiscard]] auto add_variable(
                 std::string const& name,
                 nc_type data_type,
-                std::vector<Dimension> const& dimensions) const -> Variable;
+                std::vector<Dimension> const& dimensions = {}) const -> Variable;
+
+            [[nodiscard]] auto has_variable(std::string const& name) const -> bool;
+
+            [[nodiscard]] auto variable(std::string const& name) const -> Variable;
+
+            [[nodiscard]] auto variables() const -> std::vector<Variable>;
 
             /*!
                 @brief      Write a global attribute to the group

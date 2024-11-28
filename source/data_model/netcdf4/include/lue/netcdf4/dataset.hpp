@@ -34,7 +34,7 @@ namespace lue::netcdf {
 
             auto operator=(Dataset const& other) -> Dataset& = delete;
 
-            auto operator=(Dataset&& other) noexcept -> Dataset&;
+            auto operator=(Dataset&& other) noexcept -> Dataset& = delete;  // TODO
 
             // Not needed for netCDF-4 format files
             // void end_define();

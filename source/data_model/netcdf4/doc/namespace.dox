@@ -1,12 +1,17 @@
 namespace lue {
 
     /*!
-        @brief      Namespace containing a nicer API around the netCDF C-API and additional
-                    code that makes working with the netCDF library a nicer experience
+        @brief      Namespace containing an API around the netCDF C-API and additional code that makes working
+                    with the netCDF library from C++ a nicer experience
 
         The library focuses on performing I/O to netCDF-4 format files. Other netCDF file formats are not
-        (explicitly) supported.
+        supported.
+
+        More information about netCDF can be found online:
+
+        - [Homepage](https://www.unidata.ucar.edu/software/netcdf/)
+        - [C-API](https://docs.unidata.ucar.edu/netcdf-c/current/index.html)
     */
-    namespace netcdf4 {
+    namespace netcdf {
     }
 }

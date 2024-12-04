@@ -65,6 +65,47 @@ namespace lue::netcdf {
     }
 
 
+    auto Dataset::format_as_string(int format) -> std::string
+    {
+        std::string string{};
+
+        switch (format)
+        {
+            case NC_FORMAT_CLASSIC:
+            {
+                string = "NC_FORMAT_CLASSIC";
+                break;
+            }
+            case NC_FORMAT_64BIT_OFFSET:
+            {
+                string = "NC_FORMAT_64BIT_OFFSET";
+                break;
+            }
+            case NC_FORMAT_CDF5:
+            {
+                string = "NC_FORMAT_CDF5";
+                break;
+            }
+            case NC_FORMAT_NETCDF4:
+            {
+                string = "NC_FORMAT_NETCDF4";
+                break;
+            }
+            case NC_FORMAT_NETCDF4_CLASSIC:
+            {
+                string = "NC_FORMAT_NETCDF4_CLASSIC";
+                break;
+            }
+            default:
+            {
+                throw std::runtime_error(fmt::format("Unknown format with ID: {}", format));
+            }
+        }
+
+        return string;
+    }
+
+
     Dataset::Dataset(int const dataset_id):
 
         Group{dataset_id}
@@ -78,13 +119,13 @@ namespace lue::netcdf {
         Group{std::move(other)}
 
     {
-        assert(id() < 0);
+        assert(!other.id_is_valid());
     }
 
 
     Dataset::~Dataset() noexcept
     {
-        if (Group::id() >= 0)
+        if (Group::id_is_valid())
         {
             if (int status = nc_close(Group::id()); status != NC_NOERR)
             {
@@ -105,5 +146,47 @@ namespace lue::netcdf {
     //         throw std::runtime_error(fmt::format("Cannot leave define mode: {}", error_message(status)));
     //     }
     // }
+
+    auto Dataset::release() -> int
+    {
+        return reset_id();
+    }
+
+
+    /*!
+        @brief      Return the path (or opendap URL) of the dataset
+        @exception  std::runtime_error In case the path cannot be obtained
+    */
+    auto Dataset::path() const -> std::string
+    {
+        std::size_t nr_bytes{0};
+
+        if (int status = nc_inq_path(id(), &nr_bytes, nullptr); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get path length: {}", error_message(status)));
+        }
+
+        std::string name(nr_bytes, 'x');
+
+        if (int status = nc_inq_path(id(), nullptr, name.data()); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get path: {}", error_message(status)));
+        }
+
+        return name;
+    }
+
+
+    auto Dataset::format() const -> int
+    {
+        int format{0};
+
+        if (int status = nc_inq_format(id(), &format); status != NC_NOERR)
+        {
+            throw std::runtime_error(fmt::format("Cannot get format: {}", error_message(status)));
+        }
+
+        return format;
+    }
 
 }  // namespace lue::netcdf

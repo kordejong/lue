@@ -92,4 +92,18 @@ namespace lue::netcdf {
         return fill_mode == NC_FILL;
     }
 
+
+    auto Variable::has_attribute(std::string const& name) const -> bool
+    {
+        int attribute_id{};
+
+        return nc_inq_attid(_group_id, _variable_id, name.c_str(), &attribute_id) == NC_NOERR;
+    }
+
+
+    auto Variable::attribute(std::string name) const -> Attribute
+    {
+        return {_group_id, _variable_id, std::move(name)};
+    }
+
 }  // namespace lue::netcdf

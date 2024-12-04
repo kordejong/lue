@@ -16,6 +16,7 @@ configure_file(
 add_library(lue_shared STATIC
     ${CMAKE_CURRENT_BINARY_DIR}/src/git.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
+    src/string.cpp
 )
 
 add_library(lue::shared ALIAS lue_shared)

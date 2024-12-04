@@ -86,18 +86,23 @@ namespace lue::netcdf {
                 @exception  std::runtime_error In case the attribute cannot be written
             */
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
             {
                 return Attribute::add_attribute(_group_id, _variable_id, std::move(name), values);
             }
 
 
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, T&& value) -> Attribute
+            auto add_attribute(std::string name, T&& value) -> Attribute
             {
                 return Attribute::add_attribute(
                     _group_id, _variable_id, std::move(name), std::forward<T>(value));
             }
+
+
+            [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
+
+            [[nodiscard]] auto attribute(std::string name) const -> Attribute;
 
 
             template<Arithmetic T>

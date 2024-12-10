@@ -104,6 +104,8 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto attribute(std::string name) const -> Attribute;
 
+            [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
+
 
             template<Arithmetic T>
             void write(T const& value)

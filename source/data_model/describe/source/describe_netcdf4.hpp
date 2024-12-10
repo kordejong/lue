@@ -1,11 +1,10 @@
 #pragma once
 #include "lue/netcdf4.hpp"
-#include <string>
-#include <vector>
+#include <nlohmann/json.hpp>
 
 
-namespace lue::utility {
+namespace lue::netcdf {
 
-    auto describe_netcdf4_dataset(netcdf::Dataset const& dataset) -> std::vector<std::string>;
+    void to_json(nlohmann::ordered_json& json, Dataset const& dataset);
 
-}  // namespace lue::utility
+}  // namespace lue::netcdf

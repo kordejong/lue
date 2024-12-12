@@ -1,11 +1,9 @@
-#include "lue/framework/io/raster.hpp"
+#include "lue/framework/io/gdal.hpp"
 #include "lue/framework/algorithm/create_partitioned_array.hpp"
 #include "lue/framework/algorithm/policy.hpp"
 #include "lue/framework/core/annotate.hpp"
 #include "lue/framework/core/assert.hpp"
 #include "lue/gdal.hpp"
-// #include "lue/framework/algorithm/policy/all_values_within_domain.hpp"
-// #include "lue/framework/algorithm/policy/default_value_policies.hpp"
 #include <hpx/async_colocated/get_colocation_id.hpp>
 #include <hpx/async_combinators/when_any.hpp>
 #include <hpx/components/get_ptr.hpp>
@@ -14,7 +12,7 @@
 
 
 namespace lue {
-    namespace policy::read {
+    namespace policy::from_gdal {
 
         template<typename Element>
         using DefaultPolicies = policy::
@@ -75,7 +73,7 @@ namespace lue {
         };
 
 
-    }  // namespace policy::read
+    }  // namespace policy::from_gdal
 
 
     namespace {
@@ -395,7 +393,7 @@ namespace lue {
 
 
     template<typename Element>
-    auto read(std::string const& name, Shape<Count, 2> const& partition_shape) -> PartitionedArray<Element, 2>
+    auto from_gdal(std::string const& name, Shape<Count, 2> const& partition_shape) -> PartitionedArray<Element, 2>
     {
         if constexpr (!gdal::supports<Element>())
         {
@@ -438,7 +436,7 @@ namespace lue {
             {
                 // No no-data value is set in the band. Don't bother with no-data.
 
-                using Policies = policy::read::DefaultPolicies<Element>;
+                using Policies = policy::from_gdal::DefaultPolicies<Element>;
                 Policies policies{};
                 return create_partitioned_array(policies, array_shape, partition_shape, Functor{name});
             }
@@ -451,14 +449,14 @@ namespace lue {
                 {
                     // No-data value is a NaN. This is what LUE uses as no-data for floating point
                     // by default.
-                    using Policies = policy::read::ValuePolicies<Element>;
+                    using Policies = policy::from_gdal::ValuePolicies<Element>;
                     Policies policies{};
                     return create_partitioned_array(policies, array_shape, partition_shape, Functor{name});
                 }
                 else
                 {
                     // No-data value is not NaN. Use a special no-data policy for this special value.
-                    using Policies = policy::read::SpecialValuePolicy<Element>;
+                    using Policies = policy::from_gdal::SpecialValuePolicy<Element>;
                     Policies policies{no_data_value};
                     return create_partitioned_array(policies, array_shape, partition_shape, Functor{name});
                 }
@@ -609,7 +607,7 @@ namespace lue {
 {% for Element in Elements %}
     {% for rank in ranks %}
 
-        template lue::PartitionedArray<{{ Element }}, {{ rank }}> lue::read<{{ Element }}>(
+        template lue::PartitionedArray<{{ Element }}, {{ rank }}> lue::from_gdal<{{ Element }}>(
             std::string const&, lue::Shape<lue::Count, {{ rank }}> const&);
 
         template hpx::future<void> lue::write<{{ Element }}>(

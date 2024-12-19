@@ -6,18 +6,19 @@ configure_file(
 )
 
 configure_file(
-    src/version.cpp.in
-    src/version.cpp
+    source/version.cpp.in
+    source/version.cpp
 )
 
 add_library(lue_netcdf STATIC
-    src/attribute.cpp
-    src/dataset.cpp
-    src/dimension.cpp
-    src/error.cpp
-    src/group.cpp
-    src/variable.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
+    source/attribute.cpp
+    source/dataset.cpp
+    source/dimension.cpp
+    source/error.cpp
+    source/group.cpp
+    source/type.cpp
+    source/variable.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/source/version.cpp
 )
 
 add_library(lue::netcdf4 ALIAS lue_netcdf)

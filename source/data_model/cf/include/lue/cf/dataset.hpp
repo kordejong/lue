@@ -16,6 +16,8 @@ namespace lue::cf {
             Dataset(int dataset_id);
 
             Dataset(netcdf::Dataset&& dataset);
+
+            [[nodiscard]] auto version() const -> double;
     };
 
 }  // namespace lue::cf

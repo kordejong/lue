@@ -1,7 +1,9 @@
 add_test_conditionally(test)
 
 add_library(lue_cf STATIC
-    src/dataset.cpp
+    source/dataset.cpp
+    source/dimension.cpp
+    source/variable.cpp
 )
 
 add_library(lue::cf ALIAS lue_cf)

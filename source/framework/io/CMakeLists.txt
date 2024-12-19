@@ -8,17 +8,18 @@ block()
 
     generate_template_instantiation(
         INPUT_PATHNAME
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/gdal.cpp.in"
+            "${CMAKE_CURRENT_SOURCE_DIR}/source/gdal.cpp.in"
         OUTPUT_PATHNAME
-            "${CMAKE_CURRENT_BINARY_DIR}/src/gdal.cpp"
+            "${CMAKE_CURRENT_BINARY_DIR}/source/gdal.cpp"
         DICTIONARY
             '{"Elements":[${Elements}],"ranks":[${LUE_FRAMEWORK_RANKS}]}'
     )
 endblock()
 
 add_library(lue_framework_io
-    src/util.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/src/gdal.cpp
+    source/dataset.cpp
+    source/util.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/source/gdal.cpp
 )
 
 add_library(lue::framework_io ALIAS lue_framework_io)

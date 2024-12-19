@@ -4,26 +4,26 @@
 #include <boost/test/included/unit_test.hpp>
 
 
-BOOST_AUTO_TEST_CASE(sub_group)
+BOOST_AUTO_TEST_CASE(child)
 {
-    std::string const dataset_name = "group_sub_group.nc";
+    std::string const dataset_name = "group_child_group.nc";
 
     {
         auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
-        auto group1 = dataset.add_group("sub_group1");
-        [[maybe_unused]] auto group2 = group1.add_group("sub_group2");
+        auto group1 = dataset.add_child_group("child_group1");
+        [[maybe_unused]] auto group2 = group1.add_child_group("child_group2");
     }
 
     {
         auto dataset = lue::netcdf::Dataset::open(dataset_name);
 
-        BOOST_CHECK(dataset.has_group("sub_group1"));
-        BOOST_CHECK(!dataset.has_group("sub_group2"));
+        BOOST_CHECK(dataset.has_child_group("child_group1"));
+        BOOST_CHECK(!dataset.has_child_group("child_group2"));
 
-        auto group1 = dataset.group("sub_group1");
+        auto group1 = dataset.child_group("child_group1");
 
-        BOOST_CHECK(!group1.has_group("sub_group1"));
-        BOOST_CHECK(group1.has_group("sub_group2"));
+        BOOST_CHECK(!group1.has_child_group("child_group1"));
+        BOOST_CHECK(group1.has_child_group("child_group2"));
     }
 }
 

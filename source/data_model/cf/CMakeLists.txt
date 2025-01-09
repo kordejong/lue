@@ -3,6 +3,7 @@ add_test_conditionally(test)
 add_library(lue_cf STATIC
     source/dataset.cpp
     source/dimension.cpp
+    source/group.cpp
     source/variable.cpp
 )
 

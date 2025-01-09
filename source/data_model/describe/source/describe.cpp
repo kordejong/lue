@@ -23,6 +23,15 @@ options:
 )",
             "lue_describe");
 
+
+        // TODO
+        // auto options() -> cxxopts::Options
+        // {
+        //     cxxopts::Options options("lue_describe", "Describe a dataset");
+
+        //     return options;
+        // }
+
     }  // Anonymous namespace
 
 
@@ -32,6 +41,15 @@ options:
 
     {
     }
+
+
+    // TODO
+    // Describe::Describe(int argc, char const* argv[])
+
+    //     : Application{options(), argc, argv}
+
+    // {
+    // }
 
 
     auto Describe::run_implementation() -> int

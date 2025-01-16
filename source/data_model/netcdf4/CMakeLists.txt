@@ -16,6 +16,7 @@ add_library(lue_netcdf STATIC
     source/dimension.cpp
     source/error.cpp
     source/group.cpp
+    source/hyperslab.cpp
     source/type.cpp
     source/variable.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/source/version.cpp

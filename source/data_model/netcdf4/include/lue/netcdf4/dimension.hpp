@@ -5,6 +5,9 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      A class for representing dimensions
+    */
     class Dimension
     {
 

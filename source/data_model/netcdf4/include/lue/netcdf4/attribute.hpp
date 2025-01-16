@@ -10,7 +10,6 @@
 
 
 namespace lue::netcdf {
-
     namespace detail {
 
         template<typename T>
@@ -283,6 +282,10 @@ namespace lue::netcdf {
 
     }  // namespace detail
 
+
+    /*!
+        @brief      Class for representing attributes
+    */
     class Attribute
     {
 

@@ -594,6 +594,7 @@ namespace lue::netcdf {
                 return value;
             }
 
+
             /*!
                 @brief      Write an attribute to the variable
                 @param      name Name of attribute

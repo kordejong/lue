@@ -22,6 +22,7 @@ namespace lue::cf {
                 // auxiliary_coordinate,
                 // scalar_coordinate,
                 // multidimensional_coordinate,
+                // ancillary
                 coordinate,
                 regular,
             };
@@ -39,6 +40,10 @@ namespace lue::cf {
             [[nodiscard]] auto units() const -> std::string;
 
             [[nodiscard]] auto kind() const -> Kind;
+
+            [[nodiscard]] auto axis() const -> std::string;
+
+            [[nodiscard]] auto positive() const -> std::string;
     };
 
 }  // namespace lue::cf

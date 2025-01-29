@@ -10,9 +10,7 @@ namespace lue::utility {
 
         public:
 
-            explicit Describe(std::vector<std::string> const& arguments);
-
-            // TODO explicit Describe(int argc, char const* argv[]);
+            Describe(int argc, char const* const* argv);
 
             auto run_implementation() -> int final;
 

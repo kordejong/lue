@@ -7,45 +7,33 @@
 
 namespace lue::utility {
 
-    namespace {
-
-        std::string const usage = fmt::format(
-            R"(
-Describe a dataset
-
-usage:
-    {0} <dataset>
-    {0} (-h | --help) | --version
-
-options:
-    -h --help   Show this screen
-    --version   Show version
-)",
-            "lue_describe");
-
-    }  // Anonymous namespace
-
-
-    Describe::Describe(std::vector<std::string> const& arguments):
-
-        Application{usage, arguments}
+    Describe::Describe(int const argc, char const* const* argv):
+        Application{
+            []()
+            {
+                cxxopts::Options options{"lue_describe", "Describe a dataset"};
+                options.add_options()("h,help", "Show usage")("v,version", "Show version")(
+                    "dataset", "Dataset to describe", cxxopts::value<std::string>());
+                options.parse_positional({"dataset"});
+                options.positional_help("<dataset>");
+                options.show_positional_help();
+                return options;
+            }(),
+            argc,
+            argv}
 
     {
     }
 
 
-    // TODO
-    // Describe::Describe(int argc, char const* argv[])
-
-    //     : Application{options(), argc, argv}
-
-    // {
-    // }
-
-
     auto Describe::run_implementation() -> int
     {
-        auto const dataset_name = argument<std::string>("<dataset>");
+        if (!argument_parsed("dataset"))
+        {
+            throw std::runtime_error("missing dataset");
+        }
+
+        auto const dataset_name = argument<std::string>("dataset");
         int result = EXIT_FAILURE;
         // std::vector<std::string> description{};
         nlohmann::ordered_json json{};

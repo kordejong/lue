@@ -23,15 +23,6 @@ options:
 )",
             "lue_describe");
 
-
-        // TODO
-        // auto options() -> cxxopts::Options
-        // {
-        //     cxxopts::Options options("lue_describe", "Describe a dataset");
-
-        //     return options;
-        // }
-
     }  // Anonymous namespace
 
 

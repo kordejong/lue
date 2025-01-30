@@ -1,12 +1,17 @@
 add_test_conditionally(test)
 
 add_library(lue_cf STATIC
+    # TODO remove?
     source/dataset.cpp
     source/dimension.cpp
-    source/domain.cpp
-    source/field.cpp
     source/group.cpp
     source/variable.cpp
+    # /TODO
+
+    source/netcdf/data_variable.cpp
+
+    source/domain.cpp
+    source/field.cpp
 )
 
 add_library(lue::cf ALIAS lue_cf)

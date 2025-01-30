@@ -1,11 +1,12 @@
 #pragma once
 #include "lue/cf/domain.hpp"
+#include "lue/cf/netcdf/data_variable.hpp"
 #include <optional>
 
 
 namespace lue::cf {
 
-    class Field
+    class Field: public netcdf::DataVariable
     {
 
             class Data
@@ -56,6 +57,8 @@ namespace lue::cf {
             };
 
         public:
+
+            Field(int group_id, int variable_id);
 
         private:
 

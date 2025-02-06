@@ -45,27 +45,13 @@ namespace lue::netcdf {
             [[nodiscard]] auto add_variable(
                 std::string const& name,
                 nc_type data_type,
-                std::vector<Dimension> const& dimensions = {}) const -> Variable;
+                std::vector<Dimension> const& dimensions = {}) -> Variable;
 
             [[nodiscard]] auto has_variable(std::string const& name) const -> bool;
 
             [[nodiscard]] auto variable(std::string const& name) const -> Variable;
 
             [[nodiscard]] auto variables() const -> std::vector<Variable>;
-
-            // /*!
-            //     @brief      Write a global attribute to the group
-            //     @param      name Name of attribute
-            //     @param      values Values of attribute
-            //     @return     Written attribute
-            //     @exception  std::runtime_error In case the attribute cannot be written
-            // */
-            // template<typename T>
-            // auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
-            // {
-            //     return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), values);
-            // }
-
 
             auto add_attribute(std::string name, std::string const& value) -> Attribute;
 
@@ -76,9 +62,9 @@ namespace lue::netcdf {
                 @return     Instance representing the attribute
             */
             template<Arithmetic T>
-            auto add_attribute(std::string name, T const& value) -> Attribute
+            auto add_attribute(std::string name, T const value) -> Attribute
             {
-                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), 1, value);
+                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), value);
             }
 
 

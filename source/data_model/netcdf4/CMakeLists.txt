@@ -32,7 +32,6 @@ set_target_properties(lue_netcdf
 target_include_directories(lue_netcdf
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 )
 
 target_sources(lue_netcdf

@@ -16,6 +16,11 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Move construct an instance
+        @param      other Instance whose value is not needed anymore. Afterwards, this instance will not
+                    contain a valid group id anymore. This ID should not be passed to the NetCDF API.
+    */
     Group::Group(Group&& other) noexcept:
 
         _id{other.reset_id()}
@@ -291,7 +296,7 @@ namespace lue::netcdf {
     auto Group::add_variable(
         std::string const& name,
         nc_type const data_type,
-        std::vector<Dimension> const& dimensions) const -> Variable
+        std::vector<Dimension> const& dimensions) -> Variable
     {
         int variable_id{};
 

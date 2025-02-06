@@ -523,11 +523,9 @@ namespace lue::netcdf {
 
     /*!
         @brief      A variable holds a multi-dimensional array of data
-        @param      .
-        @return     .
-        @exception  .
 
-        Attributes may be associated with a variable.
+        A variable is part of a group. A NetCDF file itself is the root group. Attributes may be associated
+        with a variable.
     */
     class Variable
     {
@@ -556,7 +554,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Set the fill value to @a value
-                @exception  .
+                @exception  std::runtime_error In case the fill value cannot be set
             */
             template<typename T>
             void set_fill_value(T const& value)
@@ -574,6 +572,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Retrieve the fill value
+                @exception  std::runtime_error In case the fill value cannot be obtained
 
                 It is required that a fill value has been set.
             */
@@ -598,9 +597,9 @@ namespace lue::netcdf {
             /*!
                 @brief      Write an attribute to the variable
                 @param      name Name of attribute
-                @param      values Values of attribute
+                @param      values Array values of attribute
                 @return     Written attribute
-                @exception  std::runtime_error In case the attribute cannot be written
+                @exception  std::runtime_error In case the attribute cannot be added
             */
             template<Arithmetic T>
             auto add_attribute(std::string name, std::size_t const nr_values, T const* values) -> Attribute
@@ -609,6 +608,13 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Write an attribute to the variable
+                @param      name Name of attribute
+                @param      value Scalar value of attribute
+                @return     Written attribute
+                @exception  std::runtime_error In case the attribute cannot be added
+            */
             template<Arithmetic T>
             auto add_attribute(std::string name, T const& value) -> Attribute
             {
@@ -625,6 +631,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Write a scalar value
+                @exception  std::runtime_error In case the value cannot be written
             */
             template<Arithmetic T>
             void write(T const& value)
@@ -642,6 +649,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Write an array element
+                @exception  std::runtime_error In case the element cannot be written
             */
             template<Arithmetic T>
             void write(Indices const& idxs, T const& value)
@@ -657,6 +665,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Write a strided array
+                @exception  std::runtime_error In case the array cannot be written
             */
             template<Arithmetic T>
             void write(Hyperslab const& hyperslab, T const* values)
@@ -675,6 +684,7 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Write an array
+                @exception  std::runtime_error In case the array cannot be written
             */
             template<Arithmetic T>
             void write(T const* value)
@@ -689,9 +699,10 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Read a scalar value
+                @exception  std::runtime_error In case the value cannot be read
             */
             template<Arithmetic T>
-            void read(T& value)
+            void read(T& value) const
             {
                 assert(nr_dimensions() == 0);
 
@@ -705,9 +716,10 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Read an array element
+                @exception  std::runtime_error In case the element cannot be read
             */
             template<Arithmetic T>
-            void read(Indices const& idxs, T& value)
+            void read(Indices const& idxs, T& value) const
             {
                 if (auto const status = detail::VariableValue<T>::get(_group_id, _variable_id, idxs, &value);
                     status != NC_NOERR)
@@ -719,9 +731,10 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Write a strided array
+                @exception  std::runtime_error In case the array cannot be read
             */
             template<Arithmetic T>
-            void read(Hyperslab const& hyperslab, T* values)
+            void read(Hyperslab const& hyperslab, T* values) const
             {
                 assert(hyperslab.nr_dimensions() == nr_dimensions());
 
@@ -737,9 +750,10 @@ namespace lue::netcdf {
 
             /*!
                 @brief      Read an array
+                @exception  std::runtime_error In case the array cannot be read
             */
             template<Arithmetic T>
-            void read(T* value)
+            void read(T* value) const
             {
                 if (auto const status = detail::VariableValue<T>::get(_group_id, _variable_id, value);
                     status != NC_NOERR)

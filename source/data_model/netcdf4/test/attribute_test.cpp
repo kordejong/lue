@@ -34,7 +34,22 @@ namespace {
     template<lue::Arithmetic T>
     void test_scalar(lue::netcdf::Group& group, std::string const& name, T const value)
     {
-        test_array(group, name, 1, &value);
+        BOOST_REQUIRE(!group.has_attribute(name));
+
+        {
+            auto const attribute = group.add_attribute(name, value);
+            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+            BOOST_REQUIRE_EQUAL(attribute.length(), 1);
+            auto const value_read = attribute.template value<T>();
+            BOOST_CHECK_EQUAL(value_read, value);
+        }
+
+        BOOST_REQUIRE(group.has_attribute(name));
+        auto const attribute = group.attribute(name);
+        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+        BOOST_REQUIRE_EQUAL(attribute.length(), 1);
+        auto const value_read = attribute.template value<T>();
+        BOOST_CHECK_EQUAL(value_read, value);
     }
 
 

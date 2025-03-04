@@ -8,6 +8,8 @@ namespace lue::netcdf {
 
     /*!
         @brief      Class for representing groups
+
+        Instances can be copied and moved.
     */
     class LUE_NETCDF4_EXPORT Group
     {

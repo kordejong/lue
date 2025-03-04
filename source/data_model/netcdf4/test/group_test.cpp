@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(variable)
     {
         auto dimension1 = dataset.add_dimension("dimension1", 6);
         auto dimension2 = dataset.add_dimension("dimension2", 4);
-        auto variable1 = dataset.add_variable(
+        [[maybe_unused]] auto variable1 = dataset.add_variable(
             "variable1", NC_INT, std::vector<lue::netcdf::Dimension>{dimension1, dimension2});
     }
 

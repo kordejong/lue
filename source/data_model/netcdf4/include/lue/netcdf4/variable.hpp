@@ -534,16 +534,6 @@ namespace lue::netcdf {
 
             Variable(int group_id, int variable_id);
 
-            Variable(Variable const& other) = default;
-
-            Variable(Variable&& other) noexcept = default;
-
-            virtual ~Variable() = default;
-
-            auto operator=(Variable const& other) -> Variable& = default;
-
-            auto operator=(Variable&& other) noexcept -> Variable& = default;
-
             [[nodiscard]] auto type() const -> nc_type;
 
             [[nodiscard]] auto nr_dimensions() const -> int;

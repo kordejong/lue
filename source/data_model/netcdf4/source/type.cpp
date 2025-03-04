@@ -1,9 +1,13 @@
 #include "lue/netcdf4/type.hpp"
 #include "lue/netcdf4/type_traits.hpp"
+#include <cassert>
 
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      Return whether @a type_id represents a numeric type
+    */
     auto is_numeric(nc_type const type_id) -> bool
     {
         bool result{false};
@@ -61,6 +65,11 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return a string representation of @a type_id
+
+        For example, for type ID NC_DOUBLE the string "NC_DOUBLE" is returned.
+    */
     auto as_string(nc_type const type_id) -> char const*
     {
         char const* result{nullptr};
@@ -113,6 +122,9 @@ namespace lue::netcdf {
                 break;
             }
         }
+
+        // We have handled all type IDs, right?
+        assert(result != nullptr);
 
         return result;
     }

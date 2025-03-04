@@ -371,16 +371,6 @@ namespace lue::netcdf {
 
             Attribute(int group_id, int variable_id, std::string name);
 
-            Attribute(Attribute const& other) = default;
-
-            Attribute(Attribute&& other) noexcept = default;
-
-            ~Attribute() = default;
-
-            auto operator=(Attribute const& other) -> Attribute& = default;
-
-            auto operator=(Attribute&& other) noexcept -> Attribute& = default;
-
             [[nodiscard]] auto name() const -> std::string const&;
 
             [[nodiscard]] auto type() const -> nc_type;

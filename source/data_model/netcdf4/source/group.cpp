@@ -31,6 +31,19 @@ namespace lue::netcdf {
 
 
     /*!
+        @brief      Move assign an instance
+        @param      other Instance whose value is not needed anymore. Afterwards, this instance will not
+                    contain a valid group id anymore. This ID should not be passed to the NetCDF API.
+    */
+    auto Group::operator=(Group&& other) noexcept -> Group&
+    {
+        _id = other.reset_id();
+
+        return *this;
+    }
+
+
+    /*!
         @brief      Return layered group ID
     */
     auto Group::id() const -> int

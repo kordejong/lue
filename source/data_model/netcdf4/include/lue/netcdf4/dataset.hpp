@@ -9,6 +9,8 @@ namespace lue::netcdf {
     /*!
         @brief      Class for representing the root group
 
+        Instances are not copyable. Upon destruction, the underlying NetCDF dataset is closed.
+
         A dataset instance can be used anywhere a Group instance can be used.
     */
     class LUE_NETCDF4_EXPORT Dataset: public Group
@@ -28,11 +30,11 @@ namespace lue::netcdf {
 
             Dataset(Dataset&& other) noexcept;
 
-            ~Dataset() noexcept;
+            ~Dataset() noexcept override;
 
             auto operator=(Dataset const& other) -> Dataset& = delete;
 
-            auto operator=(Dataset&& other) noexcept -> Dataset& = delete;  // TODO
+            auto operator=(Dataset&& other) noexcept -> Dataset&;
 
             auto release() -> int;
 

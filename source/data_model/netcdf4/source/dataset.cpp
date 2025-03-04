@@ -121,6 +121,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Move construct an instance
+        @param      other Instance whose value is not needed anymore
+    */
     Dataset::Dataset(Dataset&& other) noexcept:
 
         Group{std::move(other)}
@@ -144,6 +148,18 @@ namespace lue::netcdf {
                 // TODO Can't throw here. Log an error? Abort? Forget about it?
             }
         }
+    }
+
+
+    /*!
+        @brief      Move assign an instance
+        @param      other Instance whose value is not needed anymore
+    */
+    auto Dataset::operator=(Dataset&& other) noexcept -> Dataset&
+    {
+        Group::operator=(std::move(other));
+
+        return *this;
     }
 
 

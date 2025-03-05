@@ -3,7 +3,7 @@
 #include "lue/netcdf4/export.hpp"
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Class for defining hyperslabs of arrays
@@ -39,4 +39,4 @@ namespace lue::netcdf {
             Strides _strides;
     };
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

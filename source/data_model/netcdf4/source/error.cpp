@@ -2,7 +2,7 @@
 #include <netcdf.h>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Return error message associated with @a status
@@ -12,4 +12,4 @@ namespace lue::netcdf {
         return nc_strerror(status);
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

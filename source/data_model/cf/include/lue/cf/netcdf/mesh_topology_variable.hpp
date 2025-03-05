@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class MeshTopologyVariable: public lue::netcdf::Variable
+    class MeshTopologyVariable: public lue::netcdf4::Variable
     {
 
         public:

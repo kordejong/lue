@@ -6,14 +6,14 @@
 
 namespace lue::cf::netcdf {
 
-    class CellMethods: public lue::netcdf::Attribute
+    class CellMethods: public lue::netcdf4::Attribute
     {
 
         public:
 
         private:
 
-            std::vector<lue::netcdf::Dimension> _dimensions;
+            std::vector<lue::netcdf4::Dimension> _dimensions;
     };
 
 }  // namespace lue::cf::netcdf

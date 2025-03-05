@@ -4,7 +4,7 @@
 #include <string>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      A class for representing dimensions
@@ -36,4 +36,4 @@ namespace lue::netcdf {
 
     auto operator==(Dimension const& lhs, Dimension const& rhs) -> bool;
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

@@ -3,7 +3,7 @@
 #include <ranges>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Construct instance given @a group_id
@@ -506,4 +506,4 @@ namespace lue::netcdf {
         return groups;
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class DomainVariable: public lue::netcdf::Variable
+    class DomainVariable: public lue::netcdf4::Variable
     {
 
         public:

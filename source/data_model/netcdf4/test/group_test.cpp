@@ -8,13 +8,13 @@ BOOST_AUTO_TEST_CASE(child)
     std::string const dataset_name = "group_child_group.nc";
 
     {
-        auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+        auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
         auto group1 = dataset.add_child_group("child_group1");
         [[maybe_unused]] auto group2 = group1.add_child_group("child_group2");
     }
 
     {
-        auto dataset = lue::netcdf::Dataset::open(dataset_name);
+        auto dataset = lue::netcdf4::Dataset::open(dataset_name);
 
         BOOST_CHECK(dataset.has_child_group("child_group1"));
         BOOST_CHECK(!dataset.has_child_group("child_group2"));
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(dimension)
 {
     std::string const dataset_name = "group_dimension.nc";
 
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
 
     {
         [[maybe_unused]] auto dimension1 = dataset.add_dimension("dimension1", 6);
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(variable)
 {
     std::string const dataset_name = "group_variable.nc";
 
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
 
     // TODO Test all element types
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(variable)
         auto dimension1 = dataset.add_dimension("dimension1", 6);
         auto dimension2 = dataset.add_dimension("dimension2", 4);
         [[maybe_unused]] auto variable1 = dataset.add_variable(
-            "variable1", NC_INT, std::vector<lue::netcdf::Dimension>{dimension1, dimension2});
+            "variable1", NC_INT, std::vector<lue::netcdf4::Dimension>{dimension1, dimension2});
     }
 
     BOOST_REQUIRE(dataset.has_variable("variable1"));

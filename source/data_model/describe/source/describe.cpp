@@ -46,7 +46,7 @@ namespace lue::utility {
             // description = describe_netcdf4_dataset(dataset);
 
 
-            // json = netcdf::Dataset::open(dataset_name);
+            // json = netcdf4::Dataset::open(dataset_name);
 
             // std::cout << std::setw(4) << json << std::endl;
 

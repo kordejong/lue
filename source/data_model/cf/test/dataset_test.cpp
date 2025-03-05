@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(create)
     BOOST_CHECK_EQUAL(dataset.attribute("history").value(), std::format("LUE-{}", lue::version()));
 
     // // TODO Assert exception thrown
-    // // auto dataset2 = lue::netcdf::Dataset::create(dataset_name, NC_NOCLOBBER | NC_DISKLESS);
+    // // auto dataset2 = lue::netcdf4::Dataset::create(dataset_name, NC_NOCLOBBER | NC_DISKLESS);
 }
 
 
@@ -29,10 +29,10 @@ BOOST_AUTO_TEST_CASE(open_readable)
     // std::string const dataset_name = "dataset_open_readable.nc";
 
     // {
-    //     auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    //     auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
     // }
 
-    // auto const dataset = lue::netcdf::Dataset::open(dataset_name, NC_NOWRITE);
+    // auto const dataset = lue::netcdf4::Dataset::open(dataset_name, NC_NOWRITE);
 }
 
 
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE(open_writable)
     // std::string const dataset_name = "dataset_open_writable.nc";
 
     // {
-    //     auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    //     auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
     // }
 
-    // auto const dataset = lue::netcdf::Dataset::open(dataset_name, NC_WRITE);
+    // auto const dataset = lue::netcdf4::Dataset::open(dataset_name, NC_WRITE);
 }

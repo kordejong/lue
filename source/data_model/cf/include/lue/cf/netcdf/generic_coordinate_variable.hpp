@@ -5,7 +5,7 @@
 
 namespace lue::cf::netcdf {
 
-    class GenericCoordinateVariable: public lue::netcdf::Variable
+    class GenericCoordinateVariable: public lue::netcdf4::Variable
     {
 
         public:

@@ -8,13 +8,13 @@ namespace {
 
     template<lue::Arithmetic T>
     void test_array(
-        lue::netcdf::Group& group, std::string const& name, std::size_t const nr_values, T const* values)
+        lue::netcdf4::Group& group, std::string const& name, std::size_t const nr_values, T const* values)
     {
         BOOST_REQUIRE(!group.has_attribute(name));
 
         {
             auto const attribute = group.add_attribute(name, nr_values, values);
-            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf4::TypeTraits<T>::type_id);
             BOOST_REQUIRE_EQUAL(attribute.length(), nr_values);
             std::vector<T> values_read(nr_values);
             attribute.values(values_read.data());
@@ -23,7 +23,7 @@ namespace {
 
         BOOST_REQUIRE(group.has_attribute(name));
         auto const attribute = group.attribute(name);
-        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf4::TypeTraits<T>::type_id);
         BOOST_REQUIRE_EQUAL(attribute.length(), nr_values);
         std::vector<T> values_read(nr_values);
         attribute.values(values_read.data());
@@ -32,13 +32,13 @@ namespace {
 
 
     template<lue::Arithmetic T>
-    void test_scalar(lue::netcdf::Group& group, std::string const& name, T const value)
+    void test_scalar(lue::netcdf4::Group& group, std::string const& name, T const value)
     {
         BOOST_REQUIRE(!group.has_attribute(name));
 
         {
             auto const attribute = group.add_attribute(name, value);
-            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf4::TypeTraits<T>::type_id);
             BOOST_REQUIRE_EQUAL(attribute.length(), 1);
             auto const value_read = attribute.template value<T>();
             BOOST_CHECK_EQUAL(value_read, value);
@@ -46,7 +46,7 @@ namespace {
 
         BOOST_REQUIRE(group.has_attribute(name));
         auto const attribute = group.attribute(name);
-        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
+        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf4::TypeTraits<T>::type_id);
         BOOST_REQUIRE_EQUAL(attribute.length(), 1);
         auto const value_read = attribute.template value<T>();
         BOOST_CHECK_EQUAL(value_read, value);
@@ -55,7 +55,7 @@ namespace {
 
     template<lue::Arithmetic T>
     void test_array(
-        lue::netcdf::Group& group, std::string const& name, std::size_t const nr_values, T const value)
+        lue::netcdf4::Group& group, std::string const& name, std::size_t const nr_values, T const value)
     {
         std::vector<T> const values(nr_values, value);
         test_array(group, name, nr_values, values.data());
@@ -67,7 +67,7 @@ namespace {
 BOOST_AUTO_TEST_CASE(scalar)
 {
     std::string const dataset_name = "attribute_scalar.nc";
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
 
     test_scalar(dataset, "attribute_int8", std::int8_t{-8});
     test_scalar(dataset, "attribute_uint8", std::uint8_t{8});
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(scalar)
 BOOST_AUTO_TEST_CASE(array)
 {
     std::string const dataset_name = "attribute_array.nc";
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+    auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
 
     test_array(dataset, "attribute_int8", 5, std::int8_t{-8});
     test_array(dataset, "attribute_uint8", 5, std::uint8_t{8});

@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class BoundaryVariable: public lue::netcdf::Variable
+    class BoundaryVariable: public lue::netcdf4::Variable
     {
 
         public:

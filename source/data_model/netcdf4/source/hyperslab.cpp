@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Construct an instance given @a starts, @a counts, and @a strides
@@ -81,4 +81,4 @@ namespace lue::netcdf {
         return std::all_of(_strides.begin(), _strides.end(), [](auto const lhs) { return lhs == 1; });
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

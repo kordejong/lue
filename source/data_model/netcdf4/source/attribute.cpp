@@ -2,7 +2,7 @@
 #include <array>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Open an attribute
@@ -88,4 +88,4 @@ namespace lue::netcdf {
         return length;
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

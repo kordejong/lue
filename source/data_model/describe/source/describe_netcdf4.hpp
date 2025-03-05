@@ -3,8 +3,8 @@
 #include <nlohmann/json.hpp>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     void to_json(nlohmann::ordered_json& json, Dataset const& dataset);
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

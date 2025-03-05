@@ -5,7 +5,7 @@
 
 namespace lue::cf::netcdf {
 
-    class FormulaTerms: public lue::netcdf::Attribute
+    class FormulaTerms: public lue::netcdf4::Attribute
     {
 
         public:
@@ -13,7 +13,7 @@ namespace lue::cf::netcdf {
         private:
 
             // 1+ variables
-            std::vector<lue::netcdf::Variable> _variables;
+            std::vector<lue::netcdf4::Variable> _variables;
     };
 
 }  // namespace lue::cf::netcdf

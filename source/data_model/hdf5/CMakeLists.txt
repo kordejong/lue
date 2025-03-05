@@ -59,12 +59,12 @@ target_compile_definitions(lue_hdf5
 )
 
 target_link_libraries(lue_hdf5
-    PUBLIC
-        HDF5::HDF5
     PRIVATE
         lue::shared
         Boost::headers
         fmt::fmt
+    PUBLIC
+        HDF5::HDF5
 )
 
 if(LUE_BUILD_TESTS)

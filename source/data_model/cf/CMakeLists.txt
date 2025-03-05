@@ -1,11 +1,9 @@
-add_test_conditionally(test)
-
-add_library(lue_cf STATIC
+add_library(lue_cf SHARED
     # TODO remove?
-    source/dataset.cpp
-    source/dimension.cpp
-    source/group.cpp
-    source/variable.cpp
+    # source/dataset.cpp
+    # source/dimension.cpp
+    # source/group.cpp
+    # source/variable.cpp
     # /TODO
 
     source/netcdf/data_variable.cpp
@@ -14,26 +12,10 @@ add_library(lue_cf STATIC
     source/field.cpp
 )
 
-add_library(lue::cf ALIAS lue_cf)
-
-set_target_properties(lue_cf
-    PROPERTIES
-        EXPORT_NAME cf
-)
-
-target_include_directories(lue_cf
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-)
-
-target_sources(lue_cf
-    PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS
-            include
-            ${CMAKE_CURRENT_BINARY_DIR}/include
-        FILES
-            include/lue
+lue_configure_shared_library(
+    TARGET_BASENAME cf
+    EXPORT_HEADER_PATHNAME include/lue/cf/export.hpp
+    EXPORT_MACRO_BASENAME CF
 )
 
 target_link_libraries(lue_cf
@@ -41,6 +23,6 @@ target_link_libraries(lue_cf
         lue::netcdf4
 )
 
-lue_install_development_libraries(
-    TARGETS lue_cf
-)
+if(LUE_BUILD_TESTS)
+    add_subdirectory(test)
+endif()

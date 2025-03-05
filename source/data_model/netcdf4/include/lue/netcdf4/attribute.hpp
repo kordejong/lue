@@ -1,6 +1,7 @@
 #pragma once
 #include "lue/concept.hpp"
 #include "lue/netcdf4/error.hpp"
+#include "lue/netcdf4/export.hpp"
 #include "lue/netcdf4/type_traits.hpp"
 #include <fmt/format.h>
 #include <cassert>
@@ -286,7 +287,7 @@ namespace lue::netcdf {
     /*!
         @brief      Class for representing attributes
     */
-    class Attribute
+    class LUE_NETCDF4_EXPORT Attribute
     {
 
         public:

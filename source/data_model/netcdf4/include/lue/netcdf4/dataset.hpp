@@ -13,7 +13,7 @@ namespace lue::netcdf {
 
         A dataset instance can be used anywhere a Group instance can be used.
     */
-    class Dataset: public Group
+    class LUE_NETCDF4_EXPORT Dataset: public Group
     {
 
         public:

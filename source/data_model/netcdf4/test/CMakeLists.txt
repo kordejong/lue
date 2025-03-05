@@ -7,7 +7,7 @@ set(names
 )
 
 add_unit_tests(
-    SCOPE lue_netcdf
+    SCOPE lue_netcdf4
     NAMES ${names}
     LIBRARIES
         lue::netcdf4

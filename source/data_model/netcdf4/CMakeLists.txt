@@ -1,5 +1,3 @@
-add_test_conditionally(test)
-
 configure_file(
     include/lue/netcdf4/configure.hpp.in
     include/lue/netcdf4/configure.hpp
@@ -10,7 +8,7 @@ configure_file(
     source/version.cpp
 )
 
-add_library(lue_netcdf STATIC
+add_library(lue_netcdf4 SHARED
     source/attribute.cpp
     source/dataset.cpp
     source/dimension.cpp
@@ -22,35 +20,18 @@ add_library(lue_netcdf STATIC
     ${CMAKE_CURRENT_BINARY_DIR}/source/version.cpp
 )
 
-add_library(lue::netcdf4 ALIAS lue_netcdf)
-
-set_target_properties(lue_netcdf
-    PROPERTIES
-        EXPORT_NAME netcdf4
+lue_configure_shared_library(
+    TARGET_BASENAME netcdf4
+    EXPORT_HEADER_PATHNAME include/lue/netcdf4/export.hpp
+    EXPORT_MACRO_BASENAME NETCDF4
 )
 
-target_include_directories(lue_netcdf
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-)
-
-target_sources(lue_netcdf
-    PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS
-            include
-            ${CMAKE_CURRENT_BINARY_DIR}/include
-        FILES
-            include/lue
-            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/netcdf4/configure.hpp
-)
-
-target_link_libraries(lue_netcdf
+target_link_libraries(lue_netcdf4
     PUBLIC
         lue::shared
         netCDF::netcdf
 )
 
-lue_install_development_libraries(
-    TARGETS lue_netcdf
-)
+if(LUE_BUILD_TESTS)
+    add_subdirectory(test)
+endif()

@@ -527,7 +527,7 @@ namespace lue::netcdf {
         A variable is part of a group. A NetCDF file itself is the root group. Attributes may be associated
         with a variable.
     */
-    class Variable
+    class LUE_NETCDF4_EXPORT Variable
     {
 
         public:

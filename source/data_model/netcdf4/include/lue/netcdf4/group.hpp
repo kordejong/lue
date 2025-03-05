@@ -4,7 +4,7 @@
 #include "lue/netcdf4/variable.hpp"
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Class for representing groups
@@ -112,4 +112,4 @@ namespace lue::netcdf {
             int _id;
     };
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

@@ -7,7 +7,7 @@
 #include <vector>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
     namespace detail {
 
         template<typename T>
@@ -762,4 +762,4 @@ namespace lue::netcdf {
             int _variable_id;
     };
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

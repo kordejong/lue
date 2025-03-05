@@ -4,7 +4,7 @@
 #include <format>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Create dataset
@@ -213,4 +213,4 @@ namespace lue::netcdf {
         return format;
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

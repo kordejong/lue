@@ -2,7 +2,7 @@
 #include <vector>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     using Index = std::size_t;
     using Indices = std::vector<Index>;
@@ -16,4 +16,4 @@ namespace lue::netcdf {
     using Stride = std::ptrdiff_t;
     using Strides = std::vector<Stride>;
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

@@ -16,7 +16,7 @@ namespace lue {
         - CF constructs (must) live in the `lue::cf` namespace. CF-netCDF elements (must) live in the
           `lue::cf::netcdf` namespace. CF constructs are related to CF-netCDF elements, which in turn are
           related to the "components of a netCDF file" (variables, dimensions, attributes). Code in `lue::cf`
-          should probably not directly refer to code from `lue::netcdf`, but only use code from
+          should probably not directly refer to code from `lue::netcdf4`, but only use code from
           `lue::cf::netcdf`.
         - Rename cf library to cf_netcdf? CF in terms of netCDF. CF can be expressed in other data models as
           well, like HDF5.

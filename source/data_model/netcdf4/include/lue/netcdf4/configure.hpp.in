@@ -4,7 +4,7 @@
 #cmakedefine netCDF_HAS_PARALLEL
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     class BuildOptions
     {
@@ -24,4 +24,4 @@ namespace lue::netcdf {
 
         };
 
-} // namespace lue::netcdf
+} // namespace lue::netcdf4

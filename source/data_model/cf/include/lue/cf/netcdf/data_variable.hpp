@@ -15,7 +15,7 @@ namespace lue::cf::netcdf {
         - Elements must have one of these types: string, char, integral, floating point
         - ...
     */
-    class DataVariable: public lue::netcdf::Variable
+    class DataVariable: public lue::netcdf4::Variable
     {
 
         public:

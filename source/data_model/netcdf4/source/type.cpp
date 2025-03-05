@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Return whether @a type_id represents a numeric type
@@ -129,4 +129,4 @@ namespace lue::netcdf {
         return result;
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

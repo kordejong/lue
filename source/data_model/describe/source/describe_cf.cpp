@@ -7,12 +7,12 @@
 namespace lue::cf {
     // namespace {
 
-    //     // // void to_json(nlohmann::ordered_json& json, netcdf::Attribute const& attribute)
+    //     // // void to_json(nlohmann::ordered_json& json, netcdf4::Attribute const& attribute)
     //     // // {
     //     // //     json = nlohmann::ordered_json{
     //     // //         {"name", attribute.name()},
     //     // //         {"length", attribute.length()},
-    //     // //         {"type", netcdf::as_string(attribute.type())},
+    //     // //         {"type", netcdf4::as_string(attribute.type())},
     //     // //     };
     //     // // }
 
@@ -82,7 +82,7 @@ namespace lue::cf {
     //     }
 
 
-    //     void add_attribute(netcdf::Attribute const& attribute, nlohmann::ordered_json& json)
+    //     void add_attribute(netcdf4::Attribute const& attribute, nlohmann::ordered_json& json)
     //     {
     //         nlohmann::ordered_json::value_type value{};
 
@@ -200,7 +200,7 @@ namespace lue::cf {
 
     //         json = nlohmann::ordered_json{
     //             {"name", variable.name()},
-    //             {"type", netcdf::as_string(variable.type())},
+    //             {"type", netcdf4::as_string(variable.type())},
     //             {"attributes", attributes_json},
     //             {"dimensions", dimensions_json},
     //         };
@@ -261,7 +261,7 @@ namespace lue::cf {
     //     };
 
     //     nlohmann::ordered_json group_json{};
-    //     to_json(group_json, dynamic_cast<netcdf::Group const&>(dataset));
+    //     to_json(group_json, dynamic_cast<netcdf4::Group const&>(dataset));
 
     //     json.update(group_json);
     // }

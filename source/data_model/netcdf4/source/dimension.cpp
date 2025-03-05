@@ -4,7 +4,7 @@
 #include <format>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Construct an instance given group ID @a group_id and dimension ID @a dimension_id
@@ -82,4 +82,4 @@ namespace lue::netcdf {
         return lhs.id() == rhs.id();
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

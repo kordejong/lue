@@ -3,7 +3,7 @@
 #include <cstdint>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     template<typename T>
     struct TypeTraits
@@ -181,4 +181,4 @@ namespace lue::netcdf {
     template<typename T>
     constexpr char const* name_v = TypeTraits<T>::name;
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

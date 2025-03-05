@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class CellMeasureVariable: public lue::netcdf::Variable
+    class CellMeasureVariable: public lue::netcdf4::Variable
     {
 
         public:

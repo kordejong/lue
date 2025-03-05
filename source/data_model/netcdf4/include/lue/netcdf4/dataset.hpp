@@ -4,7 +4,7 @@
 #include <string>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Class for representing the root group
@@ -45,4 +45,4 @@ namespace lue::netcdf {
         private:
     };
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

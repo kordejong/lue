@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class AncillaryDataVariable: public lue::netcdf::Variable
+    class AncillaryDataVariable: public lue::netcdf4::Variable
     {
 
         public:

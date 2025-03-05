@@ -2,7 +2,7 @@
 #include <ranges>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     /*!
         @brief      Construct an instance given group ID @a group_id and variable ID @a variable_id
@@ -181,4 +181,4 @@ namespace lue::netcdf {
         return attributes;
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

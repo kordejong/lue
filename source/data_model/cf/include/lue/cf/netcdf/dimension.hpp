@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class Dimension: public lue::netcdf::Dimension
+    class Dimension: public lue::netcdf4::Dimension
     {
 
         public:

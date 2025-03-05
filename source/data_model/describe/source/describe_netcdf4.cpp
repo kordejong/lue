@@ -3,13 +3,13 @@
 #include <algorithm>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
 
     void to_json(nlohmann::ordered_json& json, Attribute const& attribute)
     {
         json = nlohmann::ordered_json{
             {"name", attribute.name()},
-            {"type", netcdf::as_string(attribute.type())},
+            {"type", netcdf4::as_string(attribute.type())},
             {"length", attribute.length()},
         };
 
@@ -157,4 +157,4 @@ namespace lue::netcdf {
         json.update(group_json);
     }
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

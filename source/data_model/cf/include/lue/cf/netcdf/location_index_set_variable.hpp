@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class LocationIndexSetVariable: public lue::netcdf::Variable
+    class LocationIndexSetVariable: public lue::netcdf4::Variable
     {
 
         public:

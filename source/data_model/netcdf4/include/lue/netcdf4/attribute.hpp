@@ -10,7 +10,7 @@
 #include <string>
 
 
-namespace lue::netcdf {
+namespace lue::netcdf4 {
     namespace detail {
 
         template<typename T>
@@ -474,4 +474,4 @@ namespace lue::netcdf {
             std::string _name;
     };
 
-}  // namespace lue::netcdf
+}  // namespace lue::netcdf4

@@ -4,7 +4,7 @@
 
 namespace lue::cf::netcdf {
 
-    class GridMappingVariable: public lue::netcdf::Variable
+    class GridMappingVariable: public lue::netcdf4::Variable
     {
 
         public:

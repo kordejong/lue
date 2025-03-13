@@ -1,6 +1,6 @@
 add_library(lue_cf SHARED
     # TODO remove?
-    # source/dataset.cpp
+    source/dataset.cpp
     # source/dimension.cpp
     # source/group.cpp
     # source/variable.cpp

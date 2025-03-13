@@ -1,7 +1,7 @@
 #include "lue/cf/netcdf/data_variable.hpp"
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
     DataVariable::DataVariable(int const group_id, int const variable_id):
 
@@ -10,4 +10,4 @@ namespace lue::cf::netcdf {
     {
     }
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

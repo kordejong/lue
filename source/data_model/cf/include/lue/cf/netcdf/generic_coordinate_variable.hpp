@@ -3,8 +3,15 @@
 #include <optional>
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
+    /*!
+        @brief      .
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+    */
     class GenericCoordinateVariable: public lue::netcdf4::Variable
     {
 
@@ -15,4 +22,4 @@ namespace lue::cf::netcdf {
             std::optional<BoundaryVariable> _boundary;
     };
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

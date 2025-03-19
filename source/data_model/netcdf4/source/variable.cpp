@@ -1,4 +1,5 @@
 #include "lue/netcdf4/variable.hpp"
+#include "lue/netcdf4/type.hpp"
 #include <ranges>
 
 
@@ -13,6 +14,18 @@ namespace lue::netcdf4 {
         _variable_id{variable_id}
 
     {
+    }
+
+
+    auto Variable::group_id() const -> int
+    {
+        return _group_id;
+    }
+
+
+    auto Variable::id() const -> int
+    {
+        return _variable_id;
     }
 
 
@@ -95,6 +108,23 @@ namespace lue::netcdf4 {
         }
 
         return buffer.data();
+    }
+
+
+    auto Variable::kind() const -> Kind
+    {
+        Kind kind{Kind::regular};
+
+        if (nr_dimensions() == 1 && name() == dimensions()[0].name() && netcdf4::is_numeric(type())
+            // TODO(?)
+            // monotonic_ordered() &&
+            // nr_missing_values() == 0
+        )
+        {
+            kind = Kind::coordinate;
+        }
+
+        return kind;
     }
 
 

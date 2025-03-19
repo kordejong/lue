@@ -1,5 +1,6 @@
 #pragma once
 #include "lue/cf/domain.hpp"
+#include "lue/cf/export.hpp"
 #include "lue/cf/netcdf/data_variable.hpp"
 #include <optional>
 
@@ -13,7 +14,7 @@ namespace lue::cf {
         @return     .
         @exception  .
     */
-    class Field: public netcdf4::DataVariable
+    class LUE_CF_EXPORT Field: public netcdf4::DataVariable
     {
 
             /*!
@@ -59,7 +60,7 @@ namespace lue::cf {
 
                 private:
 
-                    std::vector<Domain::DomainAxis> _domain_axes;
+                    Domain::Axes _domain_axes;
             };
 
 
@@ -81,6 +82,8 @@ namespace lue::cf {
         public:
 
             Field(int group_id, int variable_id);
+
+            [[nodiscard]] auto domain() const -> std::optional<Domain> const&;
 
         private:
 

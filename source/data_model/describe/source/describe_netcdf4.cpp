@@ -124,6 +124,13 @@ namespace lue::netcdf4 {
             std::back_inserter(attributes_json),
             [](auto const& attribute) { return attribute; });
 
+        nlohmann::ordered_json dimensions_json{};
+
+        std::ranges::transform(
+            group.dimensions(),
+            std::back_inserter(dimensions_json),
+            [](auto const& dimension) { return dimension; });
+
         nlohmann::ordered_json variables_json{};
 
         std::ranges::transform(
@@ -139,6 +146,7 @@ namespace lue::netcdf4 {
         json = nlohmann::ordered_json{
             {"name", group.name()},
             {"attributes", attributes_json},
+            {"dimensions", dimensions_json},
             {"variables", variables_json},
             {"child_groups", groups_json},
         };

@@ -1,4 +1,5 @@
 #pragma once
+#include "lue/cf/export.hpp"
 #include "lue/cf/netcdf/auxiliary_coordinate_variable.hpp"
 #include "lue/cf/netcdf/coordinate_variable.hpp"
 #include "lue/cf/netcdf/dimension.hpp"
@@ -15,7 +16,7 @@ namespace lue::cf {
 
         Metadata about measurement location and cell properties for the data
     */
-    class Domain
+    class LUE_CF_EXPORT Domain
     {
 
         public:
@@ -28,7 +29,7 @@ namespace lue::cf {
                 Either defined by a scalar coordinate variable, which implies a domain axis of size one, or
                 a dimension.
             */
-            class DomainAxis
+            class Axis
             {
 
                 public:
@@ -180,11 +181,15 @@ namespace lue::cf {
                 private:
             };
 
+            using Axes = std::vector<Axis>;
+
+
+            [[nodiscard]] auto axes() const -> Axes;
 
         private:
 
             //! Zero or more
-            std::vector<DomainAxis> _domain_axes;
+            std::vector<Axis> _axes;
 
             //! Zero or more
             std::vector<netcdf4::GenericCoordinateVariable> _coordinates;

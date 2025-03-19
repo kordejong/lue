@@ -10,6 +10,10 @@ namespace lue::netcdf4 {
         @brief      A class for representing dimensions
 
         A dimension defines a single axes for quantities contained by it.
+
+        Any of a variable's dimensions the is an independently varying latitude, longitude, vertical, or
+        time dimension and that has a size greater than one must have a corresponding coordinate variable (a
+        one dimensional variable with the same name as the dimension.
     */
     class LUE_NETCDF4_EXPORT Dimension
     {

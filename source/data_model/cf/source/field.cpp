@@ -10,4 +10,10 @@ namespace lue::cf {
     {
     }
 
+
+    auto Field::domain() const -> std::optional<Domain> const&
+    {
+        return _domain;
+    }
+
 }  // namespace lue::cf

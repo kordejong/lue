@@ -534,6 +534,10 @@ namespace lue::netcdf4 {
 
             Variable(int group_id, int variable_id);
 
+            [[nodiscard]] auto group_id() const -> int;
+
+            [[nodiscard]] auto id() const -> int;
+
             [[nodiscard]] auto type() const -> nc_type;
 
             [[nodiscard]] auto nr_dimensions() const -> int;
@@ -541,6 +545,17 @@ namespace lue::netcdf4 {
             [[nodiscard]] auto dimensions() const -> std::vector<Dimension>;
 
             [[nodiscard]] auto name() const -> std::string;
+
+            enum class Kind {
+                // auxiliary_coordinate,
+                // scalar_coordinate,
+                // multidimensional_coordinate,
+                // ancillary
+                coordinate,
+                regular,
+            };
+
+            [[nodiscard]] auto kind() const -> Kind;
 
             /*!
                 @brief      Set the fill value to @a value

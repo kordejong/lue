@@ -1,5 +1,5 @@
 #pragma once
-#include "lue/cf/export.hpp"
+#include "lue/cf/field.hpp"
 #include "lue/netcdf4/dataset.hpp"
 
 
@@ -33,18 +33,26 @@ namespace lue::cf {
         - `comment`
         - `references`
     */
-    class LUE_CF_EXPORT Dataset: public netcdf4::Dataset
+    class LUE_CF_EXPORT Dataset: public lue::netcdf4::Dataset
     {
 
         public:
+
+            using Fields = std::vector<Field>;
 
             static auto create(std::string const& name, int create_mode) -> Dataset;
 
             static auto open(std::string const& name, int open_mode = NC_NOWRITE) -> Dataset;
 
-            Dataset(netcdf4::Dataset&& dataset);
+            Dataset(lue::netcdf4::Dataset&& dataset);
 
             [[nodiscard]] auto version() const -> double;
+
+            [[nodiscard]] auto fields() const -> Fields const&;
+
+        private:
+
+            Fields _fields;
     };
 
 }  // namespace lue::cf

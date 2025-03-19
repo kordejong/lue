@@ -7,7 +7,7 @@ namespace lue::cf {
 
     auto Dataset::create(std::string const& name, int const create_mode) -> Dataset
     {
-        auto dataset = netcdf4::Dataset::create(name, create_mode);
+        auto dataset = lue::netcdf4::Dataset::create(name, create_mode);
 
         dataset.set_conventions({"CF-1.11"});
         dataset.add_attribute("history", std::string{std::format("LUE-{}", lue::version())});
@@ -18,7 +18,7 @@ namespace lue::cf {
 
     auto Dataset::open(std::string const& name, int const open_mode) -> Dataset
     {
-        auto dataset = netcdf4::Dataset::open(name, open_mode);
+        auto dataset = lue::netcdf4::Dataset::open(name, open_mode);
 
         if ((!dataset.has_attribute("Conventions")) ||
             dataset.attribute("Conventions").value().find("CF-") == std::string::npos)
@@ -26,15 +26,23 @@ namespace lue::cf {
             throw std::runtime_error(std::format("Dataset {} does not conform to the CF convention", name));
         }
 
-        return netcdf4::Dataset{dataset.release()};
+        return lue::netcdf4::Dataset{dataset.release()};
     }
 
 
-    Dataset::Dataset(netcdf4::Dataset&& dataset):
+    Dataset::Dataset(lue::netcdf4::Dataset&& dataset):
 
-        netcdf4::Dataset{std::move(dataset)}
+        lue::netcdf4::Dataset{std::move(dataset)}
 
     {
+        for (auto const& variable : variables())
+        {
+            if (variable.kind() == lue::netcdf4::Variable::Kind::regular)
+            {
+                // TODO Relation regular variable with data variable
+                _fields.emplace_back(variable.group_id(), variable.id());
+            }
+        }
     }
 
 
@@ -55,6 +63,12 @@ namespace lue::cf {
         }
 
         return std::stod(version_match[1].str());
+    }
+
+
+    auto Dataset::fields() const -> Fields const&
+    {
+        return _fields;
     }
 
 }  // namespace lue::cf

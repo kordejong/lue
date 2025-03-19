@@ -33,13 +33,13 @@ namespace lue::cf::netcdf4 {
 
             DataVariable(int group_id, int variable_id);
 
-        private:
-
             [[nodiscard]] auto standard_name() const -> std::string;
 
             [[nodiscard]] auto long_name() const -> std::string;
 
             [[nodiscard]] auto units() const -> std::string;
+
+        private:
 
             // TODO
             // To indicate missing data, these attributes:

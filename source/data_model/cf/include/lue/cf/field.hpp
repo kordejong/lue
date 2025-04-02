@@ -2,6 +2,7 @@
 #include "lue/cf/domain.hpp"
 #include "lue/cf/export.hpp"
 #include "lue/cf/netcdf/data_variable.hpp"
+#include <memory>
 #include <optional>
 
 
@@ -60,18 +61,13 @@ namespace lue::cf {
 
                 private:
 
+                    // TODO These are part of the Domain as well. Maybe just refer to (a subset of?) these?
+                    // Is each CellMethod maybe associated with a single DomainAxis instance?
                     Domain::Axes _domain_axes;
             };
 
 
-            /*!
-                @brief      Aspects of the data that are independent of the domain
-
-                - Some attributes of variables: units, long_name, standard_name, ...
-                - Some group attributes, including global attributes or the root group: history, institution,
-                    ...
-            */
-            class Properties
+            class Property
             {
 
                 public:
@@ -79,27 +75,60 @@ namespace lue::cf {
                 private:
             };
 
+
+            // /*!
+            //     @brief      Aspects of the data that are independent of the domain
+
+            //     - Some attributes of variables: units, long_name, standard_name, ...
+            //     - Some group attributes, including global attributes or the root group: history,
+            //     institution,
+            //         ...
+            // */
+            // class Properties
+            // {
+
+            //     public:
+
+            //     private:
+            // };
+
         public:
+
+            using FieldAncillaries = std::vector<FieldAncillary>;
+
+            using CellMethods = std::vector<CellMethod>;
+
+            using Properties = std::vector<Property>;
 
             Field(int group_id, int variable_id);
 
-            [[nodiscard]] auto domain() const -> std::optional<Domain> const&;
+            [[nodiscard]] auto has_domain() const -> bool;
+
+            [[nodiscard]] auto domain() const -> Domain const&;
+
+            [[nodiscard]] auto field_ancillaries() const -> FieldAncillaries const&;
+
+            [[nodiscard]] auto cell_methods() const -> CellMethods const&;
+
+            [[nodiscard]] auto properties() const -> Properties const&;
 
         private:
 
             //! Mandatory
             Data _data;
 
-            //! Zero or one
-            std::optional<Domain> _domain;
+            //! Pointer to shared instance of zero or one domains
+            std::shared_ptr<Domain> _domain;
 
             //! Zero or more
-            std::vector<FieldAncillary> _field_ancillaries;
+            FieldAncillaries _field_ancillaries;
 
             //! Zero or more
-            std::vector<CellMethod> _cell_methods;
+            CellMethods _cell_methods;
 
-            std::optional<Properties> _properties;
+            Properties _properties;
+
+            // std::optional<Properties> _properties;
     };
 
 }  // namespace lue::cf

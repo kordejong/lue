@@ -67,3 +67,72 @@ BOOST_AUTO_TEST_CASE(name)
         BOOST_CHECK_EQUAL(dataset.path(), dataset_name);
     }
 }
+
+
+BOOST_AUTO_TEST_CASE(conventions)
+{
+    // Write conventions attribute and read back in. Various cases.
+    std::string const dataset_name = "dataset_conventions.nc";
+
+    auto dataset = lue::netcdf4::Dataset::create(dataset_name, NC_CLOBBER);
+    std::vector<std::string> conventions_we_want{};
+    std::vector<std::string> conventions_we_got{};
+
+    // Default / empty
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+
+    // Empty value
+    dataset.set_conventions({""});
+    conventions_we_want = {};
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+
+    // Single value
+    dataset.set_conventions({"MyConvention"});
+    conventions_we_want = {"MyConvention"};
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+
+    // Value with whitespace front / back
+    dataset.set_conventions({" 	 MyConvention  	"});  // Note the two tabs
+    conventions_we_want = {"MyConvention"};
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+
+    // Space separated list
+    dataset.set_conventions({"MyConvention1", "MyConvention2"});
+    conventions_we_want = {"MyConvention1", "MyConvention2"};
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+
+    // Comma separated list
+    dataset.set_conventions({"My Convention1", "My Convention2"});
+    conventions_we_want = {"My Convention1", "My Convention2"};
+    conventions_we_got = dataset.conventions();
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        conventions_we_got.begin(),
+        conventions_we_got.end(),
+        conventions_we_want.begin(),
+        conventions_we_want.end());
+}

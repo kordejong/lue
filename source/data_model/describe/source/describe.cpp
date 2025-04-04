@@ -46,15 +46,19 @@ namespace lue::utility {
             // description = describe_netcdf4_dataset(dataset);
 
 
-            // json = netcdf4::Dataset::open(dataset_name);
+            // Dump all contents
+            // TODO Do this conditional, if no recognized convention is used
+            json = netcdf4::Dataset::open(dataset_name);
 
-            // std::cout << std::setw(4) << json << std::endl;
+            std::cout << std::setw(4) << json << std::endl;
 
-            // std::cout << "----------\n";
+            std::cout << "----------\n";
 
-            // json = cf::Dataset::open(dataset_name);
+            // Dump contents related to CF convention
+            // TODO Do this conditional, if the CF convention is used
+            json = lue::cf::Dataset::open(dataset_name);
 
-            // std::cout << std::setw(4) << json << std::endl;
+            std::cout << std::setw(4) << json << std::endl;
 
             result = EXIT_SUCCESS;
         }

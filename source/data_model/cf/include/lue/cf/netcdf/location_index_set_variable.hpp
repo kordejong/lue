@@ -2,8 +2,15 @@
 #include "lue/netcdf4/variable.hpp"
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
+    /*!
+        @brief      .
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+    */
     class LocationIndexSetVariable: public lue::netcdf4::Variable
     {
 
@@ -12,4 +19,4 @@ namespace lue::cf::netcdf {
         private:
     };
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

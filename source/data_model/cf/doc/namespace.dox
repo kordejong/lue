@@ -14,13 +14,20 @@ namespace lue {
         - No variable or dimension names are standardized by the CF convention. Only names of attributes and
           some of the values taken by those attributes are standardized.
         - CF constructs (must) live in the `lue::cf` namespace. CF-netCDF elements (must) live in the
-          `lue::cf::netcdf` namespace. CF constructs are related to CF-netCDF elements, which in turn are
+          `lue::cf::netcdf4` namespace. CF constructs are related to CF-netCDF elements, which in turn are
           related to the "components of a netCDF file" (variables, dimensions, attributes). Code in `lue::cf`
           should probably not directly refer to code from `lue::netcdf4`, but only use code from
-          `lue::cf::netcdf`.
+          `lue::cf::netcdf4`.
         - Rename cf library to cf_netcdf? CF in terms of netCDF. CF can be expressed in other data models as
           well, like HDF5.
     */
     namespace cf {
+
+
+        /*!
+            @brief      TODO
+        */
+        namespace netcdf4 {
+        }
     }
 }

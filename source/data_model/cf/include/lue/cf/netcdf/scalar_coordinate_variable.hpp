@@ -2,10 +2,10 @@
 #include "lue/cf/netcdf/generic_coordinate_variable.hpp"
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
     /*!
-        @brief      .
+        @brief      Coordinate for an implied sized one axis
         @tparam     .
         @param      .
         @return     .
@@ -23,4 +23,4 @@ namespace lue::cf::netcdf {
         private:
     };
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

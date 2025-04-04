@@ -2,6 +2,7 @@
 #include "lue/netcdf4/group.hpp"
 #include <netcdf.h>
 #include <string>
+#include <vector>
 
 
 namespace lue::netcdf4 {
@@ -41,6 +42,10 @@ namespace lue::netcdf4 {
             [[nodiscard]] auto path() const -> std::string;
 
             [[nodiscard]] auto format() const -> int;
+
+            void set_conventions(std::vector<std::string> conventions);
+
+            [[nodiscard]] auto conventions() const -> std::vector<std::string>;
 
         private:
     };

@@ -4,8 +4,15 @@
 #include <vector>
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
+    /*!
+        @brief      Description of variation within cells
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+    */
     class CellMethods: public lue::netcdf4::Attribute
     {
 
@@ -13,7 +20,8 @@ namespace lue::cf::netcdf {
 
         private:
 
+            // zero or more
             std::vector<lue::netcdf4::Dimension> _dimensions;
     };
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

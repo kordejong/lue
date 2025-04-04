@@ -10,7 +10,7 @@ set_target_properties(lue_cf
 
 generate_export_header(lue_cf
     EXPORT_FILE_NAME include/lue/cf/export.hpp
-    EXPORT_MACRO_NAME LUE_GDAL_EXPORT
+    EXPORT_MACRO_NAME LUE_CF_EXPORT
 )
 
 target_sources(lue_cf
@@ -23,7 +23,9 @@ target_sources(lue_cf
             include/lue
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/cf/export.hpp
     PRIVATE
-        src/dataset.cpp
+        source/dataset.cpp
+        source/dimension.cpp
+        source/variable.cpp
 )
 
 target_link_libraries(lue_cf
@@ -45,7 +47,7 @@ if(LUE_BUILD_TESTS)
     lue_configure_static_library_for_tests(
         TARGET_NAME_SHARED_LIB lue_cf
         TARGET_NAME_STATIC_LIB lue_cf_static
-        EXPORT_MACRO_BASENAME GDAL
+        EXPORT_MACRO_BASENAME CF
     )
 
     add_subdirectory(test)

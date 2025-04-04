@@ -7,13 +7,9 @@
 namespace lue::netcdf {
 
     /*!
-        @brief      .
-        @param      .
-        @return     .
-        @exception  .
+        @brief      Class for representing the root group
 
-        A Dataset is a Group: the root group. A dataset instance can be used anywhere a Group instance can be
-        used.
+        A dataset instance can be used anywhere a Group instance can be used.
     */
     class LUE_NETCDF4_EXPORT Dataset: public Group
     {

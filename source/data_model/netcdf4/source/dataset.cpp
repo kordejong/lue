@@ -12,7 +12,7 @@ namespace lue::netcdf {
         @param      create_mode One of NC_CLOBBER, NC_NOCLOBBER, NC_DISKLESS, NC_PERSIST. To force the use
                     of netCDF4 format, create mode NC_NETCDF4 is added unconditionally, so the caller doesn't
                     have to.
-        @return     Created dataset, in define mode
+        @return     Created dataset
         @exception  std::runtime_error In case @a create_mode is not compatible with netCDF-4 format or in
                     case the dataset cannot be created
     */
@@ -49,7 +49,7 @@ namespace lue::netcdf {
         @brief      Open dataset
         @param      open_mode NC_NOWRITE, NC_WRITE, NC_SHARE, NC_WRITE | NC_SHARE
         @param      name Name of dataset
-        @return     Open dataset, in define mode if @a open_mode contains NC_WRITE
+        @return     Opened dataset
         @exception  std::runtime_error In case the dataset cannot be opened
     */
     auto Dataset::open(std::string const& name, int open_mode) -> Dataset
@@ -65,6 +65,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return string representation of the @a format passed in
+        @exception  std::runtime_error In case @a format is not known
+    */
     auto Dataset::format_as_string(int format) -> std::string
     {
         std::string string{};
@@ -106,6 +110,9 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Create an instance given @a dataset_id passed in
+    */
     Dataset::Dataset(int const dataset_id):
 
         Group{dataset_id}
@@ -123,6 +130,11 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Destruct instance
+
+        In the dataset is open, it will be closed.
+    */
     Dataset::~Dataset() noexcept
     {
         if (Group::id_is_valid())
@@ -135,18 +147,10 @@ namespace lue::netcdf {
     }
 
 
-    // /*!
-    //     @brief      Leave define mode
-    //     @exception  std::runtime_error In case define mode cannot be left
-    // */
-    // void Dataset::end_define()
-    // {
-    //     if (auto const status = nc_enddef(Group::id()); status != NC_NOERR)
-    //     {
-    //         throw std::runtime_error(std::format("Cannot leave define mode: {}", error_message(status)));
-    //     }
-    // }
-
+    /*!
+        @brief      Release the ownership of the layered dataset ID
+        @return     Dataset ID
+    */
     auto Dataset::release() -> int
     {
         return reset_id();
@@ -177,6 +181,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the NetCDF format identifier
+        @exception  std::runtime_error In case the format cannot be obtained
+    */
     auto Dataset::format() const -> int
     {
         int format{0};

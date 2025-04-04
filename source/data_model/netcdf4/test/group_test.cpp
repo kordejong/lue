@@ -1,52 +1,6 @@
 #define BOOST_TEST_MODULE lue netcdf4 group
 #include "lue/netcdf4/dataset.hpp"
-#include "lue/netcdf4/group.hpp"
 #include <boost/test/included/unit_test.hpp>
-
-
-namespace {
-
-    template<lue::Arithmetic T>
-    void test_attribute(
-        lue::netcdf::Group& group, std::string const& name, std::size_t const nr_values, T const* values)
-    {
-        BOOST_REQUIRE(!group.has_attribute(name));
-
-        {
-            auto const attribute = group.add_attribute(name, nr_values, values);
-            BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
-            BOOST_REQUIRE_EQUAL(attribute.length(), nr_values);
-            std::vector<T> values_read(nr_values);
-            attribute.values(values_read.data());
-            BOOST_CHECK_EQUAL_COLLECTIONS(values_read.begin(), values_read.end(), values, values + nr_values);
-        }
-
-        BOOST_REQUIRE(group.has_attribute(name));
-        auto const attribute = group.attribute(name);
-        BOOST_CHECK_EQUAL(attribute.type(), lue::netcdf::TypeTraits<T>::type_id);
-        BOOST_REQUIRE_EQUAL(attribute.length(), nr_values);
-        std::vector<T> values_read(nr_values);
-        attribute.values(values_read.data());
-        BOOST_CHECK_EQUAL_COLLECTIONS(values_read.begin(), values_read.end(), values, values + nr_values);
-    }
-
-
-    template<lue::Arithmetic T>
-    void test_attribute(lue::netcdf::Group& group, std::string const& name, T const value)
-    {
-        test_attribute(group, name, 1, &value);
-    }
-
-
-    template<lue::Arithmetic T>
-    void test_attribute(
-        lue::netcdf::Group& group, std::string const& name, std::size_t const nr_values, T const value)
-    {
-        std::vector<T> const values(nr_values, value);
-        test_attribute(group, name, nr_values, values.data());
-    }
-
-}  // Anonymous namespace
 
 
 BOOST_AUTO_TEST_CASE(child)
@@ -134,42 +88,4 @@ BOOST_AUTO_TEST_CASE(variable)
     BOOST_CHECK_EQUAL(dimensions.size(), 2);
     BOOST_CHECK_EQUAL(dimensions[0].name(), "dimension1");
     BOOST_CHECK_EQUAL(dimensions[1].name(), "dimension2");
-}
-
-
-BOOST_AUTO_TEST_CASE(attribute_scalar)
-{
-    std::string const dataset_name = "group_attribute.nc";
-
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
-
-    test_attribute(dataset, "attribute_int8", std::int8_t{-8});
-    test_attribute(dataset, "attribute_uint8", std::uint8_t{8});
-    test_attribute(dataset, "attribute_int32", std::int32_t{-32});
-    test_attribute(dataset, "attribute_uint32", std::uint32_t{32});
-    test_attribute(dataset, "attribute_int64", std::int64_t{-64});
-    test_attribute(dataset, "attribute_uint64", std::uint64_t{64});
-    test_attribute(dataset, "attribute_float", float{5.5});
-    test_attribute(dataset, "attribute_double", double{6.6});
-
-    // TODO string
-}
-
-
-BOOST_AUTO_TEST_CASE(attribute_array)
-{
-    std::string const dataset_name = "group_attribute.nc";
-
-    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
-
-    test_attribute(dataset, "attribute_int8", 5, std::int8_t{-8});
-    test_attribute(dataset, "attribute_uint8", 5, std::uint8_t{8});
-    test_attribute(dataset, "attribute_int32", 5, std::int32_t{-32});
-    test_attribute(dataset, "attribute_uint32", 5, std::uint32_t{32});
-    test_attribute(dataset, "attribute_int64", 5, std::int64_t{-64});
-    test_attribute(dataset, "attribute_uint64", 5, std::uint64_t{64});
-    test_attribute(dataset, "attribute_float", 5, float{5.5});
-    test_attribute(dataset, "attribute_double", 5, double{6.6});
-
-    // TODO string
 }

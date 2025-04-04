@@ -5,6 +5,9 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      Construct instance given @a group_id
+    */
     Group::Group(int const group_id):
 
         _id{group_id}
@@ -22,12 +25,21 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return layered group ID
+    */
     auto Group::id() const -> int
     {
         return _id;
     }
 
 
+    /*!
+        @brief      Reset the layered group ID
+
+        The result of calling this function is that the layered group ID is not valid anymore. Only valid
+        identifiers can be passed into NetCDF API functions.
+    */
     auto Group::reset_id() -> int
     {
         auto group_id = _id;
@@ -43,6 +55,11 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether the layered group ID is valid
+
+        Only valid identifiers can be passed into NetCDF API functions.
+    */
     auto Group::id_is_valid() const -> bool
     {
         return _id >= 0;
@@ -102,6 +119,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Add a dimension with name @a name and length @a length
+        @exception  std::runtime_error In case the dimension cannot be added
+    */
     auto Group::add_dimension(std::string const& name, size_t const length) const -> Dimension
     {
         int dimension_id{};
@@ -116,6 +137,9 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether the group contains a dimension with name @a name
+    */
     auto Group::has_dimension(std::string const& name) const -> bool
     {
         int dimension_id{};
@@ -124,6 +148,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return an instance representing the dimension with name @a name
+        @exception  std::runtime_error In case the dimension cannot be obtained
+    */
     auto Group::dimension(std::string const& name) const -> Dimension
     {
         int dimension_id{};
@@ -137,6 +165,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the number of dimensions
+        @exception  std::runtime_error In case the number of dimensions cannot be obtained
+    */
     auto Group::nr_dimensions() const -> int
     {
         int nr_dimensions{0};
@@ -153,6 +185,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the collection of dimensions
+        @exception  std::runtime_error In case the dimensions cannot be obtained
+    */
     auto Group::dimensions() const -> std::vector<Dimension>
     {
         int nr_dimensions{this->nr_dimensions()};
@@ -180,12 +216,19 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Add an attribute with name @a name and value @a value
+        @return     Instance representing the attribute
+    */
     auto Group::add_attribute(std::string name, std::string const& value) -> Attribute
     {
         return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), value);
     }
 
 
+    /*!
+        @brief      Return whether the group contains an attribute with name @ name
+    */
     auto Group::has_attribute(std::string const& name) const -> bool
     {
         int attribute_id{};
@@ -194,12 +237,25 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the attribute with name @a name
+        @exception  std::runtime_error In case the attribute cannot be obtained
+    */
     auto Group::attribute(std::string name) const -> Attribute
     {
+        if (!has_attribute(name))
+        {
+            throw std::runtime_error(std::format("Attribute {} is not available", name));
+        }
+
         return {_id, NC_GLOBAL, std::move(name)};
     }
 
 
+    /*!
+        @brief      Return the collection of attributes
+        @exception  std::runtime_error In case the attributes cannot be obtained
+    */
     auto Group::attributes() const -> std::vector<Attribute>
     {
         int nr_attributes{0};
@@ -223,14 +279,14 @@ namespace lue::netcdf {
 
 
     /*!
-        @brief      Define a variable
+        @brief      Add variable
         @param      name Variable name
         @param      data_type Data type
         @param      dimensions Variable dimensions
-        @return     Defined variable
-        @exception  std::runtime_error In case the variable cannot be defined
+        @return     Instance representing the variable
+        @exception  std::runtime_error In case the variable cannot be added
 
-        A default fill value will be set (as per netCDF convention), which is dependent on the data type.
+        A default fill value will be set (as per NetCDF convention), which is dependent on the data type.
     */
     auto Group::add_variable(
         std::string const& name,
@@ -271,6 +327,9 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether the group contains a variable with name @a name
+    */
     auto Group::has_variable(std::string const& name) const -> bool
     {
         int variable_id{};
@@ -279,6 +338,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the variable with name @a name
+        @exception  std::runtime_error In case the variable cannot be obtained
+    */
     auto Group::variable(std::string const& name) const -> Variable
     {
         int variable_id{};
@@ -292,6 +355,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return collection of variables
+        @exception  std::runtime_error In case the variables cannot be obtained
+    */
     auto Group::variables() const -> std::vector<Variable>
     {
         int nr_variables{0};
@@ -324,6 +391,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return an instance representing the parent group
+        @exception  std::runtime_error In case the parent group cannot be obtained
+    */
     auto Group::parent_group() const -> Group
     {
         int group_id{};
@@ -338,10 +409,8 @@ namespace lue::netcdf {
 
 
     /*!
-        @brief      Define a sub-group
-        @param      .
-        @return     .
-        @exception  .
+        @brief      Add a child group with name @a name
+        @exception  std::runtime_error In case the group cannot be added
     */
     auto Group::add_child_group(std::string const& name) const -> Group
     {
@@ -357,6 +426,9 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether the group contains a child group with name @a name
+    */
     auto Group::has_child_group(std::string const& name) const -> bool
     {
         int group_id{};
@@ -365,6 +437,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the child group with name @a name
+        @exception  std::runtime_error In case the child group cannot be obtained
+    */
     auto Group::child_group(std::string const& name) const -> Group
     {
         int group_id{};
@@ -379,6 +455,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the collection of child groups
+        @exception  std::runtime_error In case the child groups cannot be obtained
+    */
     auto Group::child_groups() const -> std::vector<Group>
     {
         int nr_groups{0};

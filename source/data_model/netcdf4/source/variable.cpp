@@ -4,6 +4,9 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      Construct an instance given group ID @a group_id and variable ID @a variable_id
+    */
     Variable::Variable(int const group_id, int const variable_id):
 
         _group_id{group_id},
@@ -13,6 +16,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the element type
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     auto Variable::type() const -> nc_type
     {
         nc_type type{};
@@ -26,6 +33,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the number of associated dimensions
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     auto Variable::nr_dimensions() const -> int
     {
         int nr_dimensions{0};
@@ -40,6 +51,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the collection of associated dimensions
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     auto Variable::dimensions() const -> std::vector<Dimension>
     {
         int nr_dimensions{this->nr_dimensions()};
@@ -66,6 +81,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the name
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     auto Variable::name() const -> std::string
     {
         std::array<char, NC_MAX_NAME + 1> buffer{};
@@ -79,6 +98,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Unset the fill value
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     void Variable::unset_fill_value() const
     {
         if (auto const status = nc_def_var_fill(_group_id, _variable_id, NC_NOFILL, nullptr);
@@ -89,6 +112,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether a fill value has been set
+        @exception  std::runtime_error In case this information cannot be obtained
+    */
     auto Variable::has_fill_value() const -> bool
     {
         int fill_mode{};
@@ -103,6 +130,9 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return whether attribute @a name is available
+    */
     auto Variable::has_attribute(std::string const& name) const -> bool
     {
         int attribute_id{};
@@ -113,6 +143,11 @@ namespace lue::netcdf {
 
     auto Variable::attribute(std::string name) const -> Attribute
     {
+        if (!has_attribute(name))
+        {
+            throw std::runtime_error(std::format("Attribute {} is not available", name));
+        }
+
         return {_group_id, _variable_id, std::move(name)};
     }
 

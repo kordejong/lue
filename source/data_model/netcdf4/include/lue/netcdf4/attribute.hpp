@@ -390,7 +390,7 @@ namespace lue::netcdf {
             template<Arithmetic T>
             auto value() const -> T
             {
-                std::size_t length{this->length()};
+                std::size_t const length{this->length()};
 
                 if (length != 1)
                 {

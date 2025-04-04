@@ -62,4 +62,16 @@ namespace lue::cf {
         return kind;
     }
 
+
+    // auto Variable::axis() const -> std::string
+    // {
+    //     return attribute("axis").value("");
+    // }
+
+
+    // auto Variable::positive() const -> std::string
+    // {
+    //     return attribute("positive").value("");
+    // }
+
 }  // namespace lue::cf

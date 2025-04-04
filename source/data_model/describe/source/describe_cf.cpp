@@ -1,5 +1,6 @@
 #include "describe_cf.hpp"
 #include "lue/cf.hpp"
+#include "lue/netcdf4/type.hpp"
 #include <algorithm>
 
 
@@ -81,6 +82,75 @@ namespace lue::cf {
         }
 
 
+        void add_attribute(netcdf::Attribute const& attribute, nlohmann::ordered_json& json)
+        {
+            nlohmann::ordered_json::value_type value{};
+
+            if (attribute.type() == NC_CHAR || attribute.length() == 1)
+            {
+                switch (attribute.type())
+                {
+                    case NC_CHAR:
+                    {
+                        value = attribute.value();
+                        break;
+                    }
+                    case NC_BYTE:
+                    {
+                        value = attribute.value<std::int8_t>();
+                        break;
+                    }
+                    case NC_UBYTE:
+                    {
+                        value = attribute.value<std::uint8_t>();
+                        break;
+                    }
+                    case NC_INT:
+                    {
+                        value = attribute.value<std::int32_t>();
+                        break;
+                    }
+                    case NC_UINT:
+                    {
+                        value = attribute.value<std::uint32_t>();
+                        break;
+                    }
+                    case NC_INT64:
+                    {
+                        value = attribute.value<std::int64_t>();
+                        break;
+                    }
+                    case NC_UINT64:
+                    {
+                        value = attribute.value<std::uint64_t>();
+                        break;
+                    }
+                    case NC_FLOAT:
+                    {
+                        value = attribute.value<float>();
+                        break;
+                    }
+                    case NC_DOUBLE:
+                    {
+                        value = attribute.value<double>();
+                        break;
+                    }
+                    default:
+                    {
+                        value = "TODO";
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                value = "TODO";
+            }
+
+            json.push_back({attribute.name(), value});
+        }
+
+
         void to_json(nlohmann::ordered_json& json, Variable const& variable)
         {
             nlohmann::ordered_json dimensions_json{};
@@ -92,11 +162,45 @@ namespace lue::cf {
                 dimensions_json.push_back(dimension_json);
             }
 
-            json = nlohmann::ordered_json{
+            auto attributes_json = nlohmann::ordered_json{
                 {"standard_name", variable.standard_name()},
                 {"long_name", variable.long_name()},
                 {"units", variable.units()},
                 {"kind", variable_kind_as_string(variable.kind())},
+            };
+
+            switch (variable.kind())
+            {
+                case Variable::Kind::regular:
+                {
+                    if (variable.has_attribute("missing_value"))
+                    {
+                        add_attribute(variable.attribute("missing_value"), attributes_json);
+                    }
+
+                    break;
+                }
+                case Variable::Kind::coordinate:
+                {
+                    if (variable.has_attribute("axis"))
+                    {
+                        attributes_json.update(nlohmann::json{{"axis", variable.attribute("axis").value()}});
+                    }
+
+                    if (variable.has_attribute("positive"))
+                    {
+                        attributes_json.update(
+                            nlohmann::json{{"positive", variable.attribute("positive").value()}});
+                    }
+
+                    break;
+                }
+            }
+
+            json = nlohmann::ordered_json{
+                {"name", variable.name()},
+                {"type", netcdf::as_string(variable.type())},
+                {"attributes", attributes_json},
                 {"dimensions", dimensions_json},
             };
         }

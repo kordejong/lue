@@ -13,6 +13,8 @@ namespace lue::netcdf {
             {"length", attribute.length()},
         };
 
+        nlohmann::ordered_json::value_type value{};
+
         if (attribute.type() == NC_CHAR || attribute.length() == 1)
         {
             nlohmann::json value_json{};
@@ -21,57 +23,62 @@ namespace lue::netcdf {
             {
                 case NC_CHAR:
                 {
-                    json["value"] = attribute.value();
+                    value = attribute.value();
                     break;
                 }
                 case NC_BYTE:
                 {
-                    json["value"] = attribute.value<std::int8_t>();
+                    value = attribute.value<std::int8_t>();
                     break;
                 }
                 case NC_UBYTE:
                 {
-                    json["value"] = attribute.value<std::uint8_t>();
+                    value = attribute.value<std::uint8_t>();
                     break;
                 }
                 case NC_INT:
                 {
-                    json["value"] = attribute.value<std::int32_t>();
+                    value = attribute.value<std::int32_t>();
                     break;
                 }
                 case NC_UINT:
                 {
-                    json["value"] = attribute.value<std::uint32_t>();
+                    value = attribute.value<std::uint32_t>();
                     break;
                 }
                 case NC_INT64:
                 {
-                    json["value"] = attribute.value<std::int64_t>();
+                    value = attribute.value<std::int64_t>();
                     break;
                 }
-                // TODO
-                // case NC_UINT64:
-                //     {
-                //         json["value"] = attribute.value<std::uint64_t>();
-                //         break;
-                //     }
+                case NC_UINT64:
+                {
+                    value = attribute.value<std::uint64_t>();
+                    break;
+                }
                 case NC_FLOAT:
                 {
-                    json["value"] = attribute.value<float>();
+                    value = attribute.value<float>();
                     break;
                 }
                 case NC_DOUBLE:
                 {
-                    json["value"] = attribute.value<double>();
+                    value = attribute.value<double>();
                     break;
                 }
                 default:
                 {
-                    json["value"] = "TODO";
+                    value = "TODO";
                     break;
                 }
             }
         }
+        else
+        {
+            value = "TODO";
+        }
+
+        json["value"] = value;
     }
 
 

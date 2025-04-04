@@ -141,6 +141,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return attribute @a name
+        @exception  std::runtime_error In case the attribute is not available
+    */
     auto Variable::attribute(std::string name) const -> Attribute
     {
         if (!has_attribute(name))
@@ -152,6 +156,10 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return all attributes
+        @exception  std::runtime_error In case the attributes cannot be obtained
+    */
     auto Variable::attributes() const -> std::vector<Attribute>
     {
         int nr_attributes{0};

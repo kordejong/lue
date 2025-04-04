@@ -540,7 +540,7 @@ namespace lue::netcdf {
 
             Variable(Variable&& other) noexcept = default;
 
-            ~Variable() = default;
+            virtual ~Variable() = default;
 
             auto operator=(Variable const& other) -> Variable& = default;
 

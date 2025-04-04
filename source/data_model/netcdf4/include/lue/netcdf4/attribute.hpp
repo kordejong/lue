@@ -282,6 +282,10 @@ namespace lue::netcdf {
 
     }  // namespace detail
 
+
+    /*!
+        @brief      Class for representing attributes
+    */
     class LUE_NETCDF4_EXPORT Attribute
     {
 

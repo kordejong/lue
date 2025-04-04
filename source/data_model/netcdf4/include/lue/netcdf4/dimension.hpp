@@ -6,6 +6,9 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      A class for representing dimensions
+    */
     class LUE_NETCDF4_EXPORT Dimension
     {
 

@@ -21,6 +21,12 @@ namespace lue::netcdf {
     }
 
 
+    auto Dimension::group_id() const -> int
+    {
+        return _group_id;
+    }
+
+
     auto Dimension::name() const -> std::string
     {
         std::array<char, NC_MAX_NAME + 1> buffer{};
@@ -44,6 +50,14 @@ namespace lue::netcdf {
         }
 
         return length;
+    }
+
+
+    auto operator==(Dimension const& lhs, Dimension const& rhs) -> bool
+    {
+        // TODO Are dimension IDs globally unique or only within the group? In the latter case, also compare
+        //      group IDs.
+        return lhs.id() == rhs.id();
     }
 
 }  // namespace lue::netcdf

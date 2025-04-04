@@ -1,5 +1,5 @@
 #include "describe_netcdf4.hpp"
-#include "lue/string.hpp"
+#include "lue/netcdf4/type.hpp"
 #include <algorithm>
 
 
@@ -9,7 +9,7 @@ namespace lue::netcdf {
     {
         json = nlohmann::ordered_json{
             {"name", attribute.name()},
-            {"type", attribute.type()},
+            {"type", netcdf::as_string(attribute.type())},
             {"length", attribute.length()},
         };
 
@@ -75,6 +75,15 @@ namespace lue::netcdf {
     }
 
 
+    void to_json(nlohmann::ordered_json& json, Dimension const& dimension)
+    {
+        json = nlohmann::ordered_json{
+            {"name", dimension.name()},
+            {"length", dimension.length()},
+        };
+    }
+
+
     void to_json(nlohmann::ordered_json& json, Variable const& variable)
     {
         nlohmann::ordered_json attributes_json{};
@@ -84,9 +93,17 @@ namespace lue::netcdf {
             std::back_inserter(attributes_json),
             [](auto const& attribute) { return attribute; });
 
+        nlohmann::ordered_json dimensions_json{};
+
+        std::ranges::transform(
+            variable.dimensions(),
+            std::back_inserter(dimensions_json),
+            [](auto const& dimension) { return dimension; });
+
         json = nlohmann::ordered_json{
             {"name", variable.name()},
             {"attributes", attributes_json},
+            {"dimensions", dimensions_json},
         };
     }
 
@@ -110,13 +127,13 @@ namespace lue::netcdf {
         nlohmann::ordered_json groups_json{};
 
         std::ranges::transform(
-            group.groups(), std::back_inserter(groups_json), [](auto const& group) { return group; });
+            group.child_groups(), std::back_inserter(groups_json), [](auto const& group) { return group; });
 
         json = nlohmann::ordered_json{
             {"name", group.name()},
             {"attributes", attributes_json},
             {"variables", variables_json},
-            {"groups", groups_json},
+            {"child_groups", groups_json},
         };
     }
 

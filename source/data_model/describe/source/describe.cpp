@@ -44,10 +44,15 @@ namespace lue::utility {
             // auto dataset = cf::Dataset::open(dataset_name);
             // description = describe_cf_dataset(dataset);
 
-            auto dataset = netcdf::Dataset::open(dataset_name);
             // description = describe_netcdf4_dataset(dataset);
 
-            json = dataset;
+            json = netcdf::Dataset::open(dataset_name);
+
+            std::cout << std::setw(4) << json << std::endl;
+
+            std::cout << "----------\n";
+
+            json = cf::Dataset::open(dataset_name);
 
             std::cout << std::setw(4) << json << std::endl;
 

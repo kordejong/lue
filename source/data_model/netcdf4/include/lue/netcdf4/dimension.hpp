@@ -25,6 +25,8 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto id() const -> int;
 
+            [[nodiscard]] auto group_id() const -> int;
+
             [[nodiscard]] auto name() const -> std::string;
 
             [[nodiscard]] auto length() const -> std::size_t;
@@ -37,5 +39,8 @@ namespace lue::netcdf {
             //! ID of the variable
             int _dimension_id;
     };
+
+
+    auto operator==(Dimension const& lhs, Dimension const& rhs) -> bool;
 
 }  // namespace lue::netcdf

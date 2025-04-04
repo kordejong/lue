@@ -14,6 +14,7 @@ BOOST_AUTO_TEST_CASE(create)
 
     BOOST_REQUIRE(dataset.has_attribute("Conventions"));
     BOOST_CHECK_EQUAL(dataset.attribute("Conventions").value(), "CF-1.11");
+    BOOST_CHECK_EQUAL(dataset.version(), 1.11);
 
     BOOST_REQUIRE(dataset.has_attribute("history"));
     BOOST_CHECK_EQUAL(dataset.attribute("history").value(), std::format("LUE-{}", lue::version()));

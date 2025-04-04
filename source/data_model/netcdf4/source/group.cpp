@@ -140,14 +140,42 @@ namespace lue::netcdf {
     auto Group::nr_dimensions() const -> int
     {
         int nr_dimensions{0};
+        int const include_parents{0};
 
-        if (int status = nc_inq_ndims(_id, &nr_dimensions); status != NC_NOERR)
+        if (int status = nc_inq_dimids(_id, &nr_dimensions, nullptr, include_parents); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of dimensions: {}", error_message(status)));
         }
 
         return nr_dimensions;
+    }
+
+
+    auto Group::dimensions() const -> std::vector<Dimension>
+    {
+        int nr_dimensions{this->nr_dimensions()};
+        std::vector<int> dimension_ids(nr_dimensions);
+        int const include_parents{0};
+
+        if (int status = nc_inq_dimids(_id, nullptr, dimension_ids.data(), include_parents);
+            status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get dimension IDs: {}", error_message(status)));
+        }
+
+        // TODO C++23
+        // auto dimensions = dimension_ids
+        //     | std::views::transform(...)
+        //     | std::ranges::to<std::vector>();
+
+        auto dimensions_view =
+            dimension_ids | std::views::transform([group_id = _id](auto const dimension_id)
+                                                  { return Dimension{group_id, dimension_id}; });
+
+        std::vector<Dimension> dimensions(dimensions_view.begin(), dimensions_view.end());
+
+        return dimensions;
     }
 
 
@@ -289,26 +317,40 @@ namespace lue::netcdf {
     }
 
 
-    /*!
-        @brief      Define a sub-group
-        @param      .
-        @return     .
-        @exception  .
-    */
-    auto Group::add_group(std::string const& name) const -> Group
+    auto Group::parent_group() const -> Group
     {
         int group_id{};
 
-        if (int status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
+        if (int status = nc_inq_grp_parent(_id, &group_id); status != NC_NOERR)
         {
-            throw std::runtime_error(std::format("Cannot define group {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot get parent group: {}", error_message(status)));
         }
 
         return group_id;
     }
 
 
-    auto Group::has_group(std::string const& name) const -> bool
+    /*!
+        @brief      Define a sub-group
+        @param      .
+        @return     .
+        @exception  .
+    */
+    auto Group::add_child_group(std::string const& name) const -> Group
+    {
+        int group_id{};
+
+        if (int status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                std::format("Cannot define child group {}: {}", name, error_message(status)));
+        }
+
+        return group_id;
+    }
+
+
+    auto Group::has_child_group(std::string const& name) const -> bool
     {
         int group_id{};
 
@@ -316,20 +358,21 @@ namespace lue::netcdf {
     }
 
 
-    auto Group::group(std::string const& name) const -> Group
+    auto Group::child_group(std::string const& name) const -> Group
     {
         int group_id{};
 
         if (int status = nc_inq_grp_ncid(_id, name.c_str(), &group_id); status != NC_NOERR)
         {
-            throw std::runtime_error(std::format("Cannot get sub-group {}: {}", name, error_message(status)));
+            throw std::runtime_error(
+                std::format("Cannot get child group {}: {}", name, error_message(status)));
         }
 
         return group_id;
     }
 
 
-    auto Group::groups() const -> std::vector<Group>
+    auto Group::child_groups() const -> std::vector<Group>
     {
         int nr_groups{0};
 

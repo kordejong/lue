@@ -37,6 +37,8 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto nr_dimensions() const -> int;
 
+            [[nodiscard]] auto dimensions() const -> std::vector<Dimension>;
+
             [[nodiscard]] auto add_variable(
                 std::string const& name,
                 nc_type data_type,
@@ -74,13 +76,15 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
 
-            [[nodiscard]] auto add_group(std::string const& name) const -> Group;
+            [[nodiscard]] auto parent_group() const -> Group;
 
-            [[nodiscard]] auto has_group(std::string const& name) const -> bool;
+            [[nodiscard]] auto add_child_group(std::string const& name) const -> Group;
 
-            [[nodiscard]] auto group(std::string const& name) const -> Group;
+            [[nodiscard]] auto has_child_group(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto groups() const -> std::vector<Group>;
+            [[nodiscard]] auto child_group(std::string const& name) const -> Group;
+
+            [[nodiscard]] auto child_groups() const -> std::vector<Group>;
 
         protected:
 

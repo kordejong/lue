@@ -13,13 +13,13 @@ namespace lue::netcdf {
 
             Group(int group_id);
 
-            Group(Group const& other) = delete;
+            Group(Group const& other) = default;
 
             Group(Group&& other) noexcept;
 
             virtual ~Group() = default;
 
-            auto operator=(Group const& other) -> Group& = delete;  // TODO
+            auto operator=(Group const& other) -> Group& = default;
 
             auto operator=(Group&& other) noexcept -> Group&;
 
@@ -72,13 +72,15 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto attribute(std::string name) const -> Attribute;
 
-            [[nodiscard]] auto add_sub_group(std::string const& name) const -> Group;
+            [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
 
-            [[nodiscard]] auto has_sub_group(std::string const& name) const -> bool;
+            [[nodiscard]] auto add_group(std::string const& name) const -> Group;
 
-            [[nodiscard]] auto sub_group(std::string const& name) const -> Group;
+            [[nodiscard]] auto has_group(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto sub_groups() const -> std::vector<Group>;
+            [[nodiscard]] auto group(std::string const& name) const -> Group;
+
+            [[nodiscard]] auto groups() const -> std::vector<Group>;
 
         protected:
 

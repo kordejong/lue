@@ -10,20 +10,20 @@ BOOST_AUTO_TEST_CASE(sub_group)
 
     {
         auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
-        auto group1 = dataset.add_sub_group("sub_group1");
-        [[maybe_unused]] auto group2 = group1.add_sub_group("sub_group2");
+        auto group1 = dataset.add_group("sub_group1");
+        [[maybe_unused]] auto group2 = group1.add_group("sub_group2");
     }
 
     {
         auto dataset = lue::netcdf::Dataset::open(dataset_name);
 
-        BOOST_CHECK(dataset.has_sub_group("sub_group1"));
-        BOOST_CHECK(!dataset.has_sub_group("sub_group2"));
+        BOOST_CHECK(dataset.has_group("sub_group1"));
+        BOOST_CHECK(!dataset.has_group("sub_group2"));
 
-        auto group1 = dataset.sub_group("sub_group1");
+        auto group1 = dataset.group("sub_group1");
 
-        BOOST_CHECK(!group1.has_sub_group("sub_group1"));
-        BOOST_CHECK(group1.has_sub_group("sub_group2"));
+        BOOST_CHECK(!group1.has_group("sub_group1"));
+        BOOST_CHECK(group1.has_group("sub_group2"));
     }
 }
 

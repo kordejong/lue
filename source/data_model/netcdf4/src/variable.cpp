@@ -106,4 +106,26 @@ namespace lue::netcdf {
         return {_group_id, _variable_id, std::move(name)};
     }
 
+
+    auto Variable::attributes() const -> std::vector<Attribute>
+    {
+        int nr_attributes{0};
+
+        if (int status = nc_inq_varnatts(_group_id, _variable_id, &nr_attributes); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                std::format("Cannot get number of variable attributes: {}", error_message(status)));
+        }
+
+        std::vector<Attribute> attributes;
+        attributes.reserve(nr_attributes);
+
+        for (int attribute_id = 0; attribute_id < nr_attributes; ++attribute_id)
+        {
+            attributes.push_back(Attribute::open(_group_id, _variable_id, attribute_id));
+        }
+
+        return attributes;
+    }
+
 }  // namespace lue::netcdf

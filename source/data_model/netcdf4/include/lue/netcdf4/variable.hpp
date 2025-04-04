@@ -3,6 +3,7 @@
 #include "lue/netcdf4/attribute.hpp"
 #include "lue/netcdf4/dimension.hpp"
 #include <cassert>
+#include <format>
 
 
 namespace lue::netcdf {
@@ -103,6 +104,8 @@ namespace lue::netcdf {
             [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
 
             [[nodiscard]] auto attribute(std::string name) const -> Attribute;
+
+            [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
 
 
             template<Arithmetic T>

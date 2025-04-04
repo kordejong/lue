@@ -165,6 +165,28 @@ namespace lue::netcdf {
     }
 
 
+    auto Group::attributes() const -> std::vector<Attribute>
+    {
+        int nr_attributes{0};
+
+        if (int status = nc_inq_natts(_id, &nr_attributes); status != NC_NOERR)
+        {
+            throw std::runtime_error(
+                std::format("Cannot get number of group attributes: {}", error_message(status)));
+        }
+
+        std::vector<Attribute> attributes;
+        attributes.reserve(nr_attributes);
+
+        for (int attribute_id = 0; attribute_id < nr_attributes; ++attribute_id)
+        {
+            attributes.push_back(Attribute::open(_id, NC_GLOBAL, attribute_id));
+        }
+
+        return attributes;
+    }
+
+
     /*!
         @brief      Define a variable
         @param      name Variable name
@@ -273,7 +295,7 @@ namespace lue::netcdf {
         @return     .
         @exception  .
     */
-    auto Group::add_sub_group(std::string const& name) const -> Group
+    auto Group::add_group(std::string const& name) const -> Group
     {
         int group_id{};
 
@@ -286,7 +308,7 @@ namespace lue::netcdf {
     }
 
 
-    auto Group::has_sub_group(std::string const& name) const -> bool
+    auto Group::has_group(std::string const& name) const -> bool
     {
         int group_id{};
 
@@ -294,7 +316,7 @@ namespace lue::netcdf {
     }
 
 
-    auto Group::sub_group(std::string const& name) const -> Group
+    auto Group::group(std::string const& name) const -> Group
     {
         int group_id{};
 
@@ -307,7 +329,7 @@ namespace lue::netcdf {
     }
 
 
-    auto Group::sub_groups() const -> std::vector<Group>
+    auto Group::groups() const -> std::vector<Group>
     {
         int nr_groups{0};
 

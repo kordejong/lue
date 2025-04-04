@@ -2,6 +2,7 @@
 #include "describe_cf.hpp"
 #include "describe_netcdf4.hpp"
 #include <format>
+#include <iostream>
 
 
 namespace lue::utility {
@@ -35,7 +36,8 @@ namespace lue::utility {
 
         auto const dataset_name = argument<std::string>("dataset");
         int result = EXIT_FAILURE;
-        std::vector<std::string> description{};
+        // std::vector<std::string> description{};
+        nlohmann::ordered_json json{};
 
         try
         {
@@ -43,7 +45,11 @@ namespace lue::utility {
             // description = describe_cf_dataset(dataset);
 
             auto dataset = netcdf::Dataset::open(dataset_name);
-            description = describe_netcdf4_dataset(dataset);
+            // description = describe_netcdf4_dataset(dataset);
+
+            json = dataset;
+
+            std::cout << std::setw(4) << json << std::endl;
 
             result = EXIT_SUCCESS;
         }
@@ -52,10 +58,10 @@ namespace lue::utility {
             print_error_message(std::format("Cannot open dataset {}: {}", dataset_name, exception.what()));
         }
 
-        for (auto const& line : description)
-        {
-            print_info_message(line);
-        }
+        // for (auto const& line : description)
+        // {
+        //     print_info_message(line);
+        // }
 
         return result;
     }

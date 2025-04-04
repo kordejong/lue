@@ -33,7 +33,6 @@ target_sources(lue_cf
 
         source/domain.cpp
         source/field.cpp
-
 )
 
 target_link_libraries(lue_cf

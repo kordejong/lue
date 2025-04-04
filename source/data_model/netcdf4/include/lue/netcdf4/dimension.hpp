@@ -8,6 +8,8 @@ namespace lue::netcdf4 {
 
     /*!
         @brief      A class for representing dimensions
+
+        A dimension defines a single axes for quantities contained by it.
     */
     class LUE_NETCDF4_EXPORT Dimension
     {

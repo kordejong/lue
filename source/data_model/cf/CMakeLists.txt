@@ -24,9 +24,8 @@ target_sources(lue_cf
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/cf/export.hpp
     PRIVATE
         # TODO remove?
-        # source/dataset.cpp
+        source/dataset.cpp
         # source/dimension.cpp
-        # source/group.cpp
         # source/variable.cpp
         # /TODO
 
@@ -34,6 +33,7 @@ target_sources(lue_cf
 
         source/domain.cpp
         source/field.cpp
+
 )
 
 target_link_libraries(lue_cf

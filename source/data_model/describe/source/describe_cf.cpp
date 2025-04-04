@@ -268,6 +268,10 @@ namespace lue::cf {
 
         std::ranges::transform(
             domain.axes(), std::back_inserter(axes_json), [](auto const& axis) { return axis; });
+
+        json = nlohmann::ordered_json{
+            {"axes", axes_json},
+        };
     }
 
 
@@ -292,9 +296,9 @@ namespace lue::cf {
             json["units"] = field.attribute("units").value();
         }
 
-        if (field.domain())
+        if (field.has_domain())
         {
-            json["domain"] = *field.domain();
+            json["domain"] = field.domain();
         }
     }
 

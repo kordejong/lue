@@ -5,7 +5,7 @@
 namespace lue::cf::netcdf4 {
 
     /*!
-        @brief      Discrete locations multidimensional space
+        @brief      Discrete locations in multi-dimensional space
         @tparam     .
         @param      .
         @return     .

@@ -10,6 +10,8 @@ namespace lue::cf::netcdf4 {
         @param      .
         @return     .
         @exception  .
+
+        - Cell size or shape
     */
     class CellMeasureVariable: public lue::netcdf4::Variable
     {

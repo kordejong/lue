@@ -95,7 +95,7 @@ namespace lue::utility {
 
 
         // TODO? Dataset is also a group
-        for (auto const& group : dataset.sub_groups())
+        for (auto const& group : dataset.groups())
         {
             add_separation(description);
             describe_group(group, description);

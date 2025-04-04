@@ -1,7 +1,22 @@
 #include "lue/netcdf4/attribute.hpp"
+#include <array>
 
 
 namespace lue::netcdf {
+
+    auto Attribute::open(int const group_id, int const variable_id, int attribute_idx) -> Attribute
+    {
+        std::array<char, NC_MAX_NAME + 1> buffer{};
+
+        if (int status = nc_inq_attname(group_id, variable_id, attribute_idx, buffer.data());
+            status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get attribute name: {}", error_message(status)));
+        }
+
+        return {group_id, variable_id, buffer.data()};
+    }
+
 
     Attribute::Attribute(int const group_id, int const variable_id, std::string name):
 
@@ -10,6 +25,12 @@ namespace lue::netcdf {
         _name{std::move(name)}
 
     {
+    }
+
+
+    auto Attribute::name() const -> std::string const&
+    {
+        return _name;
     }
 
 

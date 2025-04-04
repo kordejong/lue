@@ -26,7 +26,7 @@ namespace lue::netcdf {
     }
 
 
-    auto Variable::dimensions() const -> std::vector<Dimension>
+    auto Variable::nr_dimensions() const -> int
     {
         int nr_dimensions{0};
 
@@ -36,6 +36,13 @@ namespace lue::netcdf {
                 std::format("Cannot get number of dimensions: {}", error_message(status)));
         }
 
+        return nr_dimensions;
+    }
+
+
+    auto Variable::dimensions() const -> std::vector<Dimension>
+    {
+        int nr_dimensions{this->nr_dimensions()};
         std::vector<int> dimension_ids(nr_dimensions);
 
         if (int status = nc_inq_vardimid(_group_id, _variable_id, dimension_ids.data()); status != NC_NOERR)

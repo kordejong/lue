@@ -35,6 +35,8 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto type() const -> nc_type;
 
+            [[nodiscard]] auto nr_dimensions() const -> int;
+
             [[nodiscard]] auto dimensions() const -> std::vector<Dimension>;
 
             [[nodiscard]] auto name() const -> std::string;

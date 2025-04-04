@@ -1,107 +1,136 @@
 #include "describe_cf.hpp"
-#include "lue/string.hpp"
-#include <format>
+#include "lue/cf.hpp"
+#include <algorithm>
 
 
-namespace lue::utility {
-
+namespace lue::cf {
     namespace {
 
+        // void to_json(nlohmann::ordered_json& json, netcdf::Attribute const& attribute)
+        // {
+        //     json = nlohmann::ordered_json{
+        //         {"name", attribute.name()},
+        //         {"length", attribute.length()},
+        //         {"type", netcdf::as_string(attribute.type())},
+        //     };
+        // }
 
-        void add_separation(std::vector<std::string>& description)
+
+        auto variable_kind_as_string(cf::Variable::Kind const kind)
         {
-            description.emplace_back("----------"
-                                     "----------"
-                                     "----------"
-                                     "----------");
-        }
+            std::string result;
 
-
-        void describe_attribute(
-            // cf::Dataset const& dataset,
-            auto const& dataset,
-            std::string const& name,
-            std::vector<std::string>& description,
-            std::optional<std::string> const& default_value = {})
-        {
-            std::string value = dataset.attribute(name).value(default_value);
-
-            description.push_back(std::format("{}: {}", name, value));
-        }
-
-
-        void attribute_value_list(
-            cf::Dataset const& dataset,
-            std::string const& name,
-            std::vector<std::string>& description,
-            std::optional<std::string> const& default_value = {})
-        {
-            std::string value = dataset.attribute(name).value(default_value);
-
-            description.push_back(std::format("{}:", name));
-
-            for (auto const& item : split_string(value, '\n'))
+            switch (kind)
             {
-                description.push_back(std::format("- {}", item));
+                case cf::Variable::Kind::coordinate:
+                {
+                    result = "coordinate";
+                    break;
+                }
+                case cf::Variable::Kind::regular:
+                {
+                    result = "regular";
+                    break;
+                }
             }
+
+            return result;
         }
 
 
-        void describe_variable(netcdf::Variable const& variable, std::vector<std::string>& description)
+        void to_json(nlohmann::ordered_json& json, netcdf::Dimension const& dimension)
         {
-            description.push_back(std::format("Variable: {}", variable.name()));
-
-            describe_attribute(variable, "units", description, "");
-            describe_attribute(variable, "long_name", description, "");
-            describe_attribute(variable, "standard_name", description, "");
-
-            // describe_attribute(variable, "bounds", description, "");
+            json = nlohmann::ordered_json{
+                {"name", dimension.name()},
+                {"length", dimension.length()},
+                {"is_time", cf::Dimension::is_time(dimension)},
+                {"is_latitude", cf::Dimension::is_latitude(dimension)},
+                {"is_longitude", cf::Dimension::is_longitude(dimension)},
+                {"is_spatiotemporal", cf::Dimension::is_spatiotemporal(dimension)},
+            };
         }
 
 
-        void describe_group(netcdf::Group const& group, std::vector<std::string>& description)
+        void to_json(nlohmann::ordered_json& json, netcdf::Variable const& variable)
         {
-            description.push_back(std::format("Group: {}", group.name()));
+            nlohmann::ordered_json dimensions_json{};
 
-            // describe_attribute(variable, "units", description, "");
-            // describe_attribute(variable, "long_name", description, "");
-            // describe_attribute(variable, "standard_name", description, "");
-            // // describe_attribute(variable, "bounds", description, "");
+            for (auto const& dimension : variable.dimensions())
+            {
+                nlohmann::ordered_json dimension_json{};
+                to_json(dimension_json, dimension);
+                dimensions_json.push_back(dimension_json);
+            }
+
+            json = nlohmann::ordered_json{
+                {"standard_name", variable.attribute("standard_name").value("")},
+                {"long_name", variable.attribute("long_name").value("")},
+                {"units", variable.attribute("units").value()},  // TODO udunits
+                {"kind", variable_kind_as_string(cf::Variable::kind(variable))},
+                {"dimensions", dimensions_json},
+            };
+        }
+
+
+        void to_json(nlohmann::ordered_json& json, netcdf::Group const& group)
+        {
+            // nlohmann::ordered_json attributes_json{};
+
+            // for(auto const& attribute: group.attributes())
+            // {
+            //     nlohmann::ordered_json attribute_json{};
+            //     to_json(attribute_json, attribute);
+            //     attributes_json.push_back(attribute_json);
+            // }
+
+            nlohmann::ordered_json variables_json{};
+
+            for (auto const& variable : group.variables())
+            {
+                nlohmann::ordered_json variable_json{};
+                to_json(variable_json, variable);
+                variables_json.push_back(variable_json);
+            }
+
+            nlohmann::ordered_json groups_json{};
+
+            for (auto const& group : group.child_groups())
+            {
+                nlohmann::ordered_json group_json{};
+                to_json(group_json, group);
+                groups_json.push_back(group_json);
+            }
+
+            json = nlohmann::ordered_json{
+                {"name", group.name()},
+                // {"attributes", attributes_json},
+                {"variables", variables_json},
+                {"child_groups", groups_json},
+            };
         }
 
     }  // Anonymous namespace
 
 
-    auto describe_cf_dataset(cf::Dataset const& dataset) -> std::vector<std::string>
+    void to_json(nlohmann::ordered_json& json, Dataset const& dataset)
     {
-        std::vector<std::string> description{};
+        // High-level stuff, related to CF
+        json = nlohmann::ordered_json{
+            // TODO Parse version number
+            {"CF version", dataset.version()},
+            {"title", dataset.attribute("title").value("")},
+            {"history", dataset.attribute("history").value("")},
+            {"institution", dataset.attribute("institution").value("")},
+            {"source", dataset.attribute("source").value("")},
+            {"comment", dataset.attribute("comment").value("")},
+            {"references", dataset.attribute("references").value("")},
+        };
 
-        description.push_back(std::format("Dataset: {}", dataset.path()));
-        description.emplace_back("File format: netCDF-4");
+        // We can't add alternative to_json functions in the netcdf namespace so we call to_json explicitlyly
+        nlohmann::ordered_json group_json{};
+        to_json(group_json, dynamic_cast<netcdf::Group const&>(dataset));
 
-        describe_attribute(dataset, "Conventions", description);
-        describe_attribute(dataset, "title", description, "");
-        attribute_value_list(dataset, "history", description, "");
-        describe_attribute(dataset, "institution", description, "");
-        describe_attribute(dataset, "source", description, "");
-        describe_attribute(dataset, "comment", description, "");
-        describe_attribute(dataset, "references", description, "");
-
-        for (auto const& variable : dataset.variables())
-        {
-            add_separation(description);
-            describe_variable(variable, description);
-        }
-
-
-        // TODO? Dataset is also a group
-        for (auto const& group : dataset.groups())
-        {
-            add_separation(description);
-            describe_group(group, description);
-        }
-
-        return description;
+        json.update(group_json);
     }
 
-}  // namespace lue::utility
+}  // namespace lue::cf

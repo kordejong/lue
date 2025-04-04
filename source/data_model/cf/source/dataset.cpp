@@ -1,5 +1,8 @@
 #include "lue/cf/dataset.hpp"
 #include "lue/version.hpp"
+#include <regex>
+
+#include <iostream>
 
 
 namespace lue::cf {
@@ -9,7 +12,7 @@ namespace lue::cf {
         auto dataset = netcdf::Dataset::create(name, create_mode);
 
         dataset.add_attribute("Conventions", std::string{"CF-1.11"});
-        dataset.add_attribute("history", std::string{std::format("LUE-{}", version())});
+        dataset.add_attribute("history", std::string{std::format("LUE-{}", lue::version())});
 
         return dataset;
     }
@@ -42,6 +45,30 @@ namespace lue::cf {
         Dataset{dataset.release()}
 
     {
+    }
+
+
+    auto Dataset::version() const -> double
+    {
+        auto const convention{attribute("Conventions").value()};
+
+        // ... CF-<double> ...
+
+        std::regex const version_regex{R"(CF-\d+[.]\d+)"};
+        std::smatch version_match{};
+
+        if (!std::regex_search(convention, version_match, version_regex))
+        {
+            throw std::runtime_error("Could not find CF version");
+        }
+
+        // TODO
+        // auto const version_as_string = version_match.str();
+        // std::cout << "YEAH: version: " << version_as_string << std::endl;
+        // std::cout << "YEAH: version: " << version_match[0] << std::endl;
+        // std::cout << "YEAH: version: " << version_match[1] << std::endl;
+
+        return 0.0;
     }
 
 }  // namespace lue::cf

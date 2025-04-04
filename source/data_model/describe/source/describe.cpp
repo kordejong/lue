@@ -8,13 +8,12 @@
 namespace lue::utility {
 
     Describe::Describe(int const argc, char const* const* argv):
-
         Application{
             []()
             {
                 cxxopts::Options options{"lue_describe", "Describe a dataset"};
                 options.add_options()("h,help", "Show usage")("v,version", "Show version")(
-                    "dataset", "Input dataset", cxxopts::value<std::string>());
+                    "dataset", "Dataset to describe", cxxopts::value<std::string>());
                 options.parse_positional({"dataset"});
                 options.positional_help("<dataset>");
                 options.show_positional_help();

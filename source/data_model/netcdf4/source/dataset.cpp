@@ -1,7 +1,10 @@
 #include "lue/netcdf4/dataset.hpp"
 #include "lue/netcdf4/error.hpp"
+#include "lue/string.hpp"
+#include <algorithm>
 #include <cassert>
-#include <format>
+#include <ranges>
+#include <sstream>
 
 
 namespace lue::netcdf4 {
@@ -211,6 +214,90 @@ namespace lue::netcdf4 {
         }
 
         return format;
+    }
+
+
+    /*!
+        @brief      Write the @a conventions to the `Conventions` attribute
+
+        - Each convention will be trimmed of leading and trailing whitespace
+        - Empty strings will be disregarded
+        - If any convention contains whitespace, conventions are separated by a comma. If not, they are
+          separated by a space.
+        - Existing content is overwritten
+    */
+    void Dataset::set_conventions(std::vector<std::string> conventions)
+    {
+        // Write "Conventions" attribute. If one of the conventions contains a space, the conventions will
+        // be separated by a comma. Otherwise they will be with a space.
+
+        // Get rid of strings that only contain whitespace
+        for (auto& convention : conventions)
+        {
+            convention = trim(convention);
+        }
+
+        conventions.erase(
+            std::remove(conventions.begin(), conventions.end(), std::string{}), conventions.end());
+
+        if (!conventions.empty())
+        {
+            // Build a string containing all conventions passed in and write is as the attribute's value
+            auto is_space = [](unsigned char const character) { return std::isspace(character); };
+            auto contains_space = [is_space](std::string const& convention)
+            { return std::ranges::find_if(std::string_view{convention}, is_space); };
+
+            char const separator =
+                std::ranges::find_if(conventions.begin(), conventions.end(), contains_space) !=
+                        conventions.end()
+                    ? ','
+                    : ' ';
+
+            // C++23: auto joined_conventions = conventions | std::views::join_with(separator);
+
+            std::ostringstream stream{};
+
+            stream << conventions[0];
+
+            for (std::size_t idx = 1; idx < conventions.size(); ++idx)
+            {
+                stream << separator << conventions[idx];
+            }
+
+            add_attribute("Conventions", stream.str());
+        }
+    }
+
+
+    /*!
+        @brief      Return the convention names stored in the `Conventions` attribute or an empty collection
+                    if no such attribute is present
+
+    */
+    auto Dataset::conventions() const -> std::vector<std::string>
+    {
+        std::vector<std::string> convention_names{};
+
+        if (has_attribute("Conventions"))
+        {
+            auto const conventions{attribute("Conventions").value()};
+
+            // If the string contains a comma, it is assumed to be a comma-separated list. If not, it is
+            // assumed to be a space separated list.
+            char const separator = conventions.find(',') != std::string::npos ? ',' : ' ';
+
+            for (auto const sub_range : std::ranges::split_view(conventions, separator))
+            {
+                std::string_view convention_name{trim({sub_range.begin(), sub_range.end()})};
+
+                if (!convention_name.empty())
+                {
+                    convention_names.emplace_back(convention_name);
+                }
+            }
+        }
+
+        return convention_names;
     }
 
 }  // namespace lue::netcdf4

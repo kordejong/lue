@@ -3,8 +3,15 @@
 #include "lue/netcdf4/variable.hpp"
 
 
-namespace lue::cf::netcdf {
+namespace lue::cf::netcdf4 {
 
+    /*!
+        @brief      Vertical coordinate system
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+    */
     class FormulaTerms: public lue::netcdf4::Attribute
     {
 
@@ -16,4 +23,4 @@ namespace lue::cf::netcdf {
             std::vector<lue::netcdf4::Variable> _variables;
     };
 
-}  // namespace lue::cf::netcdf
+}  // namespace lue::cf::netcdf4

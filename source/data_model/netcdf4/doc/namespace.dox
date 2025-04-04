@@ -12,6 +12,6 @@ namespace lue {
         - [Homepage](https://www.unidata.ucar.edu/software/netcdf/)
         - [C-API](https://docs.unidata.ucar.edu/netcdf-c/current/index.html)
     */
-    namespace netcdf {
+    namespace netcdf4 {
     }
 }

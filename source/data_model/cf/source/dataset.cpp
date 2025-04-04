@@ -7,9 +7,9 @@ namespace lue::cf {
 
     auto Dataset::create(std::string const& name, int const create_mode) -> Dataset
     {
-        auto dataset = netcdf::Dataset::create(name, create_mode);
+        auto dataset = netcdf4::Dataset::create(name, create_mode);
 
-        dataset.add_attribute("Conventions", std::string{"CF-1.11"});
+        dataset.set_conventions({"CF-1.11"});
         dataset.add_attribute("history", std::string{std::format("LUE-{}", lue::version())});
 
         return dataset;
@@ -18,7 +18,7 @@ namespace lue::cf {
 
     auto Dataset::open(std::string const& name, int const open_mode) -> Dataset
     {
-        auto dataset = netcdf::Dataset::open(name, open_mode);
+        auto dataset = netcdf4::Dataset::open(name, open_mode);
 
         if ((!dataset.has_attribute("Conventions")) ||
             dataset.attribute("Conventions").value().find("CF-") == std::string::npos)
@@ -26,18 +26,21 @@ namespace lue::cf {
             throw std::runtime_error(std::format("Dataset {} does not conform to the CF convention", name));
         }
 
-        return netcdf::Dataset{dataset.release()};
+        return netcdf4::Dataset{dataset.release()};
     }
 
 
-    Dataset::Dataset(netcdf::Dataset&& dataset):
+    Dataset::Dataset(netcdf4::Dataset&& dataset):
 
-        netcdf::Dataset{std::move(dataset)}
+        netcdf4::Dataset{std::move(dataset)}
 
     {
     }
 
 
+    /*!
+        @brief      Return the version of the CF convention used to write the data set
+    */
     auto Dataset::version() const -> double
     {
         auto const convention{attribute("Conventions").value()};
@@ -52,42 +55,6 @@ namespace lue::cf {
         }
 
         return std::stod(version_match[1].str());
-    }
-
-
-    auto Dataset::title() const -> std::string
-    {
-        return attribute("title").value("");
-    }
-
-
-    auto Dataset::history() const -> std::string
-    {
-        return attribute("history").value("");
-    }
-
-
-    auto Dataset::institution() const -> std::string
-    {
-        return attribute("institution").value("");
-    }
-
-
-    auto Dataset::source() const -> std::string
-    {
-        return attribute("source").value("");
-    }
-
-
-    auto Dataset::comment() const -> std::string
-    {
-        return attribute("comment").value("");
-    }
-
-
-    auto Dataset::references() const -> std::string
-    {
-        return attribute("references").value("");
     }
 
 }  // namespace lue::cf

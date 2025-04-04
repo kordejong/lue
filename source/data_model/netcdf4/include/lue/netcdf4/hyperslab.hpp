@@ -1,5 +1,6 @@
 #pragma once
 #include "lue/netcdf4/define.hpp"
+#include "lue/netcdf4/export.hpp"
 
 
 namespace lue::netcdf {
@@ -10,7 +11,7 @@ namespace lue::netcdf {
         In general, a hyperslab defines a subset of an array. A subset potentially includes all array
         elements.
     */
-    class Hyperslab
+    class LUE_NETCDF4_EXPORT Hyperslab
     {
 
         public:

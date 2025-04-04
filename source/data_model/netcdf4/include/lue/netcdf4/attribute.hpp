@@ -1,6 +1,7 @@
 #pragma once
 #include "lue/concept.hpp"
 #include "lue/netcdf4/error.hpp"
+#include "lue/netcdf4/export.hpp"
 #include "lue/netcdf4/type_traits.hpp"
 #include <netcdf.h>
 #include <cassert>

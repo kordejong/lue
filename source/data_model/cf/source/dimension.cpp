@@ -5,53 +5,64 @@
 
 namespace lue::cf {
 
-    namespace {
+    Dimension::Dimension(netcdf::Dimension const& dimension):
 
-        auto is_coordinate_dimension(netcdf::Dimension const& dimension, std::string const& name) -> bool
+        netcdf::Dimension{dimension}
+
+    {
+    }
+
+
+    auto Dimension::is_coordinate_dimension(std::string const& name) const -> bool
+    {
+        bool result{false};
+
+        netcdf::Group group{group_id()};
+
+        for (auto const& netcdf_variable : group.variables())
         {
-            bool result{false};
+            Variable const variable{netcdf_variable};
 
-            netcdf::Group group{dimension.group_id()};
-
-            for (auto const& variable : group.variables())
+            // TODO units
+            // && variable.attribute("units") ==
+            if (variable.kind() == Variable::Kind::coordinate && variable.dimensions()[0] == *this &&
+                variable.name() == name)
             {
-                // TODO units
-                // && variable.attribute("units") ==
-                if (Variable::is_coordinate(variable) && variable.dimensions()[0] == dimension &&
-                    variable.name() == name)
-                {
-                    result = true;
-                    break;
-                }
+                result = true;
+                break;
             }
-
-            return result;
         }
 
-    }  // Anonymous namespace
-
-
-    auto Dimension::is_latitude(netcdf::Dimension const& dimension) -> bool
-    {
-        return is_coordinate_dimension(dimension, "lat");
+        return result;
     }
 
 
-    auto Dimension::is_longitude(netcdf::Dimension const& dimension) -> bool
+    auto Dimension::kind() const -> Kind
     {
-        return is_coordinate_dimension(dimension, "lon");
+        Kind kind{Kind::unknown};
+
+        if (is_coordinate_dimension("lat"))
+        {
+            kind = Kind::latitude;
+        }
+        else if (is_coordinate_dimension("lon"))
+        {
+            kind = Kind::longitude;
+        }
+        else if (is_coordinate_dimension("time"))
+        {
+            kind = Kind::time;
+        }
+
+        return kind;
     }
 
 
-    auto Dimension::is_time(netcdf::Dimension const& dimension) -> bool
+    auto Dimension::is_spatiotemporal() const -> bool
     {
-        return is_coordinate_dimension(dimension, "time");
-    }
+        auto const kind{this->kind()};
 
-
-    auto Dimension::is_spatiotemporal(netcdf::Dimension const& dimension) -> bool
-    {
-        return is_latitude(dimension) || is_longitude(dimension) || is_time(dimension);
+        return kind == Kind::latitude || kind == Kind::longitude || kind == Kind::time;
     }
 
 }  // namespace lue::cf

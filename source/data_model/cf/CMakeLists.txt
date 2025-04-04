@@ -25,6 +25,7 @@ target_sources(lue_cf
     PRIVATE
         source/dataset.cpp
         source/dimension.cpp
+        source/group.cpp
         source/variable.cpp
 )
 

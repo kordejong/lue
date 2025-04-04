@@ -17,7 +17,7 @@ namespace lue::netcdf {
     {
         nc_type type{};
 
-        if (int status = nc_inq_vartype(_group_id, _variable_id, &type); status != NC_NOERR)
+        if (auto const status = nc_inq_vartype(_group_id, _variable_id, &type); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get type: {}", error_message(status)));
         }
@@ -30,7 +30,7 @@ namespace lue::netcdf {
     {
         int nr_dimensions{0};
 
-        if (int status = nc_inq_varndims(_group_id, _variable_id, &nr_dimensions); status != NC_NOERR)
+        if (auto const status = nc_inq_varndims(_group_id, _variable_id, &nr_dimensions); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of dimensions: {}", error_message(status)));
@@ -45,7 +45,8 @@ namespace lue::netcdf {
         int nr_dimensions{this->nr_dimensions()};
         std::vector<int> dimension_ids(nr_dimensions);
 
-        if (int status = nc_inq_vardimid(_group_id, _variable_id, dimension_ids.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_vardimid(_group_id, _variable_id, dimension_ids.data());
+            status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get dimension IDs: {}", error_message(status)));
         }
@@ -69,7 +70,7 @@ namespace lue::netcdf {
     {
         std::array<char, NC_MAX_NAME + 1> buffer{};
 
-        if (int status = nc_inq_varname(_group_id, _variable_id, buffer.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_varname(_group_id, _variable_id, buffer.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get variable name: {}", error_message(status)));
         }
@@ -80,7 +81,8 @@ namespace lue::netcdf {
 
     void Variable::unset_fill_value() const
     {
-        if (int status = nc_def_var_fill(_group_id, _variable_id, NC_NOFILL, nullptr); status != NC_NOERR)
+        if (auto const status = nc_def_var_fill(_group_id, _variable_id, NC_NOFILL, nullptr);
+            status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot unset fill value: {}", error_message(status)));
         }
@@ -91,7 +93,8 @@ namespace lue::netcdf {
     {
         int fill_mode{};
 
-        if (int status = nc_inq_var_fill(_group_id, _variable_id, &fill_mode, nullptr); status != NC_NOERR)
+        if (auto const status = nc_inq_var_fill(_group_id, _variable_id, &fill_mode, nullptr);
+            status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get fill mode: {}", error_message(status)));
         }
@@ -118,7 +121,7 @@ namespace lue::netcdf {
     {
         int nr_attributes{0};
 
-        if (int status = nc_inq_varnatts(_group_id, _variable_id, &nr_attributes); status != NC_NOERR)
+        if (auto const status = nc_inq_varnatts(_group_id, _variable_id, &nr_attributes); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of variable attributes: {}", error_message(status)));

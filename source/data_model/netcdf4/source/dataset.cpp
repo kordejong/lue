@@ -35,7 +35,7 @@ namespace lue::netcdf {
 
         int dataset_id{};
 
-        if (int status = nc_create(name.c_str(), create_mode, &dataset_id); status != NC_NOERR)
+        if (auto const status = nc_create(name.c_str(), create_mode, &dataset_id); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot create dataset {}: {}", name, error_message(status)));
@@ -56,7 +56,7 @@ namespace lue::netcdf {
     {
         int dataset_id{};
 
-        if (int status = nc_open(name.c_str(), open_mode, &dataset_id); status != NC_NOERR)
+        if (auto const status = nc_open(name.c_str(), open_mode, &dataset_id); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot open dataset {}: {}", name, error_message(status)));
         }
@@ -127,7 +127,7 @@ namespace lue::netcdf {
     {
         if (Group::id_is_valid())
         {
-            if (int status = nc_close(Group::id()); status != NC_NOERR)
+            if (auto const status = nc_close(Group::id()); status != NC_NOERR)
             {
                 // TODO Can't throw here. Log an error? Abort? Forget about it?
             }
@@ -141,7 +141,7 @@ namespace lue::netcdf {
     // */
     // void Dataset::end_define()
     // {
-    //     if (int status = nc_enddef(Group::id()); status != NC_NOERR)
+    //     if (auto const status = nc_enddef(Group::id()); status != NC_NOERR)
     //     {
     //         throw std::runtime_error(std::format("Cannot leave define mode: {}", error_message(status)));
     //     }
@@ -161,14 +161,14 @@ namespace lue::netcdf {
     {
         std::size_t nr_bytes{0};
 
-        if (int status = nc_inq_path(id(), &nr_bytes, nullptr); status != NC_NOERR)
+        if (auto const status = nc_inq_path(id(), &nr_bytes, nullptr); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get path length: {}", error_message(status)));
         }
 
         std::string name(nr_bytes, 'x');
 
-        if (int status = nc_inq_path(id(), nullptr, name.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_path(id(), nullptr, name.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get path: {}", error_message(status)));
         }
@@ -181,7 +181,7 @@ namespace lue::netcdf {
     {
         int format{0};
 
-        if (int status = nc_inq_format(id(), &format); status != NC_NOERR)
+        if (auto const status = nc_inq_format(id(), &format); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get format: {}", error_message(status)));
         }

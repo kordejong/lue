@@ -8,7 +8,7 @@ namespace lue::netcdf {
     {
         std::array<char, NC_MAX_NAME + 1> buffer{};
 
-        if (int status = nc_inq_attname(group_id, variable_id, attribute_idx, buffer.data());
+        if (auto const status = nc_inq_attname(group_id, variable_id, attribute_idx, buffer.data());
             status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get attribute name: {}", error_message(status)));
@@ -38,7 +38,8 @@ namespace lue::netcdf {
     {
         nc_type type{0};
 
-        if (int status = nc_inq_atttype(_group_id, _variable_id, _name.c_str(), &type); status != NC_NOERR)
+        if (auto const status = nc_inq_atttype(_group_id, _variable_id, _name.c_str(), &type);
+            status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get attribute type: {}", error_message(status)));
         }
@@ -51,7 +52,8 @@ namespace lue::netcdf {
     {
         std::size_t length{0};
 
-        if (int status = nc_inq_attlen(_group_id, _variable_id, _name.c_str(), &length); status != NC_NOERR)
+        if (auto const status = nc_inq_attlen(_group_id, _variable_id, _name.c_str(), &length);
+            status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get attribute length: {}", error_message(status)));
         }

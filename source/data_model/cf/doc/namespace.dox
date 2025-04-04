@@ -8,6 +8,11 @@ namespace lue {
         More information about CF can be found online:
 
         - [Homepage](https://cfconventions.org)
+
+        Notes:
+
+        - No variable or dimension names are standardized by the CF convention. Only names of attributes and
+          some of the values taken by those attributes are standardized.
     */
     namespace cf {
     }

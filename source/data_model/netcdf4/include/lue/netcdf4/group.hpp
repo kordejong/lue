@@ -50,25 +50,36 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto variables() const -> std::vector<Variable>;
 
-            /*!
-                @brief      Write a global attribute to the group
-                @param      name Name of attribute
-                @param      values Values of attribute
-                @return     Written attribute
-                @exception  std::runtime_error In case the attribute cannot be written
-            */
-            template<typename T>
-            auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            // /*!
+            //     @brief      Write a global attribute to the group
+            //     @param      name Name of attribute
+            //     @param      values Values of attribute
+            //     @return     Written attribute
+            //     @exception  std::runtime_error In case the attribute cannot be written
+            // */
+            // template<typename T>
+            // auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            // {
+            //     return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), values);
+            // }
+
+
+            auto add_attribute(std::string name, std::string const& value) -> Attribute;
+
+
+            template<Arithmetic T>
+            auto add_attribute(std::string name, T const& value) -> Attribute
             {
-                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), values);
+                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), 1, value);
             }
 
 
-            template<typename T>
-            auto add_attribute(std::string name, T&& value) -> Attribute
+            template<Arithmetic T>
+            auto add_attribute(std::string name, std::size_t const nr_values, T const* values) -> Attribute
             {
-                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), std::forward<T>(value));
+                return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), nr_values, values);
             }
+
 
             [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
 

@@ -5,16 +5,36 @@
 
 namespace lue::cf {
 
-    struct LUE_CF_EXPORT Dimension
+    /*!
+        @brief      .
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+
+        - Dimension names are not standardized
+    */
+    class LUE_CF_EXPORT Dimension: public netcdf::Dimension
     {
 
-            static auto is_latitude(netcdf::Dimension const& dimension) -> bool;
+        public:
 
-            static auto is_longitude(netcdf::Dimension const& dimension) -> bool;
+            enum class Kind {
+                latitude,
+                longitude,
+                time,
+                unknown,
+            };
 
-            static auto is_time(netcdf::Dimension const& dimension) -> bool;
+            Dimension(netcdf::Dimension const& dimension);
 
-            static auto is_spatiotemporal(netcdf::Dimension const& dimension) -> bool;
+            [[nodiscard]] auto kind() const -> Kind;
+
+            [[nodiscard]] auto is_spatiotemporal() const -> bool;
+
+        private:
+
+            [[nodiscard]] auto is_coordinate_dimension(std::string const& name) const -> bool;
     };
 
 }  // namespace lue::cf

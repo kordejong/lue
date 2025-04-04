@@ -73,6 +73,8 @@ namespace lue::utility {
                 char const* const* argv,
                 SubcommandCreators&& subcommand_creators);
 
+            // TODO Command(cxxopts::Options const& options, int argc, char const* argv[]);
+
             void print_info_message(std::string const& message) const;
 
             void print_error_message(std::string const& message) const;

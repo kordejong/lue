@@ -33,6 +33,7 @@ target_sources(lue_shared
     PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}/source/git.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/source/version.cpp
+        source/string.cpp
 )
 
 target_link_libraries(lue_shared

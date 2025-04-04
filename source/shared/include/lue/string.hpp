@@ -1,5 +1,7 @@
 #pragma once
 #include <sstream>
+#include <string>
+#include <vector>
 
 
 namespace lue {
@@ -23,5 +25,7 @@ namespace lue {
 
         return stream.str();
     }
+
+    auto split_string(std::string const& string, std::string::value_type token) -> std::vector<std::string>;
 
 }  // namespace lue

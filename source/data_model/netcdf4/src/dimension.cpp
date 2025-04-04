@@ -1,7 +1,7 @@
 #include "lue/netcdf4/dimension.hpp"
 #include "lue/netcdf4/error.hpp"
-#include <fmt/format.h>
 #include <array>
+#include <format>
 
 
 namespace lue::netcdf {
@@ -27,7 +27,7 @@ namespace lue::netcdf {
 
         if (int status = nc_inq_dimname(_group_id, _dimension_id, buffer.data()); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get dimension name: {}", error_message(status)));
+            throw std::runtime_error(std::format("Cannot get dimension name: {}", error_message(status)));
         }
 
         return buffer.data();
@@ -40,7 +40,7 @@ namespace lue::netcdf {
 
         if (int status = nc_inq_dimlen(_group_id, _dimension_id, &length); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get dimension length: {}", error_message(status)));
+            throw std::runtime_error(std::format("Cannot get dimension length: {}", error_message(status)));
         }
 
         return length;

@@ -99,11 +99,9 @@ IncludeCategories:
     Priority:        80
   - Regex:           '^"lue/'
     Priority:        90
-  - Regex:           '^<hpx/'
+  - Regex:           '^<(boost|fmt|gdal|GLFW|hdf5|hpx|imgui|netcdf|numpy|pybind11).*'
     Priority:        100
   - Regex:           '^<vulkan/'
-    Priority:        105
-  - Regex:           '^<(boost|fmt|numpy|pybind11)/'
     Priority:        110
   - Regex:           '^<.*'
     Priority:        120

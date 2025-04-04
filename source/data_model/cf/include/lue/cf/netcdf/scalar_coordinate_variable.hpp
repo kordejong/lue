@@ -4,6 +4,17 @@
 
 namespace lue::cf::netcdf {
 
+    /*!
+        @brief      .
+        @tparam     .
+        @param      .
+        @return     .
+        @exception  .
+
+        - Contain coordinate data
+        - Missing data is not allowed
+        - ...
+    */
     class ScalarCoordinateVariable: public GenericCoordinateVariable
     {
 

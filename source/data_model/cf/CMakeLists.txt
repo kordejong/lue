@@ -23,12 +23,17 @@ target_sources(lue_cf
             include/lue
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/cf/export.hpp
     PRIVATE
+        # TODO remove?
         source/dataset.cpp
         source/dimension.cpp
-        source/domain.cpp
-        source/field.cpp
         source/group.cpp
         source/variable.cpp
+        # /TODO
+
+        source/netcdf/data_variable.cpp
+
+        source/domain.cpp
+        source/field.cpp
 )
 
 target_link_libraries(lue_cf

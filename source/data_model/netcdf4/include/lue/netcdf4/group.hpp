@@ -6,6 +6,9 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      Class for representing groups
+    */
     class LUE_NETCDF4_EXPORT Group
     {
 
@@ -67,6 +70,11 @@ namespace lue::netcdf {
             auto add_attribute(std::string name, std::string const& value) -> Attribute;
 
 
+            /*!
+                @brief      Add attribute with name @a name and scalar value @a value
+                @tparam     T Type of the attribute value
+                @return     Instance representing the attribute
+            */
             template<Arithmetic T>
             auto add_attribute(std::string name, T const& value) -> Attribute
             {
@@ -74,6 +82,11 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Add attribute with name @a name and array of @a values
+                @tparam     T Element type of the values
+                @return     Instance representing the attribute
+            */
             template<Arithmetic T>
             auto add_attribute(std::string name, std::size_t const nr_values, T const* values) -> Attribute
             {

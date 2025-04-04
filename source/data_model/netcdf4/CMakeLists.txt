@@ -39,6 +39,7 @@ target_sources(lue_netcdf4
         source/dimension.cpp
         source/error.cpp
         source/group.cpp
+        source/hyperslab.cpp
         source/type.cpp
         source/variable.cpp
         ${CMAKE_CURRENT_BINARY_DIR}/source/version.cpp

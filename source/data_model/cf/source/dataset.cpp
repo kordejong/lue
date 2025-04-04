@@ -2,8 +2,6 @@
 #include "lue/version.hpp"
 #include <regex>
 
-#include <iostream>
-
 
 namespace lue::cf {
 
@@ -28,21 +26,13 @@ namespace lue::cf {
             throw std::runtime_error(std::format("Dataset {} does not conform to the CF convention", name));
         }
 
-        return dataset.release();
-    }
-
-
-    Dataset::Dataset(int const dataset_id):
-
-        netcdf::Dataset{dataset_id}
-
-    {
+        return netcdf::Dataset{dataset.release()};
     }
 
 
     Dataset::Dataset(netcdf::Dataset&& dataset):
 
-        Dataset{dataset.release()}
+        netcdf::Dataset{std::move(dataset)}
 
     {
     }
@@ -53,8 +43,7 @@ namespace lue::cf {
         auto const convention{attribute("Conventions").value()};
 
         // ... CF-<double> ...
-
-        std::regex const version_regex{R"(CF-\d+[.]\d+)"};
+        std::regex const version_regex{"CF-([0-9]+[.][0-9]+)"};
         std::smatch version_match{};
 
         if (!std::regex_search(convention, version_match, version_regex))
@@ -62,13 +51,43 @@ namespace lue::cf {
             throw std::runtime_error("Could not find CF version");
         }
 
-        // TODO
-        // auto const version_as_string = version_match.str();
-        // std::cout << "YEAH: version: " << version_as_string << std::endl;
-        // std::cout << "YEAH: version: " << version_match[0] << std::endl;
-        // std::cout << "YEAH: version: " << version_match[1] << std::endl;
+        return std::stod(version_match[1].str());
+    }
 
-        return 0.0;
+
+    auto Dataset::title() const -> std::string
+    {
+        return attribute("title").value("");
+    }
+
+
+    auto Dataset::history() const -> std::string
+    {
+        return attribute("history").value("");
+    }
+
+
+    auto Dataset::institution() const -> std::string
+    {
+        return attribute("institution").value("");
+    }
+
+
+    auto Dataset::source() const -> std::string
+    {
+        return attribute("source").value("");
+    }
+
+
+    auto Dataset::comment() const -> std::string
+    {
+        return attribute("comment").value("");
+    }
+
+
+    auto Dataset::references() const -> std::string
+    {
+        return attribute("references").value("");
     }
 
 }  // namespace lue::cf

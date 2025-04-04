@@ -57,7 +57,7 @@ namespace lue::netcdf {
     {
         std::size_t nr_bytes{0};
 
-        if (int status = nc_inq_grpname_len(_id, &nr_bytes); status != NC_NOERR)
+        if (auto const status = nc_inq_grpname_len(_id, &nr_bytes); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get group name length: {}", error_message(status)));
         }
@@ -75,7 +75,7 @@ namespace lue::netcdf {
         std::size_t nr_bytes{name_length()};
         std::string name(nr_bytes, 'x');
 
-        if (int status = nc_inq_grpname(_id, name.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_grpname(_id, name.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get group name: {}", error_message(status)));
         }
@@ -93,7 +93,7 @@ namespace lue::netcdf {
         std::size_t nr_bytes{name_length()};
         std::string name(nr_bytes, 'x');
 
-        if (int status = nc_inq_grpname_full(_id, nullptr, name.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_grpname_full(_id, nullptr, name.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get full group name: {}", error_message(status)));
         }
@@ -106,7 +106,7 @@ namespace lue::netcdf {
     {
         int dimension_id{};
 
-        if (int status = nc_def_dim(_id, name.c_str(), length, &dimension_id); status != NC_NOERR)
+        if (auto const status = nc_def_dim(_id, name.c_str(), length, &dimension_id); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot define dimension {}: {}", name, error_message(status)));
@@ -128,7 +128,7 @@ namespace lue::netcdf {
     {
         int dimension_id{};
 
-        if (int status = nc_inq_dimid(_id, name.c_str(), &dimension_id); status != NC_NOERR)
+        if (auto const status = nc_inq_dimid(_id, name.c_str(), &dimension_id); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get dimension {}: {}", name, error_message(status)));
         }
@@ -142,7 +142,8 @@ namespace lue::netcdf {
         int nr_dimensions{0};
         int const include_parents{0};
 
-        if (int status = nc_inq_dimids(_id, &nr_dimensions, nullptr, include_parents); status != NC_NOERR)
+        if (auto const status = nc_inq_dimids(_id, &nr_dimensions, nullptr, include_parents);
+            status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of dimensions: {}", error_message(status)));
@@ -158,7 +159,7 @@ namespace lue::netcdf {
         std::vector<int> dimension_ids(nr_dimensions);
         int const include_parents{0};
 
-        if (int status = nc_inq_dimids(_id, nullptr, dimension_ids.data(), include_parents);
+        if (auto const status = nc_inq_dimids(_id, nullptr, dimension_ids.data(), include_parents);
             status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get dimension IDs: {}", error_message(status)));
@@ -176,6 +177,12 @@ namespace lue::netcdf {
         std::vector<Dimension> dimensions(dimensions_view.begin(), dimensions_view.end());
 
         return dimensions;
+    }
+
+
+    auto Group::add_attribute(std::string name, std::string const& value) -> Attribute
+    {
+        return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), value);
     }
 
 
@@ -197,7 +204,7 @@ namespace lue::netcdf {
     {
         int nr_attributes{0};
 
-        if (int status = nc_inq_natts(_id, &nr_attributes); status != NC_NOERR)
+        if (auto const status = nc_inq_natts(_id, &nr_attributes); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of group attributes: {}", error_message(status)));
@@ -242,7 +249,7 @@ namespace lue::netcdf {
 
         std::vector<int> dimension_ids(dimension_ids_view.begin(), dimension_ids_view.end());
 
-        if (int status = nc_def_var(
+        if (auto const status = nc_def_var(
                 _id,
                 name.c_str(),
                 data_type,
@@ -276,7 +283,7 @@ namespace lue::netcdf {
     {
         int variable_id{};
 
-        if (int status = nc_inq_varid(_id, name.c_str(), &variable_id); status != NC_NOERR)
+        if (auto const status = nc_inq_varid(_id, name.c_str(), &variable_id); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get variable {}: {}", name, error_message(status)));
         }
@@ -289,7 +296,7 @@ namespace lue::netcdf {
     {
         int nr_variables{0};
 
-        if (int status = nc_inq_varids(_id, &nr_variables, nullptr); status != NC_NOERR)
+        if (auto const status = nc_inq_varids(_id, &nr_variables, nullptr); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get number of variables: {}", error_message(status)));
@@ -297,7 +304,7 @@ namespace lue::netcdf {
 
         std::vector<int> variable_ids(nr_variables);
 
-        if (int status = nc_inq_varids(_id, nullptr, variable_ids.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_varids(_id, nullptr, variable_ids.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get variable IDs: {}", error_message(status)));
         }
@@ -321,7 +328,7 @@ namespace lue::netcdf {
     {
         int group_id{};
 
-        if (int status = nc_inq_grp_parent(_id, &group_id); status != NC_NOERR)
+        if (auto const status = nc_inq_grp_parent(_id, &group_id); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get parent group: {}", error_message(status)));
         }
@@ -340,7 +347,7 @@ namespace lue::netcdf {
     {
         int group_id{};
 
-        if (int status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
+        if (auto const status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot define child group {}: {}", name, error_message(status)));
@@ -362,7 +369,7 @@ namespace lue::netcdf {
     {
         int group_id{};
 
-        if (int status = nc_inq_grp_ncid(_id, name.c_str(), &group_id); status != NC_NOERR)
+        if (auto const status = nc_inq_grp_ncid(_id, name.c_str(), &group_id); status != NC_NOERR)
         {
             throw std::runtime_error(
                 std::format("Cannot get child group {}: {}", name, error_message(status)));
@@ -376,14 +383,14 @@ namespace lue::netcdf {
     {
         int nr_groups{0};
 
-        if (int status = nc_inq_grps(_id, &nr_groups, nullptr); status != NC_NOERR)
+        if (auto const status = nc_inq_grps(_id, &nr_groups, nullptr); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get number of groups: {}", error_message(status)));
         }
 
         std::vector<int> group_ids(nr_groups);
 
-        if (int status = nc_inq_grps(_id, nullptr, group_ids.data()); status != NC_NOERR)
+        if (auto const status = nc_inq_grps(_id, nullptr, group_ids.data()); status != NC_NOERR)
         {
             throw std::runtime_error(std::format("Cannot get group IDs: {}", error_message(status)));
         }

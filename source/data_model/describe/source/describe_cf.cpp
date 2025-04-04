@@ -6,28 +6,60 @@
 namespace lue::cf {
     namespace {
 
-        // void to_json(nlohmann::ordered_json& json, netcdf::Attribute const& attribute)
-        // {
-        //     json = nlohmann::ordered_json{
-        //         {"name", attribute.name()},
-        //         {"length", attribute.length()},
-        //         {"type", netcdf::as_string(attribute.type())},
-        //     };
-        // }
+        // // void to_json(nlohmann::ordered_json& json, netcdf::Attribute const& attribute)
+        // // {
+        // //     json = nlohmann::ordered_json{
+        // //         {"name", attribute.name()},
+        // //         {"length", attribute.length()},
+        // //         {"type", netcdf::as_string(attribute.type())},
+        // //     };
+        // // }
 
 
-        auto variable_kind_as_string(cf::Variable::Kind const kind)
+        auto dimension_kind_as_string(Dimension::Kind const kind)
         {
             std::string result;
 
             switch (kind)
             {
-                case cf::Variable::Kind::coordinate:
+                case Dimension::Kind::latitude:
+                {
+                    result = "latitude";
+                    break;
+                }
+                case Dimension::Kind::longitude:
+                {
+                    result = "longitude";
+                    break;
+                }
+                case Dimension::Kind::time:
+                {
+                    result = "time";
+                    break;
+                }
+                case Dimension::Kind::unknown:
+                {
+                    result = "unknown";
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+
+        auto variable_kind_as_string(Variable::Kind const kind)
+        {
+            std::string result;
+
+            switch (kind)
+            {
+                case Variable::Kind::coordinate:
                 {
                     result = "coordinate";
                     break;
                 }
-                case cf::Variable::Kind::regular:
+                case Variable::Kind::regular:
                 {
                     result = "regular";
                     break;
@@ -38,20 +70,18 @@ namespace lue::cf {
         }
 
 
-        void to_json(nlohmann::ordered_json& json, netcdf::Dimension const& dimension)
+        void to_json(nlohmann::ordered_json& json, Dimension const& dimension)
         {
             json = nlohmann::ordered_json{
                 {"name", dimension.name()},
                 {"length", dimension.length()},
-                {"is_time", cf::Dimension::is_time(dimension)},
-                {"is_latitude", cf::Dimension::is_latitude(dimension)},
-                {"is_longitude", cf::Dimension::is_longitude(dimension)},
-                {"is_spatiotemporal", cf::Dimension::is_spatiotemporal(dimension)},
+                {"kind", dimension_kind_as_string(dimension.kind())},
+                {"is_spatiotemporal", dimension.is_spatiotemporal()},
             };
         }
 
 
-        void to_json(nlohmann::ordered_json& json, netcdf::Variable const& variable)
+        void to_json(nlohmann::ordered_json& json, Variable const& variable)
         {
             nlohmann::ordered_json dimensions_json{};
 
@@ -63,16 +93,16 @@ namespace lue::cf {
             }
 
             json = nlohmann::ordered_json{
-                {"standard_name", variable.attribute("standard_name").value("")},
-                {"long_name", variable.attribute("long_name").value("")},
-                {"units", variable.attribute("units").value()},  // TODO udunits
-                {"kind", variable_kind_as_string(cf::Variable::kind(variable))},
+                {"standard_name", variable.standard_name()},
+                {"long_name", variable.long_name()},
+                {"units", variable.units()},
+                {"kind", variable_kind_as_string(variable.kind())},
                 {"dimensions", dimensions_json},
             };
         }
 
 
-        void to_json(nlohmann::ordered_json& json, netcdf::Group const& group)
+        void to_json(nlohmann::ordered_json& json, Group const& group)
         {
             // nlohmann::ordered_json attributes_json{};
 
@@ -116,17 +146,15 @@ namespace lue::cf {
     {
         // High-level stuff, related to CF
         json = nlohmann::ordered_json{
-            // TODO Parse version number
             {"CF version", dataset.version()},
-            {"title", dataset.attribute("title").value("")},
-            {"history", dataset.attribute("history").value("")},
-            {"institution", dataset.attribute("institution").value("")},
-            {"source", dataset.attribute("source").value("")},
-            {"comment", dataset.attribute("comment").value("")},
-            {"references", dataset.attribute("references").value("")},
+            {"title", dataset.title()},
+            {"history", dataset.history()},
+            {"institution", dataset.institution()},
+            {"source", dataset.source()},
+            {"comment", dataset.comment()},
+            {"references", dataset.references()},
         };
 
-        // We can't add alternative to_json functions in the netcdf namespace so we call to_json explicitlyly
         nlohmann::ordered_json group_json{};
         to_json(group_json, dynamic_cast<netcdf::Group const&>(dataset));
 

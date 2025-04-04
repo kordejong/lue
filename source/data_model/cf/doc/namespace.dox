@@ -2,6 +2,12 @@ namespace lue {
 
     /*!
         @brief      Namespace containing all code related to the CF data model implementation
+
+        The library focuses on kinds of data that are relevant in the context of LUE.
+
+        More information about CF can be found online:
+
+        - [Homepage](https://cfconventions.org)
     */
     namespace cf {
     }

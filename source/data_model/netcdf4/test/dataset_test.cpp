@@ -39,3 +39,31 @@ BOOST_AUTO_TEST_CASE(open_writable)
 
     auto const dataset = lue::netcdf::Dataset::open(dataset_name, NC_WRITE);
 }
+
+
+BOOST_AUTO_TEST_CASE(name)
+{
+    {
+        std::string const dataset_name = "dataset_name1.nc";
+        auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+        BOOST_CHECK_EQUAL(dataset.name(), "/");
+        BOOST_CHECK_EQUAL(dataset.full_name(), "/");
+        BOOST_CHECK_EQUAL(dataset.path(), dataset_name);
+    }
+
+    {
+        std::string const dataset_name = "./dataset_name2.nc";
+        auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+        BOOST_CHECK_EQUAL(dataset.name(), "/");
+        BOOST_CHECK_EQUAL(dataset.full_name(), "/");
+        BOOST_CHECK_EQUAL(dataset.path(), dataset_name);
+    }
+
+    {
+        std::string const dataset_name = "dætæsêt_ñømê3.nc";
+        auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+        BOOST_CHECK_EQUAL(dataset.name(), "/");
+        BOOST_CHECK_EQUAL(dataset.full_name(), "/");
+        BOOST_CHECK_EQUAL(dataset.path(), dataset_name);
+    }
+}

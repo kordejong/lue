@@ -15,7 +15,7 @@ namespace lue::netcdf {
 
         Attributes may be associated with a variable.
     */
-    class Variable
+    class LUE_NETCDF4_EXPORT Variable
     {
 
         public:
@@ -48,7 +48,7 @@ namespace lue::netcdf {
                 if (int status = nc_def_var_fill(_group_id, _variable_id, NC_FILL, &value);
                     status != NC_NOERR)
                 {
-                    throw std::runtime_error(fmt::format("Cannot set fill value: {}", error_message(status)));
+                    throw std::runtime_error(std::format("Cannot set fill value: {}", error_message(status)));
                 }
             }
 
@@ -70,7 +70,7 @@ namespace lue::netcdf {
                 if (int status = nc_inq_var_fill(_group_id, _variable_id, &fill_mode, &value);
                     status != NC_NOERR)
                 {
-                    throw std::runtime_error(fmt::format("Cannot get fill value: {}", error_message(status)));
+                    throw std::runtime_error(std::format("Cannot get fill value: {}", error_message(status)));
                 }
 
                 assert(fill_mode == NC_FILL);
@@ -86,18 +86,23 @@ namespace lue::netcdf {
                 @exception  std::runtime_error In case the attribute cannot be written
             */
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
             {
                 return Attribute::add_attribute(_group_id, _variable_id, std::move(name), values);
             }
 
 
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, T&& value) -> Attribute
+            auto add_attribute(std::string name, T&& value) -> Attribute
             {
                 return Attribute::add_attribute(
                     _group_id, _variable_id, std::move(name), std::forward<T>(value));
             }
+
+
+            [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
+
+            [[nodiscard]] auto attribute(std::string name) const -> Attribute;
 
 
             template<Arithmetic T>
@@ -126,7 +131,7 @@ namespace lue::netcdf {
                 if (status != NC_NOERR)
                 {
                     throw std::runtime_error(
-                        fmt::format("Cannot get write value: {}", error_message(status)));
+                        std::format("Cannot get write value: {}", error_message(status)));
                 }
             }
 
@@ -156,7 +161,7 @@ namespace lue::netcdf {
 
                 if (status != NC_NOERR)
                 {
-                    throw std::runtime_error(fmt::format("Cannot get read value: {}", error_message(status)));
+                    throw std::runtime_error(std::format("Cannot get read value: {}", error_message(status)));
                 }
             }
 

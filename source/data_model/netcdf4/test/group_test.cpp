@@ -88,3 +88,24 @@ BOOST_AUTO_TEST_CASE(variable)
     BOOST_CHECK_EQUAL(dimensions[0].name(), "dimension1");
     BOOST_CHECK_EQUAL(dimensions[1].name(), "dimension2");
 }
+
+
+BOOST_AUTO_TEST_CASE(attribute)
+{
+    std::string const dataset_name = "group_attribute.nc";
+
+    auto dataset = lue::netcdf::Dataset::create(dataset_name, NC_CLOBBER);
+
+    BOOST_REQUIRE(!dataset.has_attribute("attribute_int32"));
+
+    {
+        auto attribute_int32 = dataset.add_attribute("attribute_int32", std::int32_t{55});
+        BOOST_CHECK_EQUAL(attribute_int32.type(), NC_INT);
+        BOOST_CHECK_EQUAL(attribute_int32.value<std::int32_t>(), 55);
+    }
+
+    BOOST_REQUIRE(dataset.has_attribute("attribute_int32"));
+    auto attribute_int32 = dataset.attribute("attribute_int32");
+    BOOST_CHECK_EQUAL(attribute_int32.type(), NC_INT);
+    BOOST_CHECK_EQUAL(attribute_int32.value<std::int32_t>(), 55);
+}

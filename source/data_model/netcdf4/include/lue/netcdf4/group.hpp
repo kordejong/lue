@@ -6,7 +6,7 @@
 
 namespace lue::netcdf {
 
-    class Group
+    class LUE_NETCDF4_EXPORT Group
     {
 
         public:
@@ -17,13 +17,17 @@ namespace lue::netcdf {
 
             Group(Group&& other) noexcept;
 
-            ~Group() = default;
+            virtual ~Group() = default;
 
             auto operator=(Group const& other) -> Group& = delete;  // TODO
 
             auto operator=(Group&& other) noexcept -> Group&;
 
             [[nodiscard]] auto id() const -> int;
+
+            [[nodiscard]] auto name() const -> std::string;
+
+            [[nodiscard]] auto full_name() const -> std::string;
 
             [[nodiscard]] auto add_dimension(std::string const& name, size_t length) const -> Dimension;
 
@@ -52,17 +56,21 @@ namespace lue::netcdf {
                 @exception  std::runtime_error In case the attribute cannot be written
             */
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
+            auto add_attribute(std::string name, std::vector<T> const& values) -> Attribute
             {
                 return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), values);
             }
 
 
             template<typename T>
-            [[nodiscard]] auto add_attribute(std::string name, T&& value) -> Attribute
+            auto add_attribute(std::string name, T&& value) -> Attribute
             {
                 return Attribute::add_attribute(_id, NC_GLOBAL, std::move(name), std::forward<T>(value));
             }
+
+            [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
+
+            [[nodiscard]] auto attribute(std::string name) const -> Attribute;
 
             [[nodiscard]] auto add_sub_group(std::string const& name) const -> Group;
 
@@ -70,7 +78,17 @@ namespace lue::netcdf {
 
             [[nodiscard]] auto sub_group(std::string const& name) const -> Group;
 
+            [[nodiscard]] auto sub_groups() const -> std::vector<Group>;
+
+        protected:
+
+            auto reset_id() -> int;
+
+            [[nodiscard]] auto id_is_valid() const -> bool;
+
         private:
+
+            [[nodiscard]] auto name_length() const -> std::size_t;
 
             //! ID of the group
             int _id;

@@ -93,8 +93,6 @@ IncludeCategories:
       Priority: 50
     - Regex: '^"lue/python/'
       Priority: 60
-    - Regex: '^"lue/gdal/'
-      Priority: 70
     - Regex: '^"lue/imgui/'
       Priority: 70
     - Regex: '^"lue/netcdf/'
@@ -103,11 +101,9 @@ IncludeCategories:
       Priority: 80
     - Regex: '^"lue/'
       Priority: 90
-    - Regex: "^<hpx/"
+    - Regex: "^<(boost|fmt|gdal|GLFW|hdf5|hpx|imgui|netcdf|numpy|pybind11).*"
       Priority: 100
     - Regex: "^<vulkan/"
-      Priority: 105
-    - Regex: "^<(boost|fmt|numpy|pybind11)/"
       Priority: 110
     - Regex: "^<.*"
       Priority: 120

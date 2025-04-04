@@ -1,11 +1,12 @@
 #pragma once
+#include "lue/netcdf4/export.hpp"
 #include <netcdf.h>
 #include <string>
 
 
 namespace lue::netcdf {
 
-    class Dimension
+    class LUE_NETCDF4_EXPORT Dimension
     {
 
         public:

@@ -14,15 +14,91 @@ namespace lue::netcdf {
 
 
     Group::Group(Group&& other) noexcept:
-        _id{other._id}
+
+        _id{other.reset_id()}
+
     {
-        other._id = -1;
+        assert(!other.id_is_valid());
     }
 
 
     auto Group::id() const -> int
     {
         return _id;
+    }
+
+
+    auto Group::reset_id() -> int
+    {
+        auto group_id = _id;
+
+        if (id_is_valid())
+        {
+            _id = -1;
+        }
+
+        assert(!id_is_valid());
+
+        return group_id;
+    }
+
+
+    auto Group::id_is_valid() const -> bool
+    {
+        return _id >= 0;
+    }
+
+
+    /*!
+        @brief      Return the length of the name of the group, in number of bytes
+        @exception  std::runtime_error In case the length cannot be obtained
+    */
+    auto Group::name_length() const -> std::size_t
+    {
+        std::size_t nr_bytes{0};
+
+        if (int status = nc_inq_grpname_len(_id, &nr_bytes); status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get group name length: {}", error_message(status)));
+        }
+
+        return nr_bytes;
+    }
+
+
+    /*!
+        @brief      Return the name of the group
+        @exception  std::runtime_error In case the name cannot be obtained
+    */
+    auto Group::name() const -> std::string
+    {
+        std::size_t nr_bytes{name_length()};
+        std::string name(nr_bytes, 'x');
+
+        if (int status = nc_inq_grpname(_id, name.data()); status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get group name: {}", error_message(status)));
+        }
+
+        return name;
+    }
+
+
+    /*!
+        @brief      Return the full name of the group
+        @exception  std::runtime_error In case the name cannot be obtained
+    */
+    auto Group::full_name() const -> std::string
+    {
+        std::size_t nr_bytes{name_length()};
+        std::string name(nr_bytes, 'x');
+
+        if (int status = nc_inq_grpname_full(_id, nullptr, name.data()); status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get full group name: {}", error_message(status)));
+        }
+
+        return name;
     }
 
 
@@ -33,7 +109,7 @@ namespace lue::netcdf {
         if (int status = nc_def_dim(_id, name.c_str(), length, &dimension_id); status != NC_NOERR)
         {
             throw std::runtime_error(
-                fmt::format("Cannot define dimension {}: {}", name, error_message(status)));
+                std::format("Cannot define dimension {}: {}", name, error_message(status)));
         }
 
         return {_id, dimension_id};
@@ -54,7 +130,7 @@ namespace lue::netcdf {
 
         if (int status = nc_inq_dimid(_id, name.c_str(), &dimension_id); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get dimension {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot get dimension {}: {}", name, error_message(status)));
         }
 
         return {_id, dimension_id};
@@ -68,10 +144,24 @@ namespace lue::netcdf {
         if (int status = nc_inq_ndims(_id, &nr_dimensions); status != NC_NOERR)
         {
             throw std::runtime_error(
-                fmt::format("Cannot get number of dimensions: {}", error_message(status)));
+                std::format("Cannot get number of dimensions: {}", error_message(status)));
         }
 
         return nr_dimensions;
+    }
+
+
+    auto Group::has_attribute(std::string const& name) const -> bool
+    {
+        int attribute_id{};
+
+        return nc_inq_attid(_id, NC_GLOBAL, name.c_str(), &attribute_id) == NC_NOERR;
+    }
+
+
+    auto Group::attribute(std::string name) const -> Attribute
+    {
+        return {_id, NC_GLOBAL, std::move(name)};
     }
 
 
@@ -112,7 +202,7 @@ namespace lue::netcdf {
             status != NC_NOERR)
         {
             throw std::runtime_error(
-                fmt::format("Cannot define variable {}: {}", name, error_message(status)));
+                std::format("Cannot define variable {}: {}", name, error_message(status)));
         }
 
         Variable variable{_id, variable_id};
@@ -138,7 +228,7 @@ namespace lue::netcdf {
 
         if (int status = nc_inq_varid(_id, name.c_str(), &variable_id); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get variable {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot get variable {}: {}", name, error_message(status)));
         }
 
         return {_id, variable_id};
@@ -152,14 +242,14 @@ namespace lue::netcdf {
         if (int status = nc_inq_varids(_id, &nr_variables, nullptr); status != NC_NOERR)
         {
             throw std::runtime_error(
-                fmt::format("Cannot get number of variables: {}", error_message(status)));
+                std::format("Cannot get number of variables: {}", error_message(status)));
         }
 
         std::vector<int> variable_ids(nr_variables);
 
         if (int status = nc_inq_varids(_id, nullptr, variable_ids.data()); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get variable IDs: {}", error_message(status)));
+            throw std::runtime_error(std::format("Cannot get variable IDs: {}", error_message(status)));
         }
 
         // TODO C++23
@@ -189,7 +279,7 @@ namespace lue::netcdf {
 
         if (int status = nc_def_grp(_id, name.c_str(), &group_id); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot define group {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot define group {}: {}", name, error_message(status)));
         }
 
         return group_id;
@@ -210,10 +300,40 @@ namespace lue::netcdf {
 
         if (int status = nc_inq_grp_ncid(_id, name.c_str(), &group_id); status != NC_NOERR)
         {
-            throw std::runtime_error(fmt::format("Cannot get sub-group {}: {}", name, error_message(status)));
+            throw std::runtime_error(std::format("Cannot get sub-group {}: {}", name, error_message(status)));
         }
 
         return group_id;
+    }
+
+
+    auto Group::sub_groups() const -> std::vector<Group>
+    {
+        int nr_groups{0};
+
+        if (int status = nc_inq_grps(_id, &nr_groups, nullptr); status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get number of groups: {}", error_message(status)));
+        }
+
+        std::vector<int> group_ids(nr_groups);
+
+        if (int status = nc_inq_grps(_id, nullptr, group_ids.data()); status != NC_NOERR)
+        {
+            throw std::runtime_error(std::format("Cannot get group IDs: {}", error_message(status)));
+        }
+
+        // TODO C++23
+        // auto groups = group_ids
+        //     | std::views::transform(...)
+        //     | std::ranges::to<std::vector>();
+
+        auto groups_view =
+            group_ids | std::views::transform([](auto const group_id) { return Group{group_id}; });
+
+        std::vector<Group> groups(groups_view.begin(), groups_view.end());
+
+        return groups;
     }
 
 }  // namespace lue::netcdf

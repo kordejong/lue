@@ -1,4 +1,17 @@
-add_test_conditionally(test)
+add_library(lue_netcdf4 SHARED)
+add_library(lue::netcdf4 ALIAS lue_netcdf4)
+
+set_target_properties(lue_netcdf4
+    PROPERTIES
+        EXPORT_NAME netcdf4
+        VERSION ${LUE_VERSION}
+        SOVERSION ${LUE_VERSION_MAJOR}
+)
+
+generate_export_header(lue_netcdf4
+    EXPORT_FILE_NAME include/lue/netcdf4/export.hpp
+    EXPORT_MACRO_NAME LUE_NETCDF4_EXPORT
+)
 
 configure_file(
     include/lue/netcdf4/configure.hpp.in
@@ -10,30 +23,7 @@ configure_file(
     src/version.cpp
 )
 
-add_library(lue_netcdf STATIC
-    src/attribute.cpp
-    src/dataset.cpp
-    src/dimension.cpp
-    src/error.cpp
-    src/group.cpp
-    src/variable.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
-)
-
-add_library(lue::netcdf4 ALIAS lue_netcdf)
-
-set_target_properties(lue_netcdf
-    PROPERTIES
-        EXPORT_NAME netcdf4
-)
-
-target_include_directories(lue_netcdf
-    PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-)
-
-target_sources(lue_netcdf
+target_sources(lue_netcdf4
     PUBLIC
         FILE_SET HEADERS
         BASE_DIRS
@@ -42,14 +32,39 @@ target_sources(lue_netcdf
         FILES
             include/lue
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/netcdf4/configure.hpp
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/netcdf4/export.hpp
+    PRIVATE
+        src/attribute.cpp
+        src/dataset.cpp
+        src/dimension.cpp
+        src/error.cpp
+        src/group.cpp
+        src/variable.cpp
+        ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
 )
 
-target_link_libraries(lue_netcdf
+target_link_libraries(lue_netcdf4
     PUBLIC
         lue::shared
         netCDF::netcdf
 )
 
-lue_install_development_libraries(
-    TARGETS lue_netcdf
+lue_install_runtime_libraries(
+    TARGETS
+        lue_netcdf4
 )
+
+lue_install_development_libraries(
+    TARGETS
+        lue_netcdf4
+)
+
+if(LUE_BUILD_TESTS)
+    lue_configure_static_library_for_tests(
+        TARGET_NAME_SHARED_LIB lue_netcdf4
+        TARGET_NAME_STATIC_LIB lue_netcdf4_static
+        EXPORT_MACRO_BASENAME NETCDF4
+    )
+
+    add_subdirectory(test)
+endif()

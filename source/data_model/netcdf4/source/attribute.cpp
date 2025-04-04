@@ -4,6 +4,14 @@
 
 namespace lue::netcdf {
 
+    /*!
+        @brief      Open an attribute
+        @param      group_id ID of variable's group
+        @param      variable_id ID of variable
+        @param      attribute_idx Index of attribute
+        @return     Attribute instance representing the added attribute
+        @exception  std::runtime_error In case the attribute cannot be opened
+    */
     auto Attribute::open(int const group_id, int const variable_id, int attribute_idx) -> Attribute
     {
         std::array<char, NC_MAX_NAME + 1> buffer{};
@@ -18,6 +26,12 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Construct an instance representing a variable's attribute
+        @param      group_id ID of variable's group
+        @param      variable_id ID of variable
+        @param      name Name of attribute to add
+    */
     Attribute::Attribute(int const group_id, int const variable_id, std::string name):
 
         _group_id{group_id},
@@ -28,12 +42,19 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the name of the attribute
+    */
     auto Attribute::name() const -> std::string const&
     {
         return _name;
     }
 
 
+    /*!
+        @brief      Return the type of the attribute's value
+        @exception  std::runtime_error In case the type cannot be obtained
+    */
     auto Attribute::type() const -> nc_type
     {
         nc_type type{0};
@@ -48,6 +69,12 @@ namespace lue::netcdf {
     }
 
 
+    /*!
+        @brief      Return the length the attribute's value
+        @exception  std::runtime_error In case the length cannot be obtained
+
+        The length is one in case of a scalar value.
+    */
     auto Attribute::length() const -> std::size_t
     {
         std::size_t length{0};

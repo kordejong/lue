@@ -11,6 +11,9 @@ namespace lue::netcdf {
 
         public:
 
+            /*!
+                @brief      Whether or not the underlying NetCDF library supports parallel I/O
+            */
             static constexpr bool netcdf_is_parallel{
 #ifdef netCDF_HAS_PARALLEL
                     true

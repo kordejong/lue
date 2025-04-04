@@ -291,6 +291,15 @@ namespace lue::netcdf {
 
         public:
 
+            /*!
+                @brief      Add an attribute to a variable
+                @param      group_id ID of variable's group
+                @param      variable_id ID of variable
+                @param      name Name of attribute to add
+                @param      value Value of attribute to add
+                @return     Attribute instance representing the added attribute
+                @exception  std::runtime_error In case the attribute cannot be added
+            */
             static auto add_attribute(
                 int const group_id,
                 int const variable_id,
@@ -309,6 +318,17 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Add an attribute to a variable
+                @tparam     T Type of attribute values
+                @param      group_id ID of variable's group
+                @param      variable_id ID of variable
+                @param      name Name of attribute to add
+                @param      nr_values Number of values of attribute to add
+                @param      values Pointer to values of attribute to add
+                @return     New Attribute instance representing the added attribute
+                @exception  std::runtime_error In case the attribute cannot be added
+            */
             template<Arithmetic T>
             static auto add_attribute(
                 int const group_id,
@@ -329,12 +349,23 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Add an attribute to a variable
+                @tparam     T Type of attribute value
+                @param      group_id ID of variable's group
+                @param      variable_id ID of variable
+                @param      name Name of attribute to add
+                @param      value Value of attribute to add
+                @return     New Attribute instance representing the added attribute
+                @exception  std::runtime_error In case the attribute cannot be added
+            */
             template<Arithmetic T>
-            static auto add_attribute(int const group_id, int const variable_id, std::string name, T&& value)
-                -> Attribute
+            static auto add_attribute(
+                int const group_id, int const variable_id, std::string name, T const value) -> Attribute
             {
-                return add_attribute(group_id, variable_id, std::move(name), &value);
+                return add_attribute(group_id, variable_id, std::move(name), 1, &value);
             }
+
 
             static auto open(int group_id, int variable_id, int attribute_idx) -> Attribute;
 
@@ -357,6 +388,13 @@ namespace lue::netcdf {
             [[nodiscard]] auto length() const -> std::size_t;
 
 
+            /*!
+                @brief      Obtain attribute's string value
+                @param      default_value Optional default value to return if current attribute value is
+                            empty
+                @exception  std::runtime_error In case attribute value's length or the value itself cannot be
+                            obtained
+            */
             [[nodiscard]] auto value(std::optional<std::string> default_value = {}) const -> std::string
             {
                 std::size_t length{0};
@@ -387,6 +425,11 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Obtain attribute's scalar value
+                @tparam     T Type of value
+                @exception  std::runtime_error In case attribute's value is not scalar or cannot be obtained
+            */
             template<Arithmetic T>
             auto value() const -> T
             {
@@ -411,6 +454,11 @@ namespace lue::netcdf {
             }
 
 
+            /*!
+                @brief      Obtain attribute's array values
+                @tparam     T Type of elements in the array
+                @exception  std::runtime_error In case attribute's values cannot be obtained
+            */
             template<Arithmetic T>
             void values(T* values) const
             {

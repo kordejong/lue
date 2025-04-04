@@ -12,7 +12,7 @@
 namespace lue::cf {
 
     /*!
-        @brief      Discrete locations in multidimensional space
+        @brief      Discrete locations in multi-dimensional space
 
         Metadata about measurement location and cell properties for the data
     */
@@ -28,6 +28,9 @@ namespace lue::cf {
 
                 Either defined by a scalar coordinate variable, which implies a domain axis of size one, or
                 a dimension.
+
+                DimensionCoordinate and AuxiliaryCoordinate are related to Axis via the (implicit) domain
+                mapping. TODO What does this mean?
             */
             class Axis
             {
@@ -95,9 +98,6 @@ namespace lue::cf {
 
                 private:
 
-                    // ScalarCoordinateVariable has to be non-numeric
-                    // std::variant<netcdf4::AuxiliaryCoordinateVariable, netcdf4::ScalarCoordinateVariable>
-                    //     _coordinates;
                     netcdf4::AuxiliaryCoordinateVariable _coordinates;
             };
 
@@ -115,6 +115,10 @@ namespace lue::cf {
                 public:
 
                 private:
+
+                    // TODO Associated with zero or more Coordinate instances
+
+                    // TODO Associated with zero or more DomainAncillary instances
             };
 
 
@@ -157,7 +161,7 @@ namespace lue::cf {
                 @return     .
                 @exception  .
             */
-            class DomainTopology
+            class Topology
             {
 
                 public:
@@ -183,16 +187,20 @@ namespace lue::cf {
 
             using Axes = std::vector<Axis>;
 
+            using Coordinates = std::vector<Coordinate>;
 
-            [[nodiscard]] auto axes() const -> Axes;
+
+            [[nodiscard]] auto axes() const& -> Axes;
 
         private:
 
             //! Zero or more
-            std::vector<Axis> _axes;
+            Axes _axes;
 
             //! Zero or more
-            std::vector<netcdf4::GenericCoordinateVariable> _coordinates;
+            Coordinates _coordinates;
+
+            // std::vector<netcdf4::GenericCoordinateVariable> _coordinates;
 
             // std::vector<DimensionCoordinate> _dimension_coordinates;
 
@@ -204,7 +212,7 @@ namespace lue::cf {
 
             std::vector<CellMeasure> _cell_measures;
 
-            std::vector<DomainTopology> _domain_topologies;
+            std::vector<Topology> _domain_topologies;
 
             std::vector<CellConnectivity> _cell_connectivities;
     };

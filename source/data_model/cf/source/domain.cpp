@@ -3,7 +3,7 @@
 
 namespace lue::cf {
 
-    auto Domain::axes() const -> Axes
+    auto Domain::axes() const& -> Axes
     {
         return _axes;
     }

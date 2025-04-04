@@ -10,7 +10,7 @@ add_unit_tests(
     SCOPE lue_netcdf
     NAMES ${names}
     LIBRARIES
-        lue::netcdf4
+        lue_netcdf4_static
     TARGETS
         test_names
 )

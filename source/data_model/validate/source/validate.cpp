@@ -1,27 +1,5 @@
 #include "lue/validate/validate.hpp"
 #include "lue/validate.hpp"
-#include <format>
-
-
-namespace {
-
-    std::string const usage = std::format(
-        R"(
-Validate LUE datasets
-
-usage:
-    {0} [--issues] [--fail-on-warning] <dataset>...
-    {0} (-h | --help) | --version
-
-options:
-    -h --help   Show this screen
-    --version   Show version
-    --issues    Only print issues
-    --fail-on-warning   Treat warnings as errors
-)",
-        "lue_validate");
-
-}  // Anonymous namespace
 
 
 namespace lue::utility {

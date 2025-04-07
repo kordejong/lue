@@ -3,7 +3,7 @@
 #include "lue/cf/export.hpp"
 #include "lue/cf/netcdf/data_variable.hpp"
 #include <memory>
-#include <optional>
+// #include <optional>
 
 
 namespace lue::cf {
@@ -14,6 +14,10 @@ namespace lue::cf {
         @param      .
         @return     .
         @exception  .
+
+        - Construct
+        - Corresponds to a netCDF data variable with all of its metadata
+        - Data array is the only mandatory component of the Field construct
     */
     class LUE_CF_EXPORT Field: public netcdf4::DataVariable
     {
@@ -38,8 +42,10 @@ namespace lue::cf {
                 @brief      Ancillary metadata which varies within the domain
 
                 Metadata defined over the domain.
+
+                - Construct
             */
-            class FieldAncillary
+            class Ancillary
             {
 
                 public:
@@ -53,6 +59,8 @@ namespace lue::cf {
 
                 Metadata describing how the cell values represent the variation of the physical quantity
                 within the cells of the domain
+
+                - Construct
             */
             class CellMethod
             {
@@ -67,6 +75,17 @@ namespace lue::cf {
             };
 
 
+            /*!
+                @brief      Aspect of the data that is independent of the domain
+                @tparam     .
+                @param      .
+                @return     .
+                @exception  .
+
+                - Some attributes of variables: units, long_name, standard_name, ...
+                - Some group attributes, including global attributes of the root group: history,
+                institution,
+            */
             class Property
             {
 
@@ -80,7 +99,7 @@ namespace lue::cf {
             //     @brief      Aspects of the data that are independent of the domain
 
             //     - Some attributes of variables: units, long_name, standard_name, ...
-            //     - Some group attributes, including global attributes or the root group: history,
+            //     - Some group attributes, including global attributes of the root group: history,
             //     institution,
             //         ...
             // */
@@ -94,7 +113,7 @@ namespace lue::cf {
 
         public:
 
-            using FieldAncillaries = std::vector<FieldAncillary>;
+            using FieldAncillaries = std::vector<Ancillary>;
 
             using CellMethods = std::vector<CellMethod>;
 

@@ -3,6 +3,9 @@
 #include "lue/cf/netcdf/auxiliary_coordinate_variable.hpp"
 #include "lue/cf/netcdf/coordinate_variable.hpp"
 #include "lue/cf/netcdf/dimension.hpp"
+#include "lue/cf/netcdf/domain_variable.hpp"
+#include "lue/cf/netcdf/location_index_set_variable.hpp"
+#include "lue/cf/netcdf/mesh_topology_variable.hpp"
 #include "lue/cf/netcdf/scalar_coordinate_variable.hpp"
 #include <optional>
 #include <variant>
@@ -15,8 +18,19 @@ namespace lue::cf {
         @brief      Discrete locations in multi-dimensional space
 
         Metadata about measurement location and cell properties for the data
+
+        - Construct
+        - Corresponds to a detCDF domain variable
+        - Describes a domain comprising measurement locations and cell properties
+        - Domain information is stored either implicitly or explicitly:
+            - Implicit: via data variable attributes (such as `coordinates`)
+            - Explicit (domain exists without reference to a data array):
+                - Domain variable
+                - Mesh topology variable
+                - Location index set variable
+
     */
-    class LUE_CF_EXPORT Domain
+    class LUE_CF_EXPORT Domain /* : public netcdf4::DomainVariable */
     {
 
         public:
@@ -31,6 +45,8 @@ namespace lue::cf {
 
                 DimensionCoordinate and AuxiliaryCoordinate are related to Axis via the (implicit) domain
                 mapping. TODO What does this mean?
+
+                - Construct
             */
             class Axis
             {
@@ -50,6 +66,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class Coordinate
             {
@@ -71,6 +89,8 @@ namespace lue::cf {
 
                 Numeric coordinates for a single domain axis that are non-missing and strictly monotonically
                 increasing or decreasing
+
+                - Construct
             */
             class DimensionCoordinate: public Coordinate
             {
@@ -90,6 +110,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class AuxiliaryCoordinate: public Coordinate
             {
@@ -108,6 +130,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class CoordinateReference
             {
@@ -118,7 +142,7 @@ namespace lue::cf {
 
                     // TODO Associated with zero or more Coordinate instances
 
-                    // TODO Associated with zero or more DomainAncillary instances
+                    // TODO Associated with zero or more Ancillary instances
             };
 
 
@@ -128,8 +152,10 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
-            class DomainAncillary
+            class Ancillary
             {
 
                 public:
@@ -144,6 +170,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class CellMeasure
             {
@@ -160,6 +188,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class Topology
             {
@@ -176,6 +206,8 @@ namespace lue::cf {
                 @param      .
                 @return     .
                 @exception  .
+
+                - Construct
             */
             class CellConnectivity
             {
@@ -194,6 +226,13 @@ namespace lue::cf {
 
         private:
 
+            //! Explicitly stored domain information
+            std::optional<std::variant<
+                netcdf4::DomainVariable,
+                netcdf4::MeshTopologyVariable,
+                netcdf4::LocationIndexSetVariable>>
+                _domain_variable;
+
             //! Zero or more
             Axes _axes;
 
@@ -208,7 +247,7 @@ namespace lue::cf {
 
             std::vector<CoordinateReference> _coordinate_reference_systems;
 
-            std::vector<DomainAncillary> _domain_ancillaries;
+            std::vector<Ancillary> _ancillaries;
 
             std::vector<CellMeasure> _cell_measures;
 

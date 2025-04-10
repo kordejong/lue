@@ -33,7 +33,7 @@ namespace lue::cf {
         - `comment`
         - `references`
     */
-    class LUE_CF_EXPORT Dataset: public lue::netcdf4::Dataset
+    class LUE_CF_EXPORT Dataset: private lue::netcdf4::Dataset
     {
 
         public:

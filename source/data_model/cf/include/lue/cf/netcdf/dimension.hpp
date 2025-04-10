@@ -10,6 +10,8 @@ namespace lue::cf::netcdf4 {
         @param      .
         @return     .
         @exception  .
+
+        - TODO Does this class have to exist? Does it add anything to lue::netcdf4::Dimension?
     */
     class Dimension: public lue::netcdf4::Dimension
     {

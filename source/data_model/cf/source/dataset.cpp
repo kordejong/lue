@@ -1,5 +1,7 @@
 #include "lue/cf/dataset.hpp"
+#include "lue/cf/version.hpp"
 #include "lue/version.hpp"
+#include <format>
 #include <regex>
 
 
@@ -9,7 +11,7 @@ namespace lue::cf {
     {
         auto dataset = lue::netcdf4::Dataset::create(name, create_mode);
 
-        dataset.set_conventions({"CF-1.11"});
+        dataset.set_conventions({std::format("CF-{}", cf::version)});
         dataset.add_attribute("history", std::string{std::format("LUE-{}", lue::version())});
 
         return dataset;
@@ -35,12 +37,22 @@ namespace lue::cf {
         lue::netcdf4::Dataset{std::move(dataset)}
 
     {
+        Field::Properties group_properties{};
+
+        for (auto const& attribute : attributes())
+        {
+            group_properties.insert({attribute.name(), {attribute.name(), to_string(attribute)}});
+        }
+
         for (auto const& variable : variables())
         {
             if (variable.kind() == lue::netcdf4::Variable::Kind::regular)
             {
                 // TODO Relation regular variable with data variable
                 _fields.emplace_back(variable.group_id(), variable.id());
+
+                auto& field{_fields.back()};
+                field.add_properties(group_properties);
             }
         }
     }

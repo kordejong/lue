@@ -88,4 +88,72 @@ namespace lue::netcdf4 {
         return length;
     }
 
+
+    namespace {
+
+        template<typename T>
+        auto to_string(Attribute const& attribute) -> std::string
+        {
+            return std::format("{} ({})", std::to_string(attribute.value<T>()), TypeTraits<T>::name);
+        }
+
+    }  // Anonymous namespace
+
+
+    auto to_string(Attribute const& attribute) -> std::string
+    {
+        std::string string{};
+
+        switch (attribute.type())
+        {
+            case NC_CHAR:
+            {
+                string = std::format("{} ({})", attribute.value(), TypeTraits<char>::name);
+                break;
+            }
+            case NC_BYTE:
+            {
+                string = to_string<std::int8_t>(attribute);
+                break;
+            }
+            case NC_UBYTE:
+            {
+                string = to_string<std::uint8_t>(attribute);
+                break;
+            }
+            case NC_INT:
+            {
+                string = to_string<std::int32_t>(attribute);
+                break;
+            }
+            case NC_UINT:
+            {
+                string = to_string<std::uint32_t>(attribute);
+                break;
+            }
+            case NC_INT64:
+            {
+                string = to_string<std::int64_t>(attribute);
+                break;
+            }
+            case NC_UINT64:
+            {
+                string = to_string<std::uint64_t>(attribute);
+                break;
+            }
+            case NC_FLOAT:
+            {
+                string = to_string<float>(attribute);
+                break;
+            }
+            case NC_DOUBLE:
+            {
+                string = to_string<double>(attribute);
+                break;
+            }
+        }
+
+        return string;
+    }
+
 }  // namespace lue::netcdf4

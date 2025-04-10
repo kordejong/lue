@@ -462,6 +462,7 @@ namespace lue::netcdf4 {
                 }
             }
 
+
         private:
 
             //! ID of the group
@@ -473,5 +474,9 @@ namespace lue::netcdf4 {
             //! Name of the attribute
             std::string _name;
     };
+
+
+    // TODO Move to describe
+    LUE_NETCDF4_EXPORT auto to_string(Attribute const& attribute) -> std::string;
 
 }  // namespace lue::netcdf4

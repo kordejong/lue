@@ -40,6 +40,8 @@ namespace lue::cf {
 
                 Number of cells lying along an independent axis of the domain
 
+                Specifies the number of cells lying along an independent axis of the domain.
+
                 Either defined by a scalar coordinate variable, which implies a domain axis of size one, or
                 a dimension.
 
@@ -68,19 +70,33 @@ namespace lue::cf {
                 @exception  .
 
                 - Construct
+                - Provides information which locate the cells of the domain and which depend on a subset
+                  of the domain axis constructs
             */
             class Coordinate
             {
 
                 private:
 
-                    class Data
+                    class Data  // DataArray
                     {
                     };
 
                 public:
 
-                    std::optional<Data> _data;
+                    //! Coordinate values spanning the subset of the domain axis constructs
+                    std::optional<Data> _values;
+
+                    // TODO Same type as Field::Properties
+                    using Properties = int;
+
+                    //! Properties to describe the coordinates
+                    Properties _properties;
+
+                    //! Cell bounds recording the extents of each cell
+                    std::optional<Data> _cell_bounds;
+
+                    // TODO Extra arrays needed to interpret cell bounds values
             };
 
 
@@ -91,11 +107,14 @@ namespace lue::cf {
                 increasing or decreasing
 
                 - Construct
+                - Data array of the coordinate values is required
             */
             class DimensionCoordinate: public Coordinate
             {
 
                 public:
+
+                    // TODO Constructor must provide information about the required coordinate values?
 
                 private:
 
@@ -112,6 +131,10 @@ namespace lue::cf {
                 @exception  .
 
                 - Construct
+                - Use this class when:
+                    - A single domain axis requires more than one set of coordinate values
+                    - Coordinate values are not numeric, strictly monotonic, or contain missing values
+                    - When "they" vary along more than one domain axis construct simulateously
             */
             class AuxiliaryCoordinate: public Coordinate
             {
@@ -120,7 +143,9 @@ namespace lue::cf {
 
                 private:
 
-                    netcdf4::AuxiliaryCoordinateVariable _coordinates;
+                    // Only non-numeric scalar coordinate variable
+                    std::variant<netcdf4::AuxiliaryCoordinateVariable, netcdf4::ScalarCoordinateVariable>
+                        _coordinates;
             };
 
 

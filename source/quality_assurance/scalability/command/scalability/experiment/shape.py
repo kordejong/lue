@@ -1,5 +1,7 @@
-import math
+import collections.abc
 from functools import reduce
+import math
+import typing
 
 
 def array_shape(memory_available, rank, nr_arrays, size_of_element, nr_nodes):
@@ -109,8 +111,7 @@ def range_of_shapes(min_shape, max_nr_elements, multiplier, method):
     Determine a range of shapes given the following requirements:
     - First shape equals min_shape
     - Number of cells in last shape smaller or equal to max_nr_elements
-    - Each next shape contains multiplier times more elements than the
-        previous shape
+    - Each next shape contains multiplier times more elements than the previous shape
     """
 
     def nr_elements(shape):
@@ -128,6 +129,11 @@ def range_of_shapes(min_shape, max_nr_elements, multiplier, method):
             ]
         )
 
+    def linear_increment(idx: int, size: int, multiplier: int) -> int:
+        # Increase the number of cells linearly, by idx * (multiplier - 1) * size
+        # If idx == 0, size is returned
+        return size + idx * (multiplier - 1) * size
+
     sizes = [nr_elements(min_shape)]
 
     assert method in ["linear", "exponential"]
@@ -135,14 +141,13 @@ def range_of_shapes(min_shape, max_nr_elements, multiplier, method):
     assert multiplier > 1, multiplier
 
     if method == "linear":
-        # Increase the number of cells linearly, by
-        # i * (multiplier - 1) * sizes[0]
-        new_size = lambda i: sizes[0] + i * (multiplier - 1) * sizes[0]
-        i = 1
+        idx = 1
+        new_size = linear_increment(idx, sizes[0], multiplier)
 
-        while new_size(i) <= max_nr_elements:
-            sizes.append(new_size(i))
-            i += 1
+        while new_size <= max_nr_elements:
+            sizes.append(new_size)
+            idx += 1
+            new_size = linear_increment(idx, sizes[0], multiplier)
 
     elif method == "exponential":
         # Increase the number of cells exponentially, by multiplier *
@@ -153,9 +158,9 @@ def range_of_shapes(min_shape, max_nr_elements, multiplier, method):
     normalized_shape = tuple([float(extent) / max(min_shape) for extent in min_shape])
     shapes = [shape(size, normalized_shape) for size in sizes]
 
-    assert (
-        len(shapes) == 0 or nr_elements(shapes[-1]) <= max_nr_elements
-    ), "{}, {}".format(shapes, max_nr_elements)
+    assert len(shapes) == 0 or nr_elements(shapes[-1]) <= max_nr_elements, (
+        "{}, {}".format(shapes, max_nr_elements)
+    )
 
     return shapes
 
@@ -174,7 +179,7 @@ class Range(object):
         if self.method == "linear":
             assert self.multiplier > 1
 
-    def to_json(self):
+    def to_json(self) -> dict[str, typing.Any]:
         return {
             "max_nr_elements": self.max_nr_elements,
             "multiplier": self.multiplier,
@@ -183,30 +188,39 @@ class Range(object):
 
 
 class Shape(object):
-    def __init__(self, data):
-        self.from_json(data)
+    _shape: tuple[int, int]
+    _range: Range | None
 
-    def from_json(self, data):
-        self._shape = tuple(data["shape"])
-        self._range = Range(data["range"]) if "range" in data else None
+    @classmethod
+    def from_json(cls, data):
+        shape = tuple(data["shape"])
+        range = Range(data["range"]) if "range" in data else None
 
-    def to_json(self):
-        result = {"shape": self._shape}
+        return cls(shape, range)
 
-        if self._range:
-            result["range"] = self._range.to_json()
+    @staticmethod
+    def to_json(shape) -> dict[str, typing.Any]:
+        result: dict[str, typing.Any] = {"shape": shape._shape}
+
+        if shape._range:
+            result["range"] = shape._range.to_json()
 
         return result
 
-    def is_fixed(self):
+    def __init__(self, shape: tuple[int, int], range: Range | None):
+        self._shape = shape
+        self._range = range
+
+    def is_fixed(self) -> bool:
         return self._range is None
 
     @property
-    def shapes(self):
+    def shapes(self) -> collections.abc.Sequence[tuple[int, ...]]:
         if self.is_fixed():
             result = [self._shape]
         else:
             # Range of shapes
+            assert self._range is not None
             result = range_of_shapes(
                 self._shape,
                 self._range.max_nr_elements,

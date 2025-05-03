@@ -3,10 +3,17 @@ import typing
 from pathlib import Path
 
 import numpy as np
+import numpy.typing as npt
 
 import lue.data_model as ldm
 
-from ..experiment.cluster import Cluster
+from ..experiment.platform import Platform
+
+
+# Type aliases
+Durations = npt.NDArray[np.int64]
+NrCoresUsed = npt.NDArray[np.int64]
+NrWorkersUsed = npt.NDArray[np.int64]
 
 
 MS_TO_S = 1 / 1000
@@ -14,11 +21,13 @@ MS_TO_MIN = MS_TO_S / 60
 MS_TO_H = MS_TO_MIN / 60
 
 
-def print_message(label: str, value: typing.Any):
+def print_message(label: str, value: typing.Any) -> None:
     print(f"{label:{20}}: {value}")
 
 
-def print_total_duration(durations: np.ndarray):
+def print_total_duration(durations: Durations) -> None:
+    assert durations.dtype == np.int64  # If not, just fix the above  type alias
+
     # Assumes duration is in millisconds
     total_duration_ms = durations.sum()
     total_duration_s = MS_TO_S * total_duration_ms
@@ -33,7 +42,7 @@ def print_total_duration(durations: np.ndarray):
     )
 
 
-def scenario_name_to_kind_of_worker(name):
+def scenario_name_to_kind_of_worker(name: str) -> str:
     if name in ["core_numa_node", "core_cluster_node"]:
         result = "core"
     elif name == "numa_node":
@@ -49,19 +58,21 @@ def scenario_name_to_kind_of_worker(name):
 
 
 def kind_of_worker_to_nr_cores_used(
-    nr_workers_used: np.ndarray, kind_of_worker: str, cluster: Cluster
-):
+    nr_workers_used: NrWorkersUsed, kind_of_worker: str, platform: Platform
+) -> NrCoresUsed:
+    assert nr_workers_used.dtype == np.int64  # If not, just fix the above  type alias
+
     if kind_of_worker == "core":
         # A worker is a single core
         nr_cores_used = nr_workers_used
     elif kind_of_worker == "numa_node":
         # A worker is a single NUMA node
         nr_cores_used = (
-            nr_workers_used * cluster.cluster_node.package.numa_node.nr_cores
+            nr_workers_used * platform.cluster_node.package.numa_node.nr_cores
         )
     elif kind_of_worker == "cluster_node":
         # A worker is a single cluster node
-        nr_cores_used = nr_workers_used * cluster.cluster_node.nr_cores
+        nr_cores_used = nr_workers_used * platform.cluster_node.nr_cores
     else:
         nr_cores_used = np.array([-1])
 
@@ -72,10 +83,10 @@ def kind_of_worker_to_nr_cores_used(
 
 def summarize_partition_shape_experiment(dataset: ldm.Dataset) -> None:
     durations = dataset.benchmark.measurement.duration.value[:]
-    cluster_settings = json.loads(
-        dataset.benchmark.meta_information.cluster_settings.value[:][0]
+    platform_settings = json.loads(
+        dataset.benchmark.meta_information.platform_settings.value[:][0]
     )
-    cluster = Cluster(data=cluster_settings)
+    platform = Platform(data=platform_settings)
     scenario_name = dataset.benchmark.meta_information.scenario_name.value[:][0]
     kind_of_worker = scenario_name_to_kind_of_worker(scenario_name)
     nr_workers_used = dataset.benchmark.meta_information.nr_workers.value[:]
@@ -89,7 +100,7 @@ def summarize_partition_shape_experiment(dataset: ldm.Dataset) -> None:
     # The number of core hours is the total duration times the number of cores used. The number of cores used
     # is constant while scaling the partition shape.
     nr_cores_used = kind_of_worker_to_nr_cores_used(
-        nr_workers_used, kind_of_worker, cluster
+        nr_workers_used, kind_of_worker, platform
     )
 
     durations_h = MS_TO_H * durations
@@ -102,10 +113,10 @@ def summarize_partition_shape_experiment(dataset: ldm.Dataset) -> None:
 
 def summarize_strong_scalability_experiment(dataset: ldm.Dataset) -> None:
     durations = dataset.benchmark.measurement.duration.value[:]
-    cluster_settings = json.loads(
-        dataset.benchmark.meta_information.cluster_settings.value[:][0]
+    platform_settings = json.loads(
+        dataset.benchmark.meta_information.platform_settings.value[:][0]
     )
-    cluster = Cluster(data=cluster_settings)
+    platform = Platform(data=platform_settings)
     scenario_name = dataset.benchmark.meta_information.scenario_name.value[:][0]
     kind_of_worker = scenario_name_to_kind_of_worker(scenario_name)
     nr_workers_used = dataset.benchmark.measurement.nr_workers.value[:]
@@ -113,7 +124,7 @@ def summarize_strong_scalability_experiment(dataset: ldm.Dataset) -> None:
     # The number of core hours is the total duration times the number of cores used. The number of cores
     # used differs.
     nr_cores_used = kind_of_worker_to_nr_cores_used(
-        nr_workers_used, kind_of_worker, cluster
+        nr_workers_used, kind_of_worker, platform
     )
 
     durations_h = MS_TO_H * durations
@@ -126,10 +137,10 @@ def summarize_strong_scalability_experiment(dataset: ldm.Dataset) -> None:
 
 def summarize_weak_scalability_experiment(dataset: ldm.Dataset) -> None:
     durations = dataset.benchmark.measurement.duration.value[:]
-    cluster_settings = json.loads(
-        dataset.benchmark.meta_information.cluster_settings.value[:][0]
+    platform_settings = json.loads(
+        dataset.benchmark.meta_information.platform_settings.value[:][0]
     )
-    cluster = Cluster(data=cluster_settings)
+    platform = Platform(data=platform_settings)
     scenario_name = dataset.benchmark.meta_information.scenario_name.value[:][0]
     kind_of_worker = scenario_name_to_kind_of_worker(scenario_name)
     nr_workers_used = dataset.benchmark.measurement.nr_workers.value[:]
@@ -137,7 +148,7 @@ def summarize_weak_scalability_experiment(dataset: ldm.Dataset) -> None:
     # The number of core hours is the total duration times the number of cores used. The number of cores
     # used differs.
     nr_cores_used = kind_of_worker_to_nr_cores_used(
-        nr_workers_used, kind_of_worker, cluster
+        nr_workers_used, kind_of_worker, platform
     )
 
     durations_h = MS_TO_H * durations

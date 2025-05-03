@@ -5,7 +5,7 @@ from .configuration import Configuration
 
 
 def generate_script_slurm(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     # Iterate over all combinations of array shapes and partition shapes
     # we need to benchmark and format a snippet of bash script for
@@ -14,13 +14,13 @@ def generate_script_slurm(
 
     nr_localities = benchmark.worker.nr_localities
 
-    srun_configuration = job.srun_configuration(cluster)
+    srun_configuration = job.srun_configuration(platform)
     jobstarter = f"srun --ntasks {nr_localities} {srun_configuration}"
 
     for array_shape in experiment.array.shapes:
         result_workspace_pathname = os.path.join(
             experiment.workspace_pathname(
-                result_prefix, cluster.name, benchmark.scenario_name
+                result_prefix, platform.name, benchmark.scenario_name
             ),
             "x".join([str(extent) for extent in array_shape]),
         )
@@ -33,7 +33,7 @@ def generate_script_slurm(
         for partition_shape in experiment.partition.shapes:
             result_pathname = experiment.benchmark_result_pathname(
                 result_prefix,
-                cluster.name,
+                platform.name,
                 benchmark.scenario_name,
                 array_shape,
                 "x".join([str(extent) for extent in partition_shape]),
@@ -46,10 +46,7 @@ def generate_script_slurm(
                 f'--hpx:threads="{benchmark.worker.nr_cores}" '
                 "{program_configuration}".format(
                     program_configuration=job.program_configuration(
-                        result_prefix,
-                        cluster,
                         benchmark,
-                        experiment,
                         array_shape,
                         partition_shape,
                         result_pathname=result_pathname,
@@ -59,9 +56,9 @@ def generate_script_slurm(
             ]
 
     slurm_script = job.create_slurm_script2(
-        cluster,
+        platform,
         nr_cluster_nodes=benchmark.worker.nr_cluster_nodes,
-        nr_tasks=cluster.nr_localities_to_reserve(
+        nr_tasks=platform.nr_localities_to_reserve(
             benchmark.worker, benchmark.locality_per
         ),
         benchmark=benchmark,
@@ -79,14 +76,14 @@ def generate_script_slurm(
         "# Make sure SLURM can create the output file",
         "mkdir -p {}".format(
             experiment.workspace_pathname(
-                result_prefix, cluster.name, benchmark.scenario_name
+                result_prefix, platform.name, benchmark.scenario_name
             )
         ),
         "",
         "# Submit job to SLURM scheduler",
         "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
             job_name=job_name,
-            sbatch_options=" ".join(cluster.scheduler.settings.sbatch_options),
+            sbatch_options=" ".join(platform.scheduler.settings.sbatch_options),
             delimiter=delimiter,
         ),
         slurm_script,
@@ -98,7 +95,7 @@ def generate_script_slurm(
 
 
 def generate_script_shell(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     # Iterate over all combinations of array shapes and partition shapes
     # we need to benchmark and format a snippet of bash script for
@@ -109,7 +106,7 @@ def generate_script_shell(
         for partition_shape in experiment.partition.shapes:
             result_pathname = experiment.benchmark_result_pathname(
                 result_prefix,
-                cluster.name,
+                platform.name,
                 benchmark.scenario_name,
                 array_shape,
                 "x".join([str(extent) for extent in partition_shape]),
@@ -129,10 +126,7 @@ def generate_script_shell(
                 f'--hpx:threads="{benchmark.worker.nr_cores}" '
                 "{program_configuration}".format(
                     program_configuration=job.program_configuration(
-                        result_prefix,
-                        cluster,
                         benchmark,
-                        experiment,
                         array_shape,
                         partition_shape,
                         result_pathname=result_pathname,
@@ -154,7 +148,7 @@ def generate_script(configuration_data):
     job executes a benchmark and writes results to a JSON file.
     """
     configuration = Configuration(configuration_data)
-    cluster = configuration.cluster
+    platform = configuration.platform
     benchmark = configuration.benchmark
     script_pathname = configuration.script_pathname
     result_prefix = configuration.result_prefix
@@ -167,17 +161,17 @@ def generate_script(configuration_data):
     experiment = configuration.experiment
 
     lue_dataset = job.create_raw_lue_dataset(
-        result_prefix, cluster, benchmark, experiment
+        result_prefix, platform, benchmark, experiment
     )
-    dataset.write_benchmark_settings(lue_dataset, cluster, benchmark, experiment)
+    dataset.write_benchmark_settings(lue_dataset, platform, benchmark, experiment)
 
-    if cluster.scheduler.kind == "slurm":
+    if platform.scheduler.kind == "slurm":
         generate_script_slurm(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
-    elif cluster.scheduler.kind == "shell":
+    elif platform.scheduler.kind == "shell":
         generate_script_shell(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
 
     dataset.write_script(lue_dataset, open(script_pathname).read())

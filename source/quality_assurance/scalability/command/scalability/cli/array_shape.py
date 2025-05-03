@@ -9,7 +9,7 @@ import sys
 import docopt
 
 from lue import __version__ as lue_version
-from lue.command.scalability.experiment.shape import array_shape
+from ..experiment.shape_range import array_shape
 
 
 def main() -> None:

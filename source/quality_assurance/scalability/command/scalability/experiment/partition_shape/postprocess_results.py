@@ -166,15 +166,15 @@ def post_process_raw_results(
 
 def postprocess_results(configuration_data):
     configuration = Configuration(configuration_data)
-    cluster = configuration.cluster
+    platform = configuration.platform
     benchmark = configuration.benchmark
     result_prefix = configuration.result_prefix
     experiment = configuration.experiment
 
     lue_dataset = job.open_scalability_lue_dataset(
-        result_prefix, cluster, benchmark, experiment, "r"
+        result_prefix, platform, benchmark, experiment, "r"
     )
-    cluster, benchmark, experiment = dataset.read_benchmark_settings(
+    platform, benchmark, experiment = dataset.read_benchmark_settings(
         lue_dataset, Experiment
     )
 
@@ -183,11 +183,11 @@ def postprocess_results(configuration_data):
     process.create_dot_graph(
         lue_dataset.pathname,
         experiment.result_pathname(
-            result_prefix, cluster.name, benchmark.scenario_name, "graph", "pdf"
+            result_prefix, platform.name, benchmark.scenario_name, "graph", "pdf"
         ),
     )
     plot_pathname = experiment.result_pathname(
-        result_prefix, cluster.name, benchmark.scenario_name, "plot"
+        result_prefix, platform.name, benchmark.scenario_name, "plot"
     )
     post_process_raw_results(
         lue_dataset, result_prefix, plot_pathname, experiment, filetypes

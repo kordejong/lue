@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
-import typing
+from typing import Any, Callable
+
+from ..alias import Data, MutableData
 
 
 class Range(metaclass=ABCMeta):
@@ -25,7 +27,7 @@ class Range(metaclass=ABCMeta):
         # Initialize max_size
         self.max_size = max_size
 
-    def clamp_max_size(self):
+    def clamp_max_size(self) -> None:
         """
         Update max_size to make it equal to :py:func:`size` (:py:func:`nr_sizes` - 1)
         """
@@ -56,7 +58,7 @@ class MultiplyRange(Range):
     """
 
     @classmethod
-    def from_json(cls, data):
+    def from_data(cls, data: Data) -> "MultiplyRange":
         min_size = data["min_size"]
         max_size = data["max_size"]
         multiplier = data["multiplier"]
@@ -64,8 +66,8 @@ class MultiplyRange(Range):
 
         return cls(min_size, max_size, multiplier)
 
-    @classmethod
-    def to_json(cls, range) -> dict[str, typing.Any]:
+    @staticmethod
+    def to_data(range: "MultiplyRange") -> MutableData:
         return {
             "min_size": range.min_size,
             "max_size": range.max_size,
@@ -77,7 +79,7 @@ class MultiplyRange(Range):
         self.multiplier = multiplier
         self.clamp_max_size()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "MultiplyRange(min_size={}, max_size={}, multiplier={})".format(
             self.min_size,
             self.max_size,
@@ -120,7 +122,7 @@ class IncrementRange(Range):
     """
 
     @classmethod
-    def from_json(cls, data):
+    def from_data(cls, data: Data) -> "IncrementRange":
         min_size: int = data["min_size"]
         max_size: int = data["max_size"]
         incrementor: int = data["incrementor"]
@@ -128,8 +130,8 @@ class IncrementRange(Range):
 
         return cls(min_size, max_size, incrementor)
 
-    @classmethod
-    def to_json(cls, range) -> dict[str, typing.Any]:
+    @staticmethod
+    def to_data(range: "IncrementRange") -> MutableData:
         return {
             "min_size": range.min_size,
             "max_size": range.max_size,
@@ -141,7 +143,7 @@ class IncrementRange(Range):
         self.incrementor = incrementor
         self.clamp_max_size()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "IncrementRange(min_size={}, max_size={}, incrementor={})".format(
             self.min_size,
             self.max_size,
@@ -180,22 +182,22 @@ class ConstantRange(Range):
     """
 
     @classmethod
-    def from_json(cls, data):
+    def from_data(cls, data: Data) -> "ConstantRange":
         size = data["size"]
 
         return cls(size)
 
-    @classmethod
-    def to_json(cls, range) -> dict[str, typing.Any]:
+    @staticmethod
+    def to_data(range: "ConstantRange") -> MutableData:
         return {
             "size": range.min_size,
         }
 
-    def __init__(self, size):
+    def __init__(self, size: int):
         super(ConstantRange, self).__init__(size, size)
         assert self.min_size == self.max_size
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "ConstantRange(size={})".format(self.min_size)
 
     @property
@@ -221,26 +223,26 @@ class SizeRange(object):
     """
 
     @classmethod
-    def from_json(cls, data):
+    def from_data(cls, data: Data) -> "SizeRange":
+        range: Range
+
         if "multiplier" in data:
-            range = MultiplyRange.from_json(data)
+            range = MultiplyRange.from_data(data)
         elif "incrementor" in data:
-            range = IncrementRange.from_json(data)
+            range = IncrementRange.from_data(data)
         else:
-            range = ConstantRange.from_json(data)
+            range = ConstantRange.from_data(data)
 
         return cls(range)
 
-    @classmethod
-    def to_json(cls, size_range) -> dict[str, typing.Any]:
-        to_json_by_range: dict[
-            type[typing.Any], typing.Callable[[typing.Any], dict[str, typing.Any]]
-        ] = {
-            MultiplyRange: MultiplyRange.to_json,
-            IncrementRange: IncrementRange.to_json,
-            ConstantRange: ConstantRange.to_json,
+    @staticmethod
+    def to_data(size_range: "SizeRange") -> MutableData:
+        to_data_by_range: dict[type[Any], Callable[[Any], MutableData]] = {
+            MultiplyRange: MultiplyRange.to_data,
+            IncrementRange: IncrementRange.to_data,
+            ConstantRange: ConstantRange.to_data,
         }
-        return to_json_by_range[type(size_range.range)](size_range.range)
+        return to_data_by_range[type(size_range.range)](size_range.range)
 
     def __init__(self, range: Range):
         self.range = range

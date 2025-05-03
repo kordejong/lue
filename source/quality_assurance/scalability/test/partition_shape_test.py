@@ -1,6 +1,6 @@
 import unittest
 
-from lue.command.scalability.experiment.shape import (
+from lue.command.scalability.experiment.shape_range import (
     partition_shape_multipliers,
     partition_shapes,
     range_of_shapes,

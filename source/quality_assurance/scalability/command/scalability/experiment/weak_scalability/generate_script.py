@@ -32,7 +32,7 @@ def scale_array_shape(array_shape_per_worker, nr_workers):
 
 
 def generate_script_slurm_cores(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     """
     Scale over cores in a single node
@@ -45,7 +45,7 @@ def generate_script_slurm_cores(
     array_shape_per_worker = experiment.array.shape
     partition_shape = experiment.partition.shape
     nr_localities = 1  # Single NUMA node or cluster node
-    srun_configuration = job.srun_configuration(cluster)
+    srun_configuration = job.srun_configuration(platform)
     jobstarter = f"srun --ntasks {nr_localities} {srun_configuration}"
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
@@ -59,19 +59,23 @@ def generate_script_slurm_cores(
             f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
-                    result_prefix,
-                    cluster,
                     benchmark,
-                    experiment,
                     array_shape,
                     partition_shape if nr_workers > 1 else array_shape,
+                    result_pathname=experiment.benchmark_result_pathname(
+                        result_prefix,
+                        platform.name,
+                        benchmark.scenario_name,
+                        nr_workers,
+                        "json",
+                    ),
                     nr_workers=nr_workers,
                 ),
             )
         ]
 
     slurm_script = job.create_slurm_script2(
-        cluster,
+        platform,
         nr_cluster_nodes=1,
         nr_tasks=1,
         benchmark=benchmark,
@@ -89,14 +93,14 @@ def generate_script_slurm_cores(
         "# Make sure SLURM can create the output file",
         "mkdir -p {}".format(
             experiment.workspace_pathname(
-                result_prefix, cluster.name, benchmark.scenario_name
+                result_prefix, platform.name, benchmark.scenario_name
             )
         ),
         "",
         "# Submit job to SLURM scheduler",
         "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
             job_name=job_name,
-            sbatch_options=" ".join(cluster.scheduler.settings.sbatch_options),
+            sbatch_options=" ".join(platform.scheduler.settings.sbatch_options),
             delimiter=delimiter,
         ),
         slurm_script,
@@ -108,7 +112,7 @@ def generate_script_slurm_cores(
 
 
 def generate_script_slurm_numa_nodes(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     """
     Scale over NUMA nodes in a single cluster node
@@ -120,7 +124,7 @@ def generate_script_slurm_numa_nodes(
     commands = [
         "mkdir -p {}".format(
             experiment.workspace_pathname(
-                result_prefix, cluster.name, benchmark.scenario_name
+                result_prefix, platform.name, benchmark.scenario_name
             )
         ),
     ]
@@ -129,7 +133,7 @@ def generate_script_slurm_numa_nodes(
     partition_shape = experiment.partition.shape
 
     nr_cores = benchmark.worker.nr_cores
-    srun_configuration = job.srun_configuration(cluster)
+    srun_configuration = job.srun_configuration(platform)
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
@@ -142,19 +146,23 @@ def generate_script_slurm_numa_nodes(
             f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
-                    result_prefix,
-                    cluster,
                     benchmark,
-                    experiment,
                     array_shape,
                     partition_shape,
+                    result_pathname=experiment.benchmark_result_pathname(
+                        result_prefix,
+                        platform.name,
+                        benchmark.scenario_name,
+                        nr_workers,
+                        "json",
+                    ),
                     nr_workers=nr_workers,
                 ),
             )
         ]
 
         slurm_script = job.create_slurm_script2(
-            cluster,
+            platform,
             nr_cluster_nodes=1,
             nr_tasks=nr_localities,
             benchmark=benchmark,
@@ -174,7 +182,7 @@ def generate_script_slurm_numa_nodes(
             "",
             "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
                 job_name=job_name,
-                sbatch_options=" ".join(cluster.scheduler.settings.sbatch_options),
+                sbatch_options=" ".join(platform.scheduler.settings.sbatch_options),
                 delimiter=delimiter,
             ),
             slurm_script,
@@ -190,7 +198,7 @@ def generate_script_slurm_numa_nodes(
 
 
 def generate_script_slurm_cluster_nodes(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     """
     Scale over nodes in a cluster of nodes
@@ -214,7 +222,7 @@ def generate_script_slurm_cluster_nodes(
     partition_shape = experiment.partition.shape
 
     nr_cores = benchmark.worker.nr_cores
-    srun_configuration = job.srun_configuration(cluster)
+    srun_configuration = job.srun_configuration(platform)
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
@@ -223,7 +231,7 @@ def generate_script_slurm_cluster_nodes(
         jobstarter = f"srun --ntasks {nr_localities} {srun_configuration}"
 
         result_pathname = experiment.benchmark_result_pathname(
-            result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "json"
+            result_prefix, platform.name, benchmark.scenario_name, nr_workers, "json"
         )
 
         job_steps = [
@@ -232,31 +240,45 @@ def generate_script_slurm_cluster_nodes(
             f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
-                    result_prefix,
-                    cluster,
                     benchmark,
-                    experiment,
                     array_shape,
                     partition_shape,
+                    result_pathname=experiment.benchmark_result_pathname(
+                        result_prefix,
+                        platform.name,
+                        benchmark.scenario_name,
+                        nr_workers,
+                        "json",
+                    ),
                     nr_workers=nr_workers,
                 ),
             )
         ]
 
-        slurm_script = job.create_slurm_script(
-            cluster,
+        slurm_script = job.create_slurm_script2(
+            platform,
             nr_cluster_nodes=nr_workers,
             nr_tasks=nr_localities,
-            nr_cores_per_socket=cluster.cluster_node.package.numa_node.nr_cores,
-            cpus_per_task=benchmark.nr_logical_cores_per_locality,
-            output_filename=experiment.benchmark_result_pathname(
-                result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "out"
-            ),
-            partition_name=cluster.scheduler.settings.partition_name,
-            sbatch_options=cluster.scheduler.settings.sbatch_options,
-            max_duration=experiment.max_duration,
+            benchmark=benchmark,
+            experiment=experiment,
             job_steps=job_steps,
+            result_prefix=result_prefix,
         )
+
+        # slurm_script = job.create_slurm_script(
+        #     platform,
+        #     nr_cluster_nodes=nr_workers,
+        #     nr_tasks=nr_localities,
+        #     nr_cores_per_socket=platform.cluster_node.package.numa_node.nr_cores,
+        #     cpus_per_task=benchmark.nr_logical_cores_per_locality,
+        #     output_filename=experiment.benchmark_result_pathname(
+        #         result_prefix, platform.name, benchmark.scenario_name, nr_workers, "out"
+        #     ),
+        #     partition_name=platform.scheduler.settings.partition_name,
+        #     sbatch_options=platform.scheduler.settings.sbatch_options,
+        #     max_duration=experiment.max_duration,
+        #     job_steps=job_steps,
+        # )
 
         job_name = "{name}-{program_name}-{nr_workers}".format(
             name=experiment.name,
@@ -277,7 +299,7 @@ def generate_script_slurm_cluster_nodes(
             # Submit SLURM script to scheduler
             "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
                 job_name=job_name,
-                sbatch_options=" ".join(cluster.scheduler.settings.sbatch_options),
+                sbatch_options=" ".join(platform.scheduler.settings.sbatch_options),
                 delimiter=delimiter,
             ),
             slurm_script,
@@ -293,27 +315,27 @@ def generate_script_slurm_cluster_nodes(
 
 
 def generate_script_slurm(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     assert benchmark.worker.name == "core"
     assert benchmark.worker.name in ["cluster_node", "numa_node", "core"]
 
     if benchmark.worker.scale_over_cluster_nodes:
         generate_script_slurm_cluster_nodes(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
     elif benchmark.worker.scale_over_numa_nodes:
         generate_script_slurm_numa_nodes(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
     elif benchmark.worker.scale_over_cores:
         generate_script_slurm_cores(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
 
 
 def generate_script_shell(
-    result_prefix, cluster, benchmark, experiment, script_pathname
+    result_prefix, platform, benchmark, experiment, script_pathname
 ):
     assert not benchmark.worker.scale_over_cluster_nodes
     assert not benchmark.worker.scale_over_numa_nodes
@@ -331,7 +353,7 @@ def generate_script_shell(
         nr_cores = nr_workers
         array_shape = scale_array_shape(array_shape_per_worker, nr_workers)
         result_pathname = experiment.benchmark_result_pathname(
-            result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "json"
+            result_prefix, platform.name, benchmark.scenario_name, nr_workers, "json"
         )
 
         if not commands:
@@ -347,12 +369,16 @@ def generate_script_shell(
             f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
-                    result_prefix,
-                    cluster,
                     benchmark,
-                    experiment,
                     array_shape,
                     partition_shape if nr_workers > 1 else array_shape,
+                    result_pathname=experiment.benchmark_result_pathname(
+                        result_prefix,
+                        platform.name,
+                        benchmark.scenario_name,
+                        nr_workers,
+                        "json",
+                    ),
                     nr_workers=nr_workers,
                 ),
             ),
@@ -372,7 +398,7 @@ def generate_script(configuration_data):
     """
 
     configuration = Configuration(configuration_data)
-    cluster = configuration.cluster
+    platform = configuration.platform
     benchmark = configuration.benchmark
     script_pathname = configuration.script_pathname
     result_prefix = configuration.result_prefix
@@ -392,17 +418,17 @@ def generate_script(configuration_data):
     experiment = configuration.experiment
 
     lue_dataset = job.create_raw_lue_dataset(
-        result_prefix, cluster, benchmark, experiment
+        result_prefix, platform, benchmark, experiment
     )
-    dataset.write_benchmark_settings(lue_dataset, cluster, benchmark, experiment)
+    dataset.write_benchmark_settings(lue_dataset, platform, benchmark, experiment)
 
-    if cluster.scheduler.kind == "slurm":
+    if platform.scheduler.kind == "slurm":
         generate_script_slurm(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
-    elif cluster.scheduler.kind == "shell":
+    elif platform.scheduler.kind == "shell":
         generate_script_shell(
-            result_prefix, cluster, benchmark, experiment, script_pathname
+            result_prefix, platform, benchmark, experiment, script_pathname
         )
 
     dataset.write_script(lue_dataset, open(script_pathname).read())

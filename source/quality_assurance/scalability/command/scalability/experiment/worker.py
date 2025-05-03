@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
-import typing
 
-from .cluster import Cluster
+from ..alias import Data, MutableData
 from .size_range import SizeRange
 
 
@@ -9,8 +8,6 @@ __all__ = ["Worker"]
 
 
 class WorkerBase(metaclass=ABCMeta):
-    name = ""
-
     def __init__(self, size_range: SizeRange, locality_per: str):
         self.locality_per = locality_per
         self.size_range = size_range
@@ -54,6 +51,13 @@ class WorkerBase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def name(self) -> str:
+        """
+        Return name of worker
+        """
+
+    @property
+    @abstractmethod
     def nr_localities(self) -> int:
         """
         Return number of localities to use in benchmark
@@ -68,9 +72,12 @@ class WorkerBase(metaclass=ABCMeta):
 
 
 class Core(WorkerBase):
-    name = "core"
-
-    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+    def __init__(
+        self,
+        size_range: SizeRange,
+        nr_numa_nodes_per_cluster_node: int,
+        locality_per: str,
+    ):
         super().__init__(size_range, locality_per)
 
         # Range of CPU cores for scaling
@@ -84,9 +91,13 @@ class Core(WorkerBase):
             self.min_nr_numa_nodes = 1
         elif self.locality_per == "cluster_node":
             # Per the one cluster node locality
-            self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
+            self.min_nr_numa_nodes = nr_numa_nodes_per_cluster_node
 
         self.max_nr_numa_nodes = self.min_nr_numa_nodes
+
+    @property
+    def name(self) -> str:
+        return "core"
 
     @property
     def max_nr_workers(self) -> int:
@@ -101,20 +112,24 @@ class Core(WorkerBase):
 
 
 class NUMANode(WorkerBase):
-    name = "numa_node"
-
-    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+    def __init__(
+        self, size_range: SizeRange, nr_cores_per_numa_node: int, locality_per: str
+    ):
         super().__init__(size_range, locality_per)
 
         assert self.locality_per == "numa_node", self.locality_per
 
         # Per each of the NUMA node localities
-        self.min_nr_cores = cluster.cluster_node.package.numa_node.nr_cores
+        self.min_nr_cores = nr_cores_per_numa_node
         self.max_nr_cores = self.min_nr_cores
 
         # Range of NUMA nodes for scaling
         self.min_nr_numa_nodes = self.size_range.min_size
         self.max_nr_numa_nodes = self.size_range.max_size
+
+    @property
+    def name(self) -> str:
+        return "numa_node"
 
     @property
     def max_nr_workers(self) -> int:
@@ -130,24 +145,32 @@ class NUMANode(WorkerBase):
 
 
 class ClusterNode(WorkerBase):
-    name = "cluster_node"
-
-    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+    def __init__(
+        self,
+        size_range: SizeRange,
+        nr_numa_nodes_per_cluster_node: int,
+        nr_cores_per_numa_node: int,
+        locality_per: str,
+    ):
         super().__init__(size_range, locality_per)
 
         assert self.locality_per == "numa_node", self.locality_per
 
         # Per each of the NUMA node localities
-        self.min_nr_cores = cluster.cluster_node.package.numa_node.nr_cores
+        self.min_nr_cores = nr_cores_per_numa_node
         self.max_nr_cores = self.min_nr_cores
 
         # All NUMA node localities
-        self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
+        self.min_nr_numa_nodes = nr_numa_nodes_per_cluster_node
         self.max_nr_numa_nodes = self.min_nr_numa_nodes
 
         # Range of cluster nodes for scaling
         self.min_nr_cluster_nodes = self.size_range.min_size
         self.max_nr_cluster_nodes = self.size_range.max_size
+
+    @property
+    def name(self) -> str:
+        return "cluster_node"
 
     @property
     def max_nr_workers(self) -> int:
@@ -180,32 +203,52 @@ class Worker(object):
 
     worker: WorkerBase
 
-    def from_json(self, data: dict[str, typing.Any]) -> tuple[str, SizeRange]:
+    def from_data(self, data: Data) -> tuple[str, SizeRange]:
         worker_type = data["type"]
-        size_range = SizeRange.from_json(data["size_range"])
+        size_range = SizeRange.from_data(data["size_range"])
 
         return worker_type, size_range
 
     @classmethod
-    def to_json(cls, worker) -> dict[str, typing.Any]:
+    def to_data(cls, worker: "Worker") -> MutableData:
         return {
             "type": worker.worker.name,
-            "size_range": SizeRange.to_json(worker.worker.size_range),
+            "size_range": SizeRange.to_data(worker.worker.size_range),
         }
 
     def __init__(
-        self, data: dict[str, typing.Any], cluster: Cluster, locality_per: str
+        self,
+        data: Data,
+        nr_numa_nodes_per_cluster_node: int,
+        nr_cores_per_numa_node: int,
+        locality_per: str,
     ):
-        worker_type, size_range = self.from_json(data)
+        worker_type, size_range = self.from_data(data)
+        assert worker_type in [
+            worker_type_class.name
+            for worker_type_class in [Core, NUMANode, ClusterNode]
+        ]
 
-        worker_type_classes: list[typing.Any] = [Core, NUMANode, ClusterNode]
-        worker_class_by_worker_type = {
-            worker_type_class.name: worker_type_class
-            for worker_type_class in worker_type_classes
-        }
-        self.worker = worker_class_by_worker_type[worker_type](
-            size_range, cluster, locality_per
-        )
+        if worker_type == Core.name:
+            self.worker = Core(size_range, nr_numa_nodes_per_cluster_node, locality_per)
+        elif worker_type == NUMANode.name:
+            self.worker = NUMANode(size_range, nr_cores_per_numa_node, locality_per)
+        elif worker_type == ClusterNode.name:
+            self.worker = ClusterNode(
+                size_range,
+                nr_numa_nodes_per_cluster_node,
+                nr_cores_per_numa_node,
+                locality_per,
+            )
+
+        # worker_type_classes: list[typing.Any] = [Core, NUMANode, ClusterNode]
+        # worker_class_by_worker_type = {
+        #     worker_type_class.name: worker_type_class
+        #     for worker_type_class in worker_type_classes
+        # }
+        # self.worker = worker_class_by_worker_type[worker_type](
+        #     size_range, platform, locality_per
+        # )
 
         assert 1 <= self.worker.min_nr_cluster_nodes <= self.worker.max_nr_cluster_nodes
         assert 1 <= self.worker.min_nr_numa_nodes <= self.worker.max_nr_numa_nodes
@@ -229,7 +272,7 @@ class Worker(object):
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """
         Return name of worker (one of: core, numa_node, cluster_node)
         """
@@ -314,7 +357,7 @@ class Worker(object):
         """
         return self.worker.size_range.nr_sizes
 
-    def nr_workers(self, benchmark_idx) -> int:
+    def nr_workers(self, benchmark_idx: int) -> int:
         """
         Return number of workers to use in benchmark with the index passed in
         """

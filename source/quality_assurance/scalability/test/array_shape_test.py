@@ -1,6 +1,6 @@
 import unittest
 
-from lue.command.scalability.experiment.shape import array_shape
+from lue.command.scalability.experiment.shape_range import array_shape
 
 
 class ArrayShapeTest(unittest.TestCase):

@@ -16,7 +16,7 @@ from lue.command.scalability import (
 )
 
 
-def perform_experiment(arguments) -> None:
+def perform_experiment(arguments: dict[str, str]) -> None:
     """
     Entry point for performing scalability experiments
     """
@@ -96,7 +96,7 @@ def perform_experiment(arguments) -> None:
     perform_experiment_task(experiment_name, task_name, configuration_data)
 
 
-def query_experiment(arguments) -> None:
+def query_experiment(arguments: dict[str, str]) -> None:
     """
     Entry point for querying result dataset of performed scalability experiments
     """

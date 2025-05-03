@@ -2,7 +2,11 @@ import numpy as np
 import numpy.typing as npt
 
 
-def is_monotonically_increasing(array: npt.NDArray) -> bool:
+# Type aliases
+IntegralArray = npt.NDArray[np.int_]
+
+
+def is_monotonically_increasing(array: IntegralArray) -> bool:
     """
     Return whether `array` contains monotonically increasing values
     """

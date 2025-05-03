@@ -8,6 +8,7 @@ In the context of the scalability command these terms have the following meaning
 - Count: Number of times an experimental run should be repeated
 """
 
+from .alias import Data
 from .experiment import partition_shape, strong_scalability, weak_scalability
 from .query import export_duration, summarize_experiment
 
@@ -19,7 +20,9 @@ __all__ = [
 ]
 
 
-def perform_experiment_task(experiment_name: str, task_name: str, configuration_data):
+def perform_experiment_task(
+    experiment_name: str, task_name: str, configuration_data: Data
+) -> None:
     experiment_by_name = {
         "partition_shape": partition_shape,
         "weak_scalability": weak_scalability,

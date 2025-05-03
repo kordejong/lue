@@ -14,7 +14,7 @@ from .experiment import Experiment
 
 
 def benchmark_meta_to_lue_json(
-    benchmark_pathname, lue_dataset_pathname, cluster, benchmark, experiment
+    benchmark_pathname, lue_dataset_pathname, platform, benchmark, experiment
 ):
     # Read benchmark JSON
     benchmark_json = json.loads(open(benchmark_pathname).read())
@@ -42,7 +42,7 @@ def benchmark_meta_to_lue_json(
                                     "shape_per_object": "same_shape",
                                     "value_variability": "constant",
                                     "datatype": "string",
-                                    "value": [cluster.name],
+                                    "value": [platform.name],
                                 },
                                 {
                                     "name": "command",
@@ -219,7 +219,7 @@ def benchmark_to_lue_json(benchmark_pathname, lue_json_pathname, epoch):
     open(lue_json_pathname, "w").write(json.dumps(lue_json, sort_keys=False, indent=4))
 
 
-def determine_epoch(result_prefix, cluster, benchmark, experiment):
+def determine_epoch(result_prefix, platform, benchmark, experiment):
     array_shapes = experiment.array.shapes
     partition_shapes = experiment.partition.shapes
 
@@ -229,7 +229,7 @@ def determine_epoch(result_prefix, cluster, benchmark, experiment):
         for partition_shape in partition_shapes:
             benchmark_pathname = experiment.benchmark_result_pathname(
                 result_prefix,
-                cluster.name,
+                platform.name,
                 benchmark.scenario_name,
                 array_shape,
                 "x".join([str(extent) for extent in partition_shape]),
@@ -249,7 +249,7 @@ def determine_epoch(result_prefix, cluster, benchmark, experiment):
 
 
 def import_raw_results(
-    lue_dataset_pathname, result_prefix, cluster, benchmark, experiment
+    lue_dataset_pathname, result_prefix, platform, benchmark, experiment
 ):
     """
     Import all raw benchmark results into a new LUE file
@@ -269,7 +269,7 @@ def import_raw_results(
     # To position all benchmarks in time, we need a single starting time
     # point to use as the clock's epoch and calculate the distance of
     # each benchmark's start time point from this epoch.
-    epoch = determine_epoch(result_prefix, cluster, benchmark, experiment)
+    epoch = determine_epoch(result_prefix, platform, benchmark, experiment)
 
     array_shapes = list(experiment.array.shapes)
     partition_shapes = list(experiment.partition.shapes)
@@ -279,7 +279,7 @@ def import_raw_results(
         for partition_shape in partition_shapes:
             result_pathname = experiment.benchmark_result_pathname(
                 result_prefix,
-                cluster.name,
+                platform.name,
                 benchmark.scenario_name,
                 array_shape,
                 "x".join([str(extent) for extent in partition_shape]),
@@ -292,7 +292,7 @@ def import_raw_results(
                     benchmark_meta_to_lue_json(
                         result_pathname,
                         lue_json_file.name,
-                        cluster,
+                        platform,
                         benchmark,
                         experiment,
                     )
@@ -420,17 +420,17 @@ def write_scalability_results(lue_dataset):
 
 def import_results(configuration_data):
     configuration = Configuration(configuration_data)
-    cluster = configuration.cluster
+    platform = configuration.platform
     benchmark = configuration.benchmark
     result_prefix = configuration.result_prefix
     experiment = configuration.experiment
 
     lue_dataset = job.open_raw_lue_dataset(
-        result_prefix, cluster, benchmark, experiment, "r"
+        result_prefix, platform, benchmark, experiment, "r"
     )
     raw_results_already_imported = dataset.raw_results_already_imported(lue_dataset)
 
-    cluster, benchmark, experiment = dataset.read_benchmark_settings(
+    platform, benchmark, experiment = dataset.read_benchmark_settings(
         lue_dataset, Experiment
     )
 
@@ -438,18 +438,18 @@ def import_results(configuration_data):
         lue_dataset_pathname = lue_dataset.pathname
         del lue_dataset
         import_raw_results(
-            lue_dataset_pathname, result_prefix, cluster, benchmark, experiment
+            lue_dataset_pathname, result_prefix, platform, benchmark, experiment
         )
 
     if not raw_results_already_imported or not job.scalability_lue_dataset_exists(
-        result_prefix, cluster, benchmark, experiment
+        result_prefix, platform, benchmark, experiment
     ):
         # Copy dataset and write scalability results
         job.copy_raw_to_scalability_lue_dataset(
-            result_prefix, cluster, benchmark, experiment
+            result_prefix, platform, benchmark, experiment
         )
         lue_dataset = job.open_scalability_lue_dataset(
-            result_prefix, cluster, benchmark, experiment, "w"
+            result_prefix, platform, benchmark, experiment, "w"
         )
         write_scalability_results(lue_dataset)
 

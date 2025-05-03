@@ -14,6 +14,12 @@ file(GENERATE
     INPUT lue.py.in
 )
 
+# Stub file to keep the linters happy until we actually have more useful information for them to use
+file(GENERATE
+    OUTPUT ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/__init__.pyi
+    CONTENT "def __getattr__(name: str) -> Any: ...\n"
+)
+
 # A pybind11 MODULE library is a CMake library output artifact. Target properties to set/get are
 # LIBRARY_OUTPUT_DIRECTORY and LIBRARY_OUTPUT_NAME.
 pybind11_add_module(lue_py MODULE THIN_LTO OPT_SIZE

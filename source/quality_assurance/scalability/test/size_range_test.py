@@ -11,7 +11,7 @@ class SizeRangeTest(unittest.TestCase):
             "multiplier": multiplier,
         }
 
-        size_range = SizeRange.from_json(data)
+        size_range = SizeRange.from_data(data)
 
         self.assertEqual(size_range.nr_sizes, len(permutation_sizes))
         self.assertEqual(size_range.range.min_size, permutation_sizes[0])
@@ -47,7 +47,7 @@ class SizeRangeTest(unittest.TestCase):
             "incrementor": incrementor,
         }
 
-        size_range = SizeRange.from_json(data)
+        size_range = SizeRange.from_data(data)
 
         self.assertEqual(size_range.nr_sizes, len(permutation_sizes))
         self.assertEqual(size_range.min_size, permutation_sizes[0])

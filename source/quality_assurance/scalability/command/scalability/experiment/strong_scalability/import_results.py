@@ -14,7 +14,7 @@ from .experiment import Experiment
 
 
 def benchmark_meta_to_lue_json(
-    benchmark_pathname, lue_dataset_pathname, cluster, benchmark, experiment
+    benchmark_pathname, lue_dataset_pathname, platform, benchmark, experiment
 ):
     array_shape = experiment.array.shape
     partition_shape = experiment.partition.shape
@@ -40,7 +40,7 @@ def benchmark_meta_to_lue_json(
                                     "shape_per_object": "same_shape",
                                     "value_variability": "constant",
                                     "datatype": "string",
-                                    "value": [cluster.name],
+                                    "value": [platform.name],
                                 },
                                 {
                                     "name": "command",
@@ -215,7 +215,7 @@ def benchmark_to_lue_json(benchmark_pathname, lue_json_pathname, epoch):
 
 
 def import_raw_results(
-    lue_dataset_pathname, result_prefix, cluster, benchmark, experiment
+    lue_dataset_pathname, result_prefix, platform, benchmark, experiment
 ):
     """
     Import all raw benchmark results into a new LUE file
@@ -245,7 +245,7 @@ def import_raw_results(
     # -> Results are sorted by time, not by the number of workers!!!
 
     benchmark_idxs, epoch = util.sort_benchmarks_by_time(
-        result_prefix, cluster, benchmark, experiment
+        result_prefix, platform, benchmark, experiment
     )
 
     metadata_written = False
@@ -254,14 +254,14 @@ def import_raw_results(
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
 
         result_pathname = experiment.benchmark_result_pathname(
-            result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "json"
+            result_prefix, platform.name, benchmark.scenario_name, nr_workers, "json"
         )
         assert os.path.exists(result_pathname), result_pathname
 
         if not metadata_written:
             with tempfile.NamedTemporaryFile(suffix=".json") as lue_json_file:
                 benchmark_meta_to_lue_json(
-                    result_pathname, lue_json_file.name, cluster, benchmark, experiment
+                    result_pathname, lue_json_file.name, platform, benchmark, experiment
                 )
                 process.import_lue_json(lue_json_file.name, lue_dataset_pathname)
             metadata_written = True
@@ -591,17 +591,17 @@ def write_scalability_results(lue_dataset):
 
 def import_results(configuration_data):
     configuration = Configuration(configuration_data)
-    cluster = configuration.cluster
+    platform = configuration.platform
     benchmark = configuration.benchmark
     result_prefix = configuration.result_prefix
     experiment = configuration.experiment
 
     lue_dataset = job.open_raw_lue_dataset(
-        result_prefix, cluster, benchmark, experiment, "r"
+        result_prefix, platform, benchmark, experiment, "r"
     )
     raw_results_already_imported = dataset.raw_results_already_imported(lue_dataset)
 
-    cluster, benchmark, experiment = dataset.read_benchmark_settings(
+    platform, benchmark, experiment = dataset.read_benchmark_settings(
         lue_dataset, Experiment
     )
 
@@ -609,18 +609,18 @@ def import_results(configuration_data):
         lue_dataset_pathname = lue_dataset.pathname
         del lue_dataset
         import_raw_results(
-            lue_dataset_pathname, result_prefix, cluster, benchmark, experiment
+            lue_dataset_pathname, result_prefix, platform, benchmark, experiment
         )
 
     if not raw_results_already_imported or not job.scalability_lue_dataset_exists(
-        result_prefix, cluster, benchmark, experiment
+        result_prefix, platform, benchmark, experiment
     ):
         # Copy dataset and write scalability results
         job.copy_raw_to_scalability_lue_dataset(
-            result_prefix, cluster, benchmark, experiment
+            result_prefix, platform, benchmark, experiment
         )
         lue_dataset = job.open_scalability_lue_dataset(
-            result_prefix, cluster, benchmark, experiment, "w"
+            result_prefix, platform, benchmark, experiment, "w"
         )
         write_scalability_results(lue_dataset)
 

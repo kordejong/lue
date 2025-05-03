@@ -1,12 +1,19 @@
 import csv
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
 import lue.data_model as ldm
 
 
-def export_duration_partition_shape(dataset: ldm.Dataset, csv_writer) -> None:
+# Type aliases
+CSVWriter = Any
+
+
+def export_duration_partition_shape(
+    dataset: ldm.Dataset, csv_writer: CSVWriter
+) -> None:
     # Assert that the number of array shapes for which experiments where performed is 1
     lue_array = dataset.array.array
     assert lue_array.shape.value.nr_arrays == 1
@@ -72,7 +79,9 @@ def export_duration_partition_shape(dataset: ldm.Dataset, csv_writer) -> None:
             )
 
 
-def export_duration_strong_scalability(dataset: ldm.Dataset, csv_writer) -> None:
+def export_duration_strong_scalability(
+    dataset: ldm.Dataset, csv_writer: CSVWriter
+) -> None:
     measurement_property_set = dataset.benchmark.measurement
     count = measurement_property_set.duration.value.array_shape[:][0]
     nr_workers = measurement_property_set.nr_workers.value[:]
@@ -136,7 +145,9 @@ def export_duration_strong_scalability(dataset: ldm.Dataset, csv_writer) -> None
             )
 
 
-def export_duration_weak_scalability(dataset: ldm.Dataset, csv_writer) -> None:
+def export_duration_weak_scalability(
+    dataset: ldm.Dataset, csv_writer: CSVWriter
+) -> None:
     measurement_property_set = dataset.benchmark.measurement
     count = measurement_property_set.duration.value.array_shape[:][0]
     nr_workers = measurement_property_set.nr_workers.value[:]

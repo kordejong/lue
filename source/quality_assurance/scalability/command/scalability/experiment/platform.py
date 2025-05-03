@@ -1,26 +1,38 @@
-class Core(object):
-    def __init__(self, data):
-        self.from_json(data)
+from collections.abc import Sequence
 
-    def __str__(self):
+from ..alias import Data, MutableData
+from .worker import Worker
+
+
+class Core(object):
+    nr_threads: int
+
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def __str__(self) -> str:
         return "Core(nr_threads={})".format(
             self.nr_threads,
         )
 
-    def from_json(self, data):
+    def from_data(self, data: Data) -> None:
         self.nr_threads = data["nr_threads"]
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         return {
             "nr_threads": self.nr_threads,
         }
 
 
 class NUMANode(object):
-    def __init__(self, data):
-        self.from_json(data)
+    memory: int
+    nr_cores: int
+    core: Core
 
-    def __str__(self):
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def __str__(self) -> str:
         return "NUMANode(memory={}, nr_cores={}, core={})".format(
             self.memory,
             self.nr_cores,
@@ -28,127 +40,140 @@ class NUMANode(object):
         )
 
     @property
-    def nr_threads(self):
+    def nr_threads(self) -> int:
         return self.nr_cores * self.core.nr_threads
 
-    def from_json(self, data):
+    def from_data(self, data: Data) -> None:
         self.memory = data["memory"]
         self.nr_cores = data["nr_cores"]
         self.core = Core(data["core"])
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         return {
             "memory": self.memory,
             "nr_cores": self.nr_cores,
-            "core": self.core.to_json(),
+            "core": self.core.to_data(),
         }
 
 
 class Package(object):
-    def __init__(self, data):
-        self.from_json(data)
+    _nr_numa_nodes: int
+    numa_node: NUMANode
 
-    def __str__(self):
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def __str__(self) -> str:
         return "Package(nr_numa_nodes={}, numa_node={})".format(
             self._nr_numa_nodes,
-            self.numa_node.to_json(),
+            self.numa_node.to_data(),
         )
 
     @property
-    def nr_numa_nodes(self):
+    def nr_numa_nodes(self) -> int:
         return self._nr_numa_nodes
 
     @property
-    def memory(self):
+    def memory(self) -> int:
         return self._nr_numa_nodes * self.numa_node.memory
 
     @property
-    def nr_cores(self):
+    def nr_cores(self) -> int:
         return self._nr_numa_nodes * self.numa_node.nr_cores
 
     @property
-    def nr_threads(self):
+    def nr_threads(self) -> int:
         return self._nr_numa_nodes * self.numa_node.nr_threads
 
-    def from_json(self, data):
+    def from_data(self, data: Data) -> None:
         self._nr_numa_nodes = data["nr_numa_nodes"]
         self.numa_node = NUMANode(data["numa_node"])
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         return {
             "nr_numa_nodes": self.nr_numa_nodes,
-            "numa_node": self.numa_node.to_json(),
+            "numa_node": self.numa_node.to_data(),
         }
 
 
 class ClusterNode(object):
-    def __init__(self, data):
-        self.from_json(data)
+    nr_packages: int
+    package: Package
 
-    def __str__(self):
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def __str__(self) -> str:
         return "ClusterNode(nr_packages={}, package={})".format(
             self.nr_packages,
             self.package,
         )
 
     @property
-    def nr_numa_nodes(self):
+    def nr_numa_nodes(self) -> int:
         return self.nr_packages * self.package.nr_numa_nodes
 
     @property
-    def memory(self):
+    def memory(self) -> int:
         return self.nr_packages * self.package.memory
 
     @property
-    def nr_cores(self):
+    def nr_cores(self) -> int:
         return self.nr_packages * self.package.nr_cores
 
     @property
-    def nr_threads(self):
+    def nr_threads(self) -> int:
         return self.nr_packages * self.package.nr_threads
 
-    def from_json(self, data):
+    def from_data(self, data: Data) -> None:
         self.nr_packages = data["nr_packages"]
         self.package = Package(data["package"])
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         return {
             "nr_packages": self.nr_packages,
-            "package": self.package.to_json(),
+            "package": self.package.to_data(),
         }
 
 
 class Scheduler(object):
-    def __init__(self, data):
-        self._from_json(data)
+    kind: str
 
-    def _from_json(self, data):
+    def __init__(self, data: Data):
+        self._from_data(data)
+
+    def _from_data(self, data: Data) -> None:
         self.kind = data["kind"]
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         return {"kind": self.kind}
 
 
 class ShellScheduler(Scheduler):
-    def __init__(self, data):
+    def __init__(self, data: Data):
         super(ShellScheduler, self).__init__(data)
 
-    def to_json(self):
-        return super(ShellScheduler, self).to_json()
+    def to_data(self) -> MutableData:
+        return super(ShellScheduler, self).to_data()
 
 
 class SlurmSettings(object):
-    def __init__(self, data):
-        self.from_json(data)
+    partition_name: str
+    sbatch_options: Sequence[str]
+    mpirun_options: Sequence[str]
+    srun_options: Sequence[str]
 
-    def from_json(self, data):
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def from_data(self, data: Data) -> None:
         self.partition_name = data["partition"]
         self.sbatch_options = data["sbatch_options"] if "sbatch_options" in data else ""
         self.mpirun_options = data["mpirun_options"] if "mpirun_options" in data else ""
         self.srun_options = data["srun_options"] if "srun_options" in data else ""
 
-    def to_json(self):
-        result = {
+    def to_data(self) -> MutableData:
+        result: MutableData = {
             "partition": self.partition_name,
         }
 
@@ -165,26 +190,31 @@ class SlurmSettings(object):
 
 
 class SlurmScheduler(Scheduler):
-    def __init__(self, data):
-        super(SlurmScheduler, self).__init__(data)
-        self.from_json(data)
+    settings: SlurmSettings
 
-    def from_json(self, data):
+    def __init__(self, data: Data):
+        super(SlurmScheduler, self).__init__(data)
+        self.from_data(data)
+
+    def from_data(self, data: Data) -> None:
         self.settings = SlurmSettings(data["settings"])
 
-    def to_json(self):
-        result = super(SlurmScheduler, self).to_json()
+    def to_data(self) -> MutableData:
+        result = super(SlurmScheduler, self).to_data()
 
-        result["settings"] = self.settings.to_json()
+        result["settings"] = self.settings.to_data()
 
         return result
 
 
 class SoftwareEnvironment(object):
-    def __init__(self, data):
-        self.from_json(data)
+    module_names: Sequence[str]
+    venv: Data | None
 
-    def from_json(self, data):
+    def __init__(self, data: Data):
+        self.from_data(data)
+
+    def from_data(self, data: Data) -> None:
         self.module_names = data["modules"]
 
         if "venv" in data:
@@ -192,18 +222,18 @@ class SoftwareEnvironment(object):
         else:
             self.venv = None
 
-    def to_json(self):
-        result = {
+    def to_data(self) -> MutableData:
+        result: MutableData = {
             "modules": self.module_names,
         }
 
-        if self.venv:
+        if self.venv is not None:
             result["venv"] = self.venv
 
         return result
 
     @property
-    def configuration(self):
+    def configuration(self) -> str:
         commands = []
 
         if self.module_names:
@@ -218,13 +248,17 @@ class SoftwareEnvironment(object):
         return "\n".join(commands)
 
 
-class Cluster(object):
+class Platform(object):
+    name: str
     scheduler: Scheduler
+    nr_cluster_nodes: int
+    cluster_node: ClusterNode
+    software_environment: SoftwareEnvironment | None
 
-    def __init__(self, data):
-        self.from_json(data)
+    def __init__(self, data: Data):
+        self.from_data(data)
 
-    def from_json(self, data):
+    def from_data(self, data: Data) -> None:
         self.name = data["name"]
         scheduler_json = data["scheduler"]
         scheduler_kind = scheduler_json["kind"]
@@ -243,20 +277,20 @@ class Cluster(object):
             else None
         )
 
-    def to_json(self):
+    def to_data(self) -> MutableData:
         result = {
             "name": self.name,
-            "scheduler": self.scheduler.to_json(),
+            "scheduler": self.scheduler.to_data(),
             "nr_cluster_nodes": self.nr_cluster_nodes,
-            "cluster_node": self.cluster_node.to_json(),
+            "cluster_node": self.cluster_node.to_data(),
         }
 
         if self.software_environment:
-            result["software_environment"] = self.software_environment.to_json()
+            result["software_environment"] = self.software_environment.to_data()
 
         return result
 
-    def nr_localities_to_reserve(self, worker, locality_per) -> int:
+    def nr_localities_to_reserve(self, worker: Worker, locality_per: str) -> int:
         """
         When scheduling jobs, the number of localities we need to ask for from the scheduler
 
@@ -265,21 +299,23 @@ class Cluster(object):
         """
         result = -1
 
-        if worker.type == "thread":
+        if worker.name == "core":
             # Claim a whole cluster node
             if locality_per == "cluster_node":
                 result = 1
             elif locality_per == "numa_node":
                 result = self.cluster_node.nr_numa_nodes
-        elif worker.type == "numa_node":
+        elif worker.name == "numa_node":
             # Claim a whole cluster node
             assert locality_per == "numa_node"
             result = self.cluster_node.nr_numa_nodes
-        elif worker.type == "cluster_node":
+        elif worker.name == "cluster_node":
             # Claim all cluster nodes in the partition
             if locality_per == "cluster_node":
                 result = worker.nr_cluster_nodes
             elif locality_per == "numa_node":
                 result = worker.nr_cluster_nodes * self.cluster_node.nr_numa_nodes
+
+        assert result > 0
 
         return result

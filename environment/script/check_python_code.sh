@@ -13,7 +13,8 @@ ruff check "$lue_ad_hoc_prefix"
 echo "pyright..."
 pyright --project $LUE "$lue_ad_hoc_prefix"
 echo "mypy..."
-mypy --check-untyped-defs "$lue_ad_hoc_prefix"
+mypy --strict "$lue_ad_hoc_prefix"
+# mypy --check-untyped-defs --disallow-untyped-defs "$lue_ad_hoc_prefix"
 
 # TODO Create and install lib/python3.12/lue/data_model/__init__.pyi with this content:
 # def __getattr__(name: str) -> Any: ...

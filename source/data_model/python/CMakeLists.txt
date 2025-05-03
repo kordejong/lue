@@ -8,6 +8,12 @@ file(GENERATE
     INPUT hdf5.py.in
 )
 
+# Stub file to keep the linters happy until we actually have more useful information for them to use
+file(GENERATE
+    OUTPUT ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/data_model/__init__.pyi
+    CONTENT "def __getattr__(name: str) -> Any: ...\n"
+)
+
 add_library(lue_py_data_model SHARED)
 add_library(lue::py_data_model ALIAS lue_py_data_model)
 

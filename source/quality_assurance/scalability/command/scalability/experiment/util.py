@@ -1,17 +1,27 @@
+import datetime
 import os.path
 
 import dateutil.parser
 
+from .benchmark import Benchmark
+from .platform import Platform
+from .strong_scalability.experiment import Experiment as StrongScalabilityExperiment
+from .weak_scalability.experiment import Experiment as WeakScalabilityExperiment
 from ..core import json
 
 
-def sort_benchmarks_by_time(result_prefix, cluster, benchmark, experiment):
+def sort_benchmarks_by_time(
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: StrongScalabilityExperiment | WeakScalabilityExperiment,
+) -> tuple[list[int], datetime.datetime]:
     items = []
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
         benchmark_pathname = experiment.benchmark_result_pathname(
-            result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "json"
+            result_prefix, platform.name, benchmark.scenario_name, nr_workers, "json"
         )
         assert os.path.exists(benchmark_pathname), benchmark_pathname
         benchmark_json = json.json_to_data(benchmark_pathname)

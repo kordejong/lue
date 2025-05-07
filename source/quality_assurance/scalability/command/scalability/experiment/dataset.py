@@ -1,4 +1,6 @@
 import json
+from typing import TypeVar
+
 
 import numpy as np
 
@@ -52,9 +54,12 @@ def write_script(lue_dataset: ldm.Dataset, script: str) -> None:
     ldm.assert_is_valid(lue_dataset)
 
 
+ExperimentType = TypeVar("ExperimentType")
+
+
 def read_benchmark_settings(
-    lue_dataset: ldm.Dataset, Experiment: type
-) -> tuple[Platform, Benchmark, Experiment]:
+    lue_dataset: ldm.Dataset, ExperimentType: type
+) -> tuple[Platform, Benchmark, ExperimentType]:  # type: ignore[unused-ignore, reportInvalidTypeVarUse]
     ldm.assert_is_valid(lue_dataset, fail_on_warning=False)
 
     phenomenon = lue_dataset.benchmark
@@ -64,7 +69,9 @@ def read_benchmark_settings(
     benchmark = Benchmark(
         json.loads(property_set.benchmark_settings.value[:][0]), platform
     )
-    experiment = Experiment(json.loads(property_set.experiment_settings.value[:][0]))
+    experiment = ExperimentType(
+        json.loads(property_set.experiment_settings.value[:][0])
+    )
 
     return platform, benchmark, experiment
 

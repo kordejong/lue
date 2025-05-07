@@ -1,12 +1,20 @@
 import os.path
 
+from ...alias import Data
 from .. import dataset, job
 from .configuration import Configuration
+from ..platform import Platform, SlurmScheduler
+from ..benchmark import Benchmark
+from .experiment import Experiment
 
 
 def generate_script_slurm(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     # Iterate over all combinations of array shapes and partition shapes
     # we need to benchmark and format a snippet of bash script for
     # executing the benchmark
@@ -72,6 +80,8 @@ def generate_script_slurm(
     )
     delimiter = "END_OF_SLURM_SCRIPT"
 
+    assert isinstance(platform.scheduler, SlurmScheduler)
+
     commands = [
         "# Make sure SLURM can create the output file",
         "mkdir -p {}".format(
@@ -95,8 +105,12 @@ def generate_script_slurm(
 
 
 def generate_script_shell(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     # Iterate over all combinations of array shapes and partition shapes
     # we need to benchmark and format a snippet of bash script for
     # executing the benchmark
@@ -139,7 +153,7 @@ def generate_script_shell(
     print("bash {}".format(script_pathname))
 
 
-def generate_script(configuration_data):
+def generate_script(configuration_data: Data) -> None:
     """
     Given a fixed set of workers, iterate over a range of array shapes
     and a range of partition shapes and capture benchmark results

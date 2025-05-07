@@ -1,12 +1,20 @@
 import os.path
 
+from ...alias import Data
 from .. import dataset, job
+from ..benchmark import Benchmark
+from ..platform import Platform, SlurmScheduler
 from .configuration import Configuration
+from .experiment import Experiment
 
 
 def generate_script_slurm_cores(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     """
     Scale over cores in a single NUMA node or a single cluster node
     """
@@ -61,6 +69,8 @@ def generate_script_slurm_cores(
     )
     delimiter = "END_OF_SLURM_SCRIPT"
 
+    assert isinstance(platform.scheduler, SlurmScheduler)
+
     commands = [
         "# Make sure SLURM can create the output file",
         "mkdir -p {}".format(
@@ -84,8 +94,12 @@ def generate_script_slurm_cores(
 
 
 def generate_script_slurm_numa_nodes(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     """
     Scale over NUMA nodes in a single cluster node
     """
@@ -148,6 +162,8 @@ def generate_script_slurm_numa_nodes(
         )
         delimiter = "END_OF_SLURM_SCRIPT_{}".format(nr_workers)
 
+        assert isinstance(platform.scheduler, SlurmScheduler)
+
         commands += [
             "",
             "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
@@ -167,8 +183,12 @@ def generate_script_slurm_numa_nodes(
 
 
 def generate_script_slurm_cluster_nodes(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     """
     Scale over nodes in a cluster of nodes
     """
@@ -254,6 +274,8 @@ def generate_script_slurm_cluster_nodes(
             result_prefix, platform.name, benchmark.scenario_name, nr_workers, "json"
         )
 
+        assert isinstance(platform.scheduler, SlurmScheduler)
+
         commands += [
             # Create a snippet of bash script that creates a SLURM script
             # for this partition. Note that this has to be done at runtime
@@ -282,8 +304,12 @@ def generate_script_slurm_cluster_nodes(
 
 
 def generate_script_slurm(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     assert benchmark.worker.name in ["cluster_node", "numa_node", "core"]
 
     if benchmark.worker.scale_over_cluster_nodes:
@@ -301,8 +327,12 @@ def generate_script_slurm(
 
 
 def generate_script_shell(
-    result_prefix, platform, benchmark, experiment, script_pathname
-):
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+    script_pathname: str,
+) -> None:
     assert benchmark.worker.name == "core"
     assert not benchmark.worker.scale_over_cluster_nodes
     assert not benchmark.worker.scale_over_numa_nodes
@@ -354,7 +384,7 @@ def generate_script_shell(
     print("bash {}".format(script_pathname))
 
 
-def generate_script(configuration_data):
+def generate_script(configuration_data: Data) -> None:
     """
     Given a fixed array size and partition shape size, iterate over a
     range of sets of workers and capture benchmark results

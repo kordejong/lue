@@ -1,9 +1,10 @@
+from ...alias import Data
 from .generate_script import generate_script
 from .import_results import import_results
 from .postprocess_results import postprocess_results
 
 
-def perform_task(task_name, configuration_data):
+def perform_task(task_name: str, configuration_data: Data) -> None:
     task_by_name = {
         "script": generate_script,
         "import": import_results,

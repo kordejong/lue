@@ -1,9 +1,12 @@
+from collections.abc import Sequence
 import dateutil.parser
 import matplotlib.pyplot as plt
+import matplotlib.axes as mpla
 import numpy as np
 
 import lue.data_model as ldm
 
+from ...alias import Data, Shapes
 from ...core import math, plot, process
 from .. import dataset, job
 from .configuration import Configuration
@@ -11,8 +14,12 @@ from .experiment import Experiment
 
 
 def post_process_raw_results(
-    lue_dataset, result_prefix, plot_pathname, experiment, filetypes
-):
+    lue_dataset: ldm.Dataset,
+    result_prefix: str,
+    plot_pathname: str,
+    experiment: Experiment,
+    filetypes: Sequence[str],
+) -> None:
     """
     Create plots and tables from raw benchmark results
     """
@@ -45,7 +52,12 @@ def post_process_raw_results(
 
     assert math.is_monotonically_increasing(partition_sizes), partition_sizes
 
-    def plot_duration(axis, array_idx, partition_sizes, partition_shapes):
+    def plot_duration(
+        axis: mpla.Axes,
+        array_idx: int,
+        partition_sizes: Sequence[int],
+        partition_shapes: Shapes,
+    ) -> None:
         if count == 1:
             duration = lue_dataset.partition.partition.properties[
                 "duration_{}".format(array_idx)
@@ -164,12 +176,12 @@ def post_process_raw_results(
         )
 
 
-def postprocess_results(configuration_data):
+def postprocess_results(configuration_data: Data) -> None:
     configuration = Configuration(configuration_data)
     platform = configuration.platform
     benchmark = configuration.benchmark
     result_prefix = configuration.result_prefix
-    experiment = configuration.experiment
+    experiment: Experiment = configuration.experiment
 
     lue_dataset = job.open_scalability_lue_dataset(
         result_prefix, platform, benchmark, experiment, "r"

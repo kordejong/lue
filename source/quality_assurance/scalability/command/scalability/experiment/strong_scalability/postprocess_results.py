@@ -1,9 +1,17 @@
+from collections.abc import Sequence
 import dateutil.parser
+from typing import Callable
+
+from matplotlib.lines import Line2D
+from matplotlib.container import ErrorbarContainer
+import matplotlib.axes as mpla
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.typing import ArrayLike
 
 import lue.data_model as ldm
 
+from ...alias import Data
 from ...core import math, plot, process
 from .. import dataset, job
 from .configuration import Configuration
@@ -17,7 +25,12 @@ from .experiment import Experiment
 # import re
 
 
-def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetypes):
+def post_process_raw_results(
+    lue_dataset: ldm.Dataset,
+    result_prefix: str,
+    plot_pathname: str,
+    filetypes: Sequence[str],
+) -> None:
     """
     Create plots and tables from raw benchmark results
     """
@@ -51,14 +64,14 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
 
     lue_scaling = lue_dataset.benchmark.scaling
 
-    def annotate_plot(axis, y_label):
+    def annotate_plot(axis: mpla.Axes, y_label: str) -> None:
         axis.set_xlabel("workers ({})".format(worker_type))
         axis.set_xticks(nr_workers)
         axis.set_ylabel(y_label)
         axis.grid()
 
-    def plot_duration(axis):
-        def plot_value(data):
+    def plot_duration(axis: mpla.Axes) -> None:
+        def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,
                 data,
@@ -67,7 +80,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 marker="o",
             )
 
-        def plot_statistic(data):
+        def plot_statistic(data: ArrayLike) -> ErrorbarContainer:
             return axis.errorbar(
                 x=nr_workers,
                 y=data,
@@ -76,6 +89,8 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 color=plot.actual_color,
                 marker="o",
             )
+
+        plot_actual: Callable[[ArrayLike], list[Line2D] | ErrorbarContainer]
 
         if count == 1:
             duration = lue_measurement.duration.value[:][sort_idxs]
@@ -111,8 +126,8 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
 
         annotate_plot(axis, y_label)
 
-    def plot_relative_speed_up(axis):
-        def plot_value(data):
+    def plot_relative_speed_up(axis: mpla.Axes) -> None:
+        def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,
                 data,
@@ -121,7 +136,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 marker="o",
             )
 
-        def plot_statistic(data):
+        def plot_statistic(data: ArrayLike) -> ErrorbarContainer:
             return axis.errorbar(
                 x=nr_workers,
                 y=data,
@@ -130,6 +145,8 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 color=plot.actual_color,
                 marker="o",
             )
+
+        plot_actual: Callable[[ArrayLike], list[Line2D] | ErrorbarContainer]
 
         if count == 1:
             relative_speed_up = lue_scaling.relative_speed_up.value[:][sort_idxs]
@@ -163,8 +180,8 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
 
         annotate_plot(axis, y_label)
 
-    def plot_relative_efficiency(axis):
-        def plot_value(data):
+    def plot_relative_efficiency(axis: mpla.Axes) -> None:
+        def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,
                 data,
@@ -173,7 +190,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 marker="o",
             )
 
-        def plot_statistic(data):
+        def plot_statistic(data: ArrayLike) -> ErrorbarContainer:
             return axis.errorbar(
                 x=nr_workers,
                 y=data,
@@ -182,6 +199,8 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
                 color=plot.actual_color,
                 marker="o",
             )
+
+        plot_actual: Callable[[ArrayLike], list[Line2D] | ErrorbarContainer]
 
         if count == 1:
             relative_efficiency = lue_scaling.relative_efficiency.value[:][sort_idxs]
@@ -678,7 +697,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
 #         plot_performance_counters(lue_dataset, nr_workers[i])
 
 
-def postprocess_results(configuration_data):
+def postprocess_results(configuration_data: Data) -> None:
     """
     Post-process the results of executing the benchmark script generated
     by the generate_script function

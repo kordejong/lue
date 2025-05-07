@@ -49,9 +49,9 @@ class WorkerBase(metaclass=ABCMeta):
 
         return self.min_nr_cluster_nodes
 
-    @property
+    @staticmethod
     @abstractmethod
-    def name(self) -> str:
+    def name() -> str:
         """
         Return name of worker
         """
@@ -95,8 +95,8 @@ class Core(WorkerBase):
 
         self.max_nr_numa_nodes = self.min_nr_numa_nodes
 
-    @property
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         return "core"
 
     @property
@@ -127,8 +127,8 @@ class NUMANode(WorkerBase):
         self.min_nr_numa_nodes = self.size_range.min_size
         self.max_nr_numa_nodes = self.size_range.max_size
 
-    @property
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         return "numa_node"
 
     @property
@@ -168,8 +168,8 @@ class ClusterNode(WorkerBase):
         self.min_nr_cluster_nodes = self.size_range.min_size
         self.max_nr_cluster_nodes = self.size_range.max_size
 
-    @property
-    def name(self) -> str:
+    @staticmethod
+    def name() -> str:
         return "cluster_node"
 
     @property
@@ -212,7 +212,7 @@ class Worker(object):
     @classmethod
     def to_data(cls, worker: "Worker") -> MutableData:
         return {
-            "type": worker.worker.name,
+            "type": worker.worker.name(),
             "size_range": SizeRange.to_data(worker.worker.size_range),
         }
 
@@ -224,16 +224,17 @@ class Worker(object):
         locality_per: str,
     ):
         worker_type, size_range = self.from_data(data)
-        assert worker_type in [
-            worker_type_class.name
-            for worker_type_class in [Core, NUMANode, ClusterNode]
-        ]
 
-        if worker_type == Core.name:
+        # assert worker_type in [
+        #     worker_type_class.name()
+        #     for worker_type_class in [Core, NUMANode, ClusterNode]
+        # ], worker_type
+
+        if worker_type == Core.name():
             self.worker = Core(size_range, nr_numa_nodes_per_cluster_node, locality_per)
-        elif worker_type == NUMANode.name:
+        elif worker_type == NUMANode.name():
             self.worker = NUMANode(size_range, nr_cores_per_numa_node, locality_per)
-        elif worker_type == ClusterNode.name:
+        elif worker_type == ClusterNode.name():
             self.worker = ClusterNode(
                 size_range,
                 nr_numa_nodes_per_cluster_node,
@@ -276,7 +277,7 @@ class Worker(object):
         """
         Return name of worker (one of: core, numa_node, cluster_node)
         """
-        return self.worker.name
+        return self.worker.name()
 
     @property
     def scale_over_cluster_nodes(self) -> int:

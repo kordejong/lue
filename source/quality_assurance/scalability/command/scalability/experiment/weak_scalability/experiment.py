@@ -1,31 +1,33 @@
 import os.path
 
+from ...alias import Data, MutableData
 from ..shape_range import ShapeRange
 from .. import experiment
 
 
 class Experiment(experiment.Experiment):
-    def __init__(self, data):
+    array: ShapeRange
+    partition: ShapeRange
+
+    def __init__(self, data: Data):
         super(Experiment, self).__init__(
             data,
             "weak_scalability",
             data.get(
                 "description",
-                "Weak scaling experiment of {}, "
+                f"Weak scaling experiment of {os.path.basename(data['command_pathname'])}, "
                 "relating runtime to an increasing number of workers, "
-                "while keeping the problem size per worker constant".format(
-                    os.path.basename(data["command_pathname"])
-                ),
+                "while keeping the problem size per worker constant",
             ),
         )
 
         self.from_data(data)
 
-    def from_data(self, data):
+    def from_data(self, data: Data) -> None:
         self.array = ShapeRange.from_data(data["array"])
         self.partition = ShapeRange.from_data(data["partition"])
 
-    def to_data(self):
+    def to_data(self) -> MutableData:
         result = super(Experiment, self).to_data()
         result["array"] = ShapeRange.to_data(self.array)
         result["partition"] = ShapeRange.to_data(self.partition)

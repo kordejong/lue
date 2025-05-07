@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, MutableSequence, Sequence
 from functools import reduce
 import math
 
@@ -116,7 +116,7 @@ def partition_shapes(min_shape: Shape, max_shape: Shape, step: int) -> Iterable[
 
 
 def range_of_shapes(
-    min_shape: Shape, max_nr_elements: int, multiplier: int, method: str
+    min_shape: Shape, max_nr_elements: int, multiplier: float, method: str
 ) -> Shapes:
     """
     Determine a range of shapes given the following requirements:
@@ -126,10 +126,10 @@ def range_of_shapes(
     - Each next shape contains multiplier times more elements than the previous shape
     """
 
-    def nr_elements(shape: Shape) -> int:
-        return reduce(lambda e1, e2: e1 * e2, shape)
+    def nr_elements(shape: Shape) -> float:
+        return float(reduce(lambda e1, e2: e1 * e2, shape))
 
-    def shape(nr_elements: int, normalized_shape: Sequence[float]) -> Shape:
+    def shape(nr_elements: float, normalized_shape: Sequence[float]) -> Shape:
         rank = len(normalized_shape)
         nr_elements_per_dimension = nr_elements ** (1.0 / rank)
 
@@ -140,12 +140,12 @@ def range_of_shapes(
             ]
         )
 
-    def linear_increment(idx: int, size: int, multiplier: int) -> int:
+    def linear_increment(idx: int, size: float, multiplier: float) -> float:
         # Increase the number of cells linearly, by idx * (multiplier - 1) * size
         # If idx == 0, size is returned
-        return size + idx * (multiplier - 1) * size
+        return size + idx * (multiplier - 1.0) * size
 
-    sizes = [nr_elements(min_shape)]
+    sizes: MutableSequence[float] = [nr_elements(min_shape)]
 
     assert method in ["linear", "exponential"]
 
@@ -178,7 +178,7 @@ def range_of_shapes(
 
 class Range(object):
     max_nr_elements: int
-    multiplier: int
+    multiplier: float
     method: str
 
     def __init__(self, data: Data):
@@ -186,8 +186,8 @@ class Range(object):
 
     def from_data(self, data: Data) -> None:
         self.max_nr_elements = data["max_nr_elements"]
+        assert type(data["multiplier"]) in (int, float)
         self.multiplier = data["multiplier"]
-        assert isinstance(self.multiplier, int)  # Otherwise update type hints
         self.method = data["method"]
 
         assert self.method in ["linear", "exponential"]

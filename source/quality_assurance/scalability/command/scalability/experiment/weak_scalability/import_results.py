@@ -1,3 +1,4 @@
+import datetime
 import json
 import os.path
 import tempfile
@@ -7,15 +8,22 @@ import numpy as np
 
 import lue.data_model as ldm
 
+from ...alias import Data
 from ...core import process
 from .. import dataset, job, util
+from ..benchmark import Benchmark
+from ..platform import Platform
 from .configuration import Configuration
 from .experiment import Experiment
 
 
 def benchmark_meta_to_lue_json(
-    benchmark_pathname, lue_dataset_pathname, platform, benchmark, experiment
-):
+    benchmark_pathname: str,
+    lue_dataset_pathname: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+) -> None:
     array_shape = experiment.array.shape
     partition_shape = experiment.partition.shape
 
@@ -105,7 +113,7 @@ def benchmark_meta_to_lue_json(
                                     "shape_per_object": "same_shape",
                                     "value_variability": "constant",
                                     "datatype": "string",
-                                    "value": [benchmark.worker.type],
+                                    "value": [benchmark.worker.name],
                                 },
                             ],
                         }
@@ -122,8 +130,12 @@ def benchmark_meta_to_lue_json(
 
 
 def benchmark_to_lue_json(
-    nr_workers, benchmark_pathname, lue_json_pathname, epoch, benchmark
-):
+    nr_workers: int,
+    benchmark_pathname: str,
+    lue_json_pathname: str,
+    epoch: datetime.datetime,
+    benchmark: Benchmark,
+) -> None:
     # Read benchmark JSON
     benchmark_json = json.loads(open(benchmark_pathname).read())
 
@@ -227,8 +239,12 @@ def benchmark_to_lue_json(
 
 
 def import_raw_results(
-    lue_dataset_pathname, result_prefix, platform, benchmark, experiment
-):
+    lue_dataset_pathname: str,
+    result_prefix: str,
+    platform: Platform,
+    benchmark: Benchmark,
+    experiment: Experiment,
+) -> None:
     """
     Import all raw benchmark results into a new LUE file
 
@@ -288,7 +304,7 @@ def import_raw_results(
     ldm.assert_is_valid(lue_dataset_pathname)
 
 
-def write_scalability_results(lue_dataset):
+def write_scalability_results(lue_dataset: ldm.Dataset) -> None:
     count = lue_dataset.benchmark.measurement.duration.value.shape[1]
 
     lue_measurement = lue_dataset.benchmark.measurement
@@ -422,7 +438,7 @@ def write_scalability_results(lue_dataset):
         # std_lups_property.value.expand(nr_durations)[:] = std_lups
 
 
-def import_results(configuration_data):
+def import_results(configuration_data: Data) -> None:
     configuration = Configuration(configuration_data)
     platform = configuration.platform
     benchmark = configuration.benchmark

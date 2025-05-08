@@ -6,6 +6,9 @@ from .. import experiment
 
 
 class Experiment(experiment.Experiment):
+    array: ShapeRange
+    partition: ShapeRange
+
     def __init__(self, data: Data):
         super(Experiment, self).__init__(
             data,

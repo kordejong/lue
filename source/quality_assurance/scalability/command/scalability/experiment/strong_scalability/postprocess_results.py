@@ -4,7 +4,7 @@ from typing import Callable
 
 from matplotlib.lines import Line2D
 from matplotlib.container import ErrorbarContainer
-import matplotlib.axes as mpla
+from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import ArrayLike
@@ -64,13 +64,13 @@ def post_process_raw_results(
 
     lue_scaling = lue_dataset.benchmark.scaling
 
-    def annotate_plot(axis: mpla.Axes, y_label: str) -> None:
+    def annotate_plot(axis: Axes, y_label: str) -> None:
         axis.set_xlabel("workers ({})".format(worker_type))
         axis.set_xticks(nr_workers)
         axis.set_ylabel(y_label)
         axis.grid()
 
-    def plot_duration(axis: mpla.Axes) -> None:
+    def plot_duration(axis: Axes) -> None:
         def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,
@@ -126,7 +126,7 @@ def post_process_raw_results(
 
         annotate_plot(axis, y_label)
 
-    def plot_relative_speed_up(axis: mpla.Axes) -> None:
+    def plot_relative_speed_up(axis: Axes) -> None:
         def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,
@@ -180,7 +180,7 @@ def post_process_raw_results(
 
         annotate_plot(axis, y_label)
 
-    def plot_relative_efficiency(axis: mpla.Axes) -> None:
+    def plot_relative_efficiency(axis: Axes) -> None:
         def plot_value(data: ArrayLike) -> list[Line2D]:
             return axis.plot(
                 nr_workers,

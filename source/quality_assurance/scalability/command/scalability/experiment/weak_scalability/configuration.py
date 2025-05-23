@@ -1,4 +1,4 @@
-from ...core import json_to_data
+from ...core.json import json_to_data
 from .. import configuration
 from . import experiment
 

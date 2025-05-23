@@ -1,6 +1,7 @@
 import os.path
 
-from .. import experiment, shape
+from ..shape import Shape
+from .. import experiment
 
 
 class Experiment(experiment.Experiment):
@@ -21,13 +22,13 @@ class Experiment(experiment.Experiment):
         self.from_json(data)
 
     def from_json(self, data):
-        self.array = shape.Shape(data["array"])
-        self.partition = shape.Shape(data["partition"])
+        self.array = Shape.from_json(data["array"])
+        self.partition = Shape.from_json(data["partition"])
 
     def to_json(self):
         result = super(Experiment, self).to_json()
-        result["array"] = self.array.to_json()
-        result["partition"] = self.partition.to_json()
+        result["array"] = Shape.to_json(self.array.to_json)
+        result["partition"] = Shape.to_json(self.partition.to_json)
 
         return result
 

@@ -4,15 +4,15 @@ from .. import dataset, job
 from .configuration import Configuration
 
 
-def generate_script_slurm_threads(
+def generate_script_slurm_cores(
     result_prefix, cluster, benchmark, experiment, script_pathname
 ):
     """
-    Scale over threads in a single NUMA node or a single cluster node
+    Scale over cores in a single NUMA node or a single cluster node
     """
-    assert benchmark.worker.nr_cluster_nodes_range == 0
-    assert benchmark.worker.nr_numa_nodes_range == 0
-    assert benchmark.worker.nr_threads_range >= 1
+    assert not benchmark.worker.scale_over_cluster_nodes
+    assert not benchmark.worker.scale_over_numa_nodes
+    assert benchmark.worker.scale_over_cores
 
     job_steps = []
     array_shape = experiment.array.shape
@@ -23,12 +23,12 @@ def generate_script_slurm_threads(
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
-        nr_threads = nr_workers
+        nr_cores = nr_workers
 
         job_steps += [
             # Run the benchmark, resulting in a json file
             f"{jobstarter} {experiment.command_pathname} {experiment.command_arguments} "
-            f'--hpx:threads="{nr_threads}" '
+            f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
                     result_prefix,
@@ -85,9 +85,9 @@ def generate_script_slurm_numa_nodes(
     """
     Scale over NUMA nodes in a single cluster node
     """
-    assert benchmark.worker.nr_cluster_nodes_range == 0
-    assert benchmark.worker.nr_numa_nodes_range >= 1
-    assert benchmark.worker.nr_threads_range == 0
+    assert not benchmark.worker.scale_over_cluster_nodes
+    assert benchmark.worker.scale_over_numa_nodes
+    assert not benchmark.worker.scale_over_cores
 
     commands = [
         "mkdir -p {}".format(
@@ -99,7 +99,7 @@ def generate_script_slurm_numa_nodes(
     array_shape = experiment.array.shape
     partition_shape = experiment.partition.shape
 
-    nr_threads = benchmark.worker.nr_threads
+    nr_cores = benchmark.worker.nr_cores
     srun_configuration = job.srun_configuration(cluster)
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
@@ -109,7 +109,7 @@ def generate_script_slurm_numa_nodes(
 
         job_steps = [
             f"{jobstarter} {experiment.command_pathname} {experiment.command_arguments} "
-            f'--hpx:threads="{nr_threads}" '
+            f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
                     result_prefix,
@@ -164,9 +164,9 @@ def generate_script_slurm_cluster_nodes(
     """
     Scale over nodes in a cluster of nodes
     """
-    assert benchmark.worker.nr_cluster_nodes_range >= 1
-    assert benchmark.worker.nr_numa_nodes_range == 0
-    assert benchmark.worker.nr_threads_range == 0
+    assert benchmark.worker.scale_over_cluster_nodes
+    assert not benchmark.worker.scale_over_numa_nodes
+    assert not benchmark.worker.scale_over_cores
 
     # Given a problem size, measure the duration of executing an
     # executable on increasingly more nodes. For each number of nodes
@@ -181,7 +181,7 @@ def generate_script_slurm_cluster_nodes(
     array_shape = experiment.array.shape
     partition_shape = experiment.partition.shape
 
-    nr_threads = benchmark.worker.nr_threads
+    nr_cores = benchmark.worker.nr_cores
     srun_configuration = job.srun_configuration(cluster)
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
@@ -192,7 +192,7 @@ def generate_script_slurm_cluster_nodes(
         job_steps = [
             # Run the benchmark, resulting in a json file
             f"{jobstarter} {experiment.command_pathname} {experiment.command_arguments} "
-            f'--hpx:threads="{nr_threads}" '
+            f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
                     result_prefix,
@@ -262,18 +262,18 @@ def generate_script_slurm_cluster_nodes(
 def generate_script_slurm(
     result_prefix, cluster, benchmark, experiment, script_pathname
 ):
-    assert benchmark.worker.type in ["cluster_node", "numa_node", "thread"]
+    assert benchmark.worker.name in ["cluster_node", "numa_node", "core"]
 
-    if benchmark.worker.nr_cluster_nodes_range > 0:
+    if benchmark.worker.scale_over_cluster_nodes:
         generate_script_slurm_cluster_nodes(
             result_prefix, cluster, benchmark, experiment, script_pathname
         )
-    elif benchmark.worker.nr_numa_nodes_range > 0:
+    elif benchmark.worker.scale_over_numa_nodes:
         generate_script_slurm_numa_nodes(
             result_prefix, cluster, benchmark, experiment, script_pathname
         )
-    elif benchmark.worker.nr_threads_range > 0:
-        generate_script_slurm_threads(
+    elif benchmark.worker.scale_over_cores:
+        generate_script_slurm_cores(
             result_prefix, cluster, benchmark, experiment, script_pathname
         )
 
@@ -281,31 +281,36 @@ def generate_script_slurm(
 def generate_script_shell(
     result_prefix, cluster, benchmark, experiment, script_pathname
 ):
-    assert benchmark.worker.type == "thread"
-    assert benchmark.worker.nr_cluster_nodes_range == 0
-    assert benchmark.worker.nr_numa_nodes_range == 0
-    assert benchmark.worker.nr_threads_range >= 1
+    assert benchmark.worker.name == "core"
+    assert not benchmark.worker.scale_over_cluster_nodes
+    assert not benchmark.worker.scale_over_numa_nodes
+    assert benchmark.worker.scale_over_cores
 
     # Iterate over all sets of workers we need to benchmark and format
     # a snippet of bash script for executing the benchmark
-    commands = []
+    commands: list[str] = []
 
     array_shape = experiment.array.shape
     partition_shape = experiment.partition.shape
 
     for benchmark_idx in range(benchmark.worker.nr_benchmarks):
         nr_workers = benchmark.worker.nr_workers(benchmark_idx)
-        nr_threads = nr_workers
+        nr_cores = nr_workers
         result_pathname = experiment.benchmark_result_pathname(
             result_prefix, cluster.name, benchmark.scenario_name, nr_workers, "json"
         )
 
+        if not commands:
+            commands += [
+                # Create directory for the resulting json file
+                "mkdir -p {}".format(os.path.dirname(result_pathname)),
+                "",
+            ]
+
         commands += [
-            # Create directory for the resulting json file
-            "mkdir -p {}".format(os.path.dirname(result_pathname)),
             # Run the benchmark, resulting in a json file
             f"{experiment.command_pathname} {experiment.command_arguments} "
-            f'--hpx:threads="{nr_threads}" '
+            f'--hpx:threads="{nr_cores}" '
             "{program_configuration}".format(
                 program_configuration=job.program_configuration(
                     result_prefix,
@@ -340,9 +345,9 @@ def generate_script(configuration_data):
     assert (
         sum(
             [
-                benchmark.worker.nr_cluster_nodes_range > 0,
-                benchmark.worker.nr_numa_nodes_range > 0,
-                benchmark.worker.nr_threads_range > 0,
+                benchmark.worker.scale_over_cluster_nodes,
+                benchmark.worker.scale_over_numa_nodes,
+                benchmark.worker.scale_over_cores,
             ]
         )
         == 1

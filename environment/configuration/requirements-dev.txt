@@ -16,3 +16,4 @@ sphinx==7.4.7
 jupyter-book==1.0.4.post1
 livereload==2.7.1
 sphinxcontrib-mermaid==1.0.0
+sphinx-autoapi==3.6.0

@@ -13,7 +13,8 @@ skip = "*.cpp,*.cpp.in,*.hpp,*.hpp.in,*.tex,*_test.py,pyproject.toml"
 ignore-words-list = "nD"
 
 # [tool.pyright]
-# max-line-length = 110
+# venvPath = "."
+# venv = ".venv"
 
 [tool.typos]
 default.extend-ignore-identifiers-re = [

@@ -28,7 +28,6 @@ computer here, but everything works similar when performing experiments over clu
 computer cluster.
 ```
 
-
 ## Model
 
 The model we will be using here is [Conway's Game of
@@ -61,7 +60,6 @@ in the result file. More information about the `scalability.instrument` sub-pack
 Finally, the lue_scalability.py assumes that the model supports certain command line options. These are
 described in the [lue_scalability.py reference page](#lue-scalability-calling-conventions). The model code is
 updated for this as well, see the last section of the code.
-
 
 ## Configuration
 
@@ -101,7 +99,6 @@ The terminology used in describing a cluster node is inspired by the [Portable H
 In case of multi-node computer clusters, scheduler can be "slurm" and several settings can be added as well,
 like the name of the partition to use. The lue_qa repository contains examples for those as well.
 
-
 ### Worker
 
 Since we are using the orkney desktop computer as our platform here, the worker we are interested in here is
@@ -120,7 +117,7 @@ Example configuration for the partition shape experiment:
     "locality_per": "numa_node",
     "worker": {
         "type": "thread",
-        "pool": {
+        "range": {
             "size": 12
         }
     }
@@ -136,7 +133,7 @@ Example configuration for the strong and weak scalability experiments:
     "locality_per": "numa_node",
     "worker": {
         "type": "thread",
-        "pool": {
+        "range": {
             "min_size": 1,
             "max_size": 12,
             "incrementor": 1
@@ -147,7 +144,6 @@ Example configuration for the strong and weak scalability experiments:
 
 The count is the number of times an experimental run should be repeated. Doing it more than once allows for
 the inspection of the spread in the resulting scalability metrics.
-
 
 ### Experiment
 
@@ -180,7 +176,6 @@ Example configuration for the partition shape experiment:
     }
 }
 ```
-
 
 ## Experiment
 
@@ -238,7 +233,6 @@ Latencies by partition shape. Note the range in good partition shapes resulting 
 shape 850x850 appears to be a good candidate.
 ```
 
-
 ### Strong scalability
 
 Performing a strong scalability experiment involves calling the same commands as in the partition shape
@@ -264,7 +258,6 @@ loss in efficiency compared to a linear scaling model is about 20%.
 LUE users can be quite happy with these results. These results show that the model can use additional hardware
 to speed up the model.
 
-
 ### Weak scalability
 
 Performing a weak scalability experiment involves calling the same commands as in the partition shape and
@@ -288,7 +281,6 @@ using 12 CPU cores. The loss in efficiency compared to a linear scaling model is
 ```
 
 These results show that the model can use additional hardware to process larger datasets.
-
 
 ## Bash script
 

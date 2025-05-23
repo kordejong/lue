@@ -32,11 +32,7 @@ def post_process_raw_results(
     lue_epoch = lue_clock.epoch
     assert lue_epoch.kind == ldm.Epoch.Kind.common_era
     assert lue_epoch.calendar == ldm.Calendar.gregorian
-    time_point = dateutil.parser.isoparse(lue_epoch.origin)
-
-    # String containing time point in local time zone and conventions
-    # time_point = time_point.astimezone(tzlocal.get_localzone()).strftime("%c")
-    time_point = time_point.strftime("%c")
+    time_point = dateutil.parser.isoparse(lue_epoch.origin).strftime("%c")
 
     array_shapes = lue_dataset.array.array.shape.value[:]
     assert len(array_shapes) == len(array_shapes)
@@ -154,8 +150,7 @@ def post_process_raw_results(
         )
 
     figure.suptitle(
-        "{}, {}, {}\n"
-        "Partition shape scalability experiment ({})".format(
+        "{}, {}, {}\nPartition shape scalability experiment ({})".format(
             name,
             system_name,
             time_point,

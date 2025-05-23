@@ -1,3 +1,7 @@
+"""
+Implementation of the scalability command-line utility
+"""
+
 import datetime
 import sys
 from pathlib import Path
@@ -12,7 +16,10 @@ from lue.command.scalability import (
 )
 
 
-def perform_experiment(arguments):
+def perform_experiment(arguments) -> None:
+    """
+    Entry point for performing scalability experiments
+    """
     if arguments["partition_shape"]:
         experiment_name = "partition_shape"
     elif arguments["weak_scalability"]:
@@ -89,7 +96,10 @@ def perform_experiment(arguments):
     perform_experiment_task(experiment_name, task_name, configuration_data)
 
 
-def query_experiment(arguments):
+def query_experiment(arguments) -> None:
+    """
+    Entry point for querying result dataset of performed scalability experiments
+    """
     path = Path(arguments["<result_pathname>"])
 
     if arguments["summary"]:
@@ -99,7 +109,10 @@ def query_experiment(arguments):
         export_duration(dataset_path=path, csv_path=csv_path)
 
 
-def main():
+def main() -> None:
+    """
+    Main entry point of the command
+    """
     usage = """\
 Perform scalability experiment
 
@@ -127,9 +140,7 @@ Options:
     result_pathname   Pathname of input LUE file containing postprocessed results
     csv_pathname      Pathname of output CSV file for storing exported durations
     platform          Name of platform
-""".format(
-        command=Path(sys.argv[0]).name
-    )
+""".format(command=Path(sys.argv[0]).name)
 
     arguments = docopt.docopt(usage, version=lue_version)
 

@@ -1,167 +1,335 @@
-from . import pool
+from abc import ABCMeta, abstractmethod
+import typing
+
+from .cluster import Cluster
+from .size_range import SizeRange
+
+
+__all__ = ["Worker"]
+
+
+class WorkerBase(metaclass=ABCMeta):
+    name = ""
+
+    def __init__(self, size_range: SizeRange, locality_per: str):
+        self.locality_per = locality_per
+        self.size_range = size_range
+
+        self.min_nr_cores = 1
+        self.max_nr_cores = 1
+        self.min_nr_numa_nodes = 1
+        self.max_nr_numa_nodes = 1
+        self.min_nr_cluster_nodes = 1
+        self.max_nr_cluster_nodes = 1
+
+    @property
+    def nr_cores_range(self) -> int:
+        return self.max_nr_cores - self.min_nr_cores + 1
+
+    @property
+    def nr_numa_nodes_range(self) -> int:
+        return self.max_nr_numa_nodes - self.min_nr_numa_nodes + 1
+
+    @property
+    def nr_cluster_nodes_range(self) -> int:
+        return self.max_nr_cluster_nodes - self.min_nr_cluster_nodes + 1
+
+    @property
+    def nr_cores(self) -> int:
+        assert self.nr_cores_range == 1
+
+        return self.min_nr_cores
+
+    @property
+    def nr_numa_nodes(self) -> int:
+        assert self.nr_numa_nodes_range == 1
+
+        return self.min_nr_numa_nodes
+
+    @property
+    def nr_cluster_nodes(self) -> int:
+        assert self.nr_cluster_nodes_range == 1
+
+        return self.min_nr_cluster_nodes
+
+    @property
+    @abstractmethod
+    def nr_localities(self) -> int:
+        """
+        Return number of localities to use in benchmark
+        """
+
+    @property
+    @abstractmethod
+    def max_nr_workers(self) -> int:
+        """
+        Return the maximum number of workers to use
+        """
+
+
+class Core(WorkerBase):
+    name = "core"
+
+    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+        super().__init__(size_range, locality_per)
+
+        # Range of CPU cores for scaling
+        self.min_nr_cores = self.size_range.min_size
+        self.max_nr_cores = self.size_range.max_size
+
+        assert self.locality_per in ["numa_node", "cluster_node"], self.locality_per
+
+        if self.locality_per == "numa_node":
+            # Per the one NUMA node locality
+            self.min_nr_numa_nodes = 1
+        elif self.locality_per == "cluster_node":
+            # Per the one cluster node locality
+            self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
+
+        self.max_nr_numa_nodes = self.min_nr_numa_nodes
+
+    @property
+    def max_nr_workers(self) -> int:
+        return self.nr_cores
+
+    @property
+    def nr_localities(self) -> int:
+        assert self.nr_numa_nodes_range == 1
+        assert self.nr_cluster_nodes_range == 1
+
+        return 1
+
+
+class NUMANode(WorkerBase):
+    name = "numa_node"
+
+    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+        super().__init__(size_range, locality_per)
+
+        assert self.locality_per == "numa_node", self.locality_per
+
+        # Per each of the NUMA node localities
+        self.min_nr_cores = cluster.cluster_node.package.numa_node.nr_cores
+        self.max_nr_cores = self.min_nr_cores
+
+        # Range of NUMA nodes for scaling
+        self.min_nr_numa_nodes = self.size_range.min_size
+        self.max_nr_numa_nodes = self.size_range.max_size
+
+    @property
+    def max_nr_workers(self) -> int:
+        return self.nr_numa_nodes
+
+    @property
+    def nr_localities(self) -> int:
+        assert self.locality_per == "numa_node", self.locality_per
+        assert self.nr_numa_nodes_range == 1
+        assert self.nr_cluster_nodes_range == 1
+
+        return self.min_nr_numa_nodes
+
+
+class ClusterNode(WorkerBase):
+    name = "cluster_node"
+
+    def __init__(self, size_range: SizeRange, cluster: Cluster, locality_per: str):
+        super().__init__(size_range, locality_per)
+
+        assert self.locality_per == "numa_node", self.locality_per
+
+        # Per each of the NUMA node localities
+        self.min_nr_cores = cluster.cluster_node.package.numa_node.nr_cores
+        self.max_nr_cores = self.min_nr_cores
+
+        # All NUMA node localities
+        self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
+        self.max_nr_numa_nodes = self.min_nr_numa_nodes
+
+        # Range of cluster nodes for scaling
+        self.min_nr_cluster_nodes = self.size_range.min_size
+        self.max_nr_cluster_nodes = self.size_range.max_size
+
+    @property
+    def max_nr_workers(self) -> int:
+        return self.nr_cluster_nodes
+
+    @property
+    def nr_localities(self) -> int:
+        assert self.locality_per == "numa_node", self.locality_per
+        assert self.nr_numa_nodes_range == 1
+        assert self.nr_cluster_nodes_range == 1
+
+        return self.min_nr_cluster_nodes * self.min_nr_numa_nodes
 
 
 class Worker(object):
-    def __init__(self, data, cluster, locality_per):
-        """
-        Class for storing information about the workers to be used
-        in scalability experiments
+    """
+    Class for storing information about the workers to be used in scalability experiments
 
-        Three types of workers can be added during an experiment:
-        - thread: used in scalability experiments on
-            - a single cluster node
-            - a single NUMA node within a cluster node
-        - numa_node: used in scalability experiments on a cluster node
-            containing NUMA nodes
-        - cluster_node: used in scalability experiments on a cluster of nodes
-        """
-        self.from_json(data)
+    A worker is a piece of hardware. Three kinds of workers can be incrementally added during an experiment:
 
-        if self.type == "thread":
-            self.min_nr_cluster_nodes = 1
-            self.max_nr_cluster_nodes = 1
-            self.min_nr_threads = self.pool.min_size
-            self.max_nr_threads = self.pool.max_size
+    - core: used in scalability experiments within
 
-            if locality_per == "cluster_node":
-                self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
-                self.max_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
-            elif locality_per == "numa_node":
-                self.min_nr_numa_nodes = 1
-                self.max_nr_numa_nodes = 1
+      - a NUMA node
+      - a cluster node
 
-        elif self.type == "numa_node":
-            assert locality_per == "numa_node"
+    - numa_node: used in scalability experiments within a cluster node
 
-            self.min_nr_cluster_nodes = 1
-            self.max_nr_cluster_nodes = 1
-            self.min_nr_numa_nodes = self.pool.min_size
-            self.max_nr_numa_nodes = self.pool.max_size
-            self.min_nr_threads = cluster.cluster_node.package.numa_node.nr_cores
-            self.max_nr_threads = cluster.cluster_node.package.numa_node.nr_cores
+    - cluster_node: used in scalability experiments within a cluster partition
+    """
 
-        elif self.type == "cluster_node":
-            assert locality_per == "numa_node"
+    worker: WorkerBase
 
-            self.min_nr_cluster_nodes = self.pool.min_size
-            self.max_nr_cluster_nodes = self.pool.max_size
-            self.min_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
-            self.max_nr_numa_nodes = cluster.cluster_node.nr_numa_nodes
-            self.min_nr_threads = cluster.cluster_node.package.numa_node.nr_cores
-            self.max_nr_threads = self.min_nr_threads
+    def from_json(self, data: dict[str, typing.Any]) -> tuple[str, SizeRange]:
+        worker_type = data["type"]
+        size_range = SizeRange.from_json(data["size_range"])
 
-        assert 1 <= self.min_nr_cluster_nodes <= self.max_nr_cluster_nodes
-        assert 1 <= self.min_nr_numa_nodes <= self.max_nr_numa_nodes
-        assert 1 <= self.min_nr_threads <= self.max_nr_threads
+        return worker_type, size_range
 
-    def __str__(self):
-        return "Worker(type={}, pool={})".format(
-            self.type,
-            self.pool,
-        )
-
-    def from_json(self, data):
-        self.type = data["type"]
-        assert self.type in ["thread", "numa_node", "cluster_node"], self.type
-
-        self.pool = pool.Pool(data["pool"])
-
-    def to_json(self):
+    @classmethod
+    def to_json(cls, worker) -> dict[str, typing.Any]:
         return {
-            "type": self.type,
-            "pool": self.pool.to_json(),
+            "type": worker.worker.name,
+            "size_range": SizeRange.to_json(worker.worker.size_range),
         }
 
-    @property
-    def nr_cluster_nodes_range(self):
-        """
-        Return range in number of cluster nodes to use
-        """
-        return self.max_nr_cluster_nodes - self.min_nr_cluster_nodes
+    def __init__(
+        self, data: dict[str, typing.Any], cluster: Cluster, locality_per: str
+    ):
+        worker_type, size_range = self.from_json(data)
+
+        worker_type_classes: list[typing.Any] = [Core, NUMANode, ClusterNode]
+        worker_class_by_worker_type = {
+            worker_type_class.name: worker_type_class
+            for worker_type_class in worker_type_classes
+        }
+        self.worker = worker_class_by_worker_type[worker_type](
+            size_range, cluster, locality_per
+        )
+
+        assert 1 <= self.worker.min_nr_cluster_nodes <= self.worker.max_nr_cluster_nodes
+        assert 1 <= self.worker.min_nr_numa_nodes <= self.worker.max_nr_numa_nodes
+        assert 1 <= self.worker.min_nr_cores <= self.worker.max_nr_cores
+
+        assert (
+            sum(
+                [
+                    self.scale_over_cores,
+                    self.scale_over_numa_nodes,
+                    self.scale_over_cluster_nodes,
+                ]
+            )
+            <= 1
+        )
+
+    def __str__(self) -> str:
+        return "Worker(type={}, size_range={})".format(
+            self.worker.name,
+            self.worker.size_range,
+        )
 
     @property
-    def nr_numa_nodes_range(self):
+    def name(self):
         """
-        Return range in number of numa nodes to use
+        Return name of worker (one of: core, numa_node, cluster_node)
         """
-        return self.max_nr_numa_nodes - self.min_nr_numa_nodes
+        return self.worker.name
 
     @property
-    def nr_threads_range(self):
+    def scale_over_cluster_nodes(self) -> int:
         """
-        Return range in number of threads to use
+        Return whether scaling happens over cluster nodes
         """
-        return self.max_nr_threads - self.min_nr_threads
+        return self.worker.nr_cluster_nodes_range > 1
 
     @property
-    def nr_benchmarks(self):
-        """
-        Return number of benchmarks to perform for benchmark
-        """
-        return self.pool.nr_permutations
-
-    def nr_workers(self, benchmark_idx):
-        """
-        Return number of workers to use in benchmark with the index passed in
-        """
-        return self.pool.permutation_size(benchmark_idx)
+    def min_nr_cluster_nodes(self) -> int:
+        return self.worker.min_nr_cluster_nodes
 
     @property
-    def nr_cluster_nodes(self):
+    def max_nr_cluster_nodes(self) -> int:
+        return self.worker.max_nr_cluster_nodes
+
+    @property
+    def nr_cluster_nodes(self) -> int:
         """
         Return number of nodes to use in benchmark
 
         This assumes that the range in number of nodes to use is zero
         """
-        assert self.nr_cluster_nodes_range == 0
+        return self.worker.nr_cluster_nodes
 
-        return self.min_nr_cluster_nodes
+    @property
+    def scale_over_numa_nodes(self) -> int:
+        """
+        Return whether scaling happens over NUMA nodes
+        """
+        return self.worker.nr_numa_nodes_range > 1
+
+    @property
+    def min_nr_numa_nodes(self) -> int:
+        return self.worker.min_nr_numa_nodes
+
+    @property
+    def max_nr_numa_nodes(self) -> int:
+        return self.worker.max_nr_numa_nodes
+
+    @property
+    def nr_numa_nodes(self) -> int:
+        """
+        Return number of NUMA nodes to use in benchmark
+
+        This assumes that the range in number of NUMA nodes to use is zero
+        """
+        return self.worker.nr_numa_nodes
+
+    @property
+    def scale_over_cores(self) -> int:
+        """
+        Return whether scaling happens over CPU cores
+        """
+        return self.worker.nr_cores_range > 1
+
+    @property
+    def min_nr_cores(self) -> int:
+        return self.worker.min_nr_cores
+
+    @property
+    def max_nr_cores(self) -> int:
+        return self.worker.max_nr_cores
+
+    @property
+    def nr_cores(self) -> int:
+        """
+        Return number of cores to use in benchmark
+
+        This assumes that the range in number of cores to use is zero
+        """
+        return self.worker.nr_cores
+
+    @property
+    def nr_benchmarks(self) -> int:
+        """
+        Return number of benchmarks to perform for benchmark
+        """
+        return self.worker.size_range.nr_sizes
+
+    def nr_workers(self, benchmark_idx) -> int:
+        """
+        Return number of workers to use in benchmark with the index passed in
+        """
+        return self.worker.size_range.size(benchmark_idx)
+
+    @property
+    def max_nr_workers(self) -> int:
+        """
+        Return the maximum number of workers to use
+        """
+        return self.worker.max_nr_workers
 
     @property
     def nr_localities(self) -> int:
         """
         Return number of localities to use in benchmark
-
-        This assumes that the range in number of nodes to use is zero
         """
-        result = 0
-
-        if self.type == "thread":
-            assert self.nr_numa_nodes_range == 0
-            assert self.nr_cluster_nodes_range == 0
-            result = 1
-        elif self.type == "numa_node":
-            assert self.nr_numa_nodes_range == 0
-            assert self.nr_cluster_nodes_range == 0
-            result = self.min_nr_numa_nodes
-        elif self.type == "cluster_node":
-            # assert self.locality_per == "numa_node"
-            assert self.nr_numa_nodes_range == 0
-            assert self.nr_cluster_nodes_range == 0
-            result = self.min_nr_cluster_nodes * self.min_nr_numa_nodes
-
-        assert result > 0
-
-        return result
-
-    @property
-    def nr_numa_nodes(self):
-        """
-        Return number of numa nodes to use in benchmark
-
-        This assumes that the range in number of numa nodes to use is zero
-        """
-        assert self.nr_numa_nodes_range == 0, self
-
-        return self.min_nr_numa_nodes
-
-    @property
-    def nr_threads(self):
-        """
-        Return number of threads to use in benchmark
-
-        This assumes that the range in number of threads to use is zero
-        """
-        assert self.nr_threads_range == 0, self
-
-        return self.min_nr_threads
+        return self.worker.nr_localities

@@ -65,12 +65,11 @@ parts:
             sections:
               - file: source/quality_assurance/cxx/doc/index.md
               - file: source/quality_assurance/python/doc/index.md
-
+              - file: source/quality_assurance/scalability/doc/index.md
       - file: pcraster/index.md
         sections:
           - file: pcraster/port.md
           - file: pcraster/status.md
-
       - file: faq.md
 
   - caption: Developer
@@ -112,6 +111,11 @@ parts:
                 sections:
                   - file: source/framework/doc/howto/add_local_operation.md
                   - file: source/framework/doc/howto/trace.md
+
+      # TODO Not picked up?
+      - file: developer/reference/index.md
+        sections:
+          - file: developer/reference/python/api.md
 
   - caption: About
     chapters:

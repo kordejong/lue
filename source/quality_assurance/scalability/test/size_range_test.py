@@ -1,9 +1,9 @@
 import unittest
 
-from lue.command.scalability.experiment.pool import Pool
+from lue.command.scalability.experiment.size_range import SizeRange
 
 
-class PoolTest(unittest.TestCase):
+class SizeRangeTest(unittest.TestCase):
     def _test_case_multiplier(self, min_size, max_size, multiplier, permutation_sizes):
         data = {
             "min_size": min_size,
@@ -11,14 +11,14 @@ class PoolTest(unittest.TestCase):
             "multiplier": multiplier,
         }
 
-        pool = Pool(data)
+        size_range = SizeRange.from_json(data)
 
-        self.assertEqual(pool.nr_permutations, len(permutation_sizes))
-        self.assertEqual(pool.range.min_size, permutation_sizes[0])
-        self.assertEqual(pool.range.max_size, permutation_sizes[-1])
+        self.assertEqual(size_range.nr_sizes, len(permutation_sizes))
+        self.assertEqual(size_range.range.min_size, permutation_sizes[0])
+        self.assertEqual(size_range.range.max_size, permutation_sizes[-1])
 
         for i in range(len(permutation_sizes)):
-            self.assertEqual(pool.permutation_size(i), permutation_sizes[i])
+            self.assertEqual(size_range.size(i), permutation_sizes[i])
 
     def test_case_1_64_2_multiplier(self):
         self._test_case_multiplier(1, 64, 2, [1, 2, 4, 8, 16, 32, 64])
@@ -47,14 +47,14 @@ class PoolTest(unittest.TestCase):
             "incrementor": incrementor,
         }
 
-        pool = Pool(data)
+        size_range = SizeRange.from_json(data)
 
-        self.assertEqual(pool.nr_permutations, len(permutation_sizes))
-        self.assertEqual(pool.min_size, permutation_sizes[0])
-        self.assertEqual(pool.max_size, permutation_sizes[-1])
+        self.assertEqual(size_range.nr_sizes, len(permutation_sizes))
+        self.assertEqual(size_range.min_size, permutation_sizes[0])
+        self.assertEqual(size_range.max_size, permutation_sizes[-1])
 
         for i in range(len(permutation_sizes)):
-            self.assertEqual(pool.permutation_size(i), permutation_sizes[i])
+            self.assertEqual(size_range.size(i), permutation_sizes[i])
 
     def test_case_1_5_1_incrementor(self):
         self._test_case_incrementor(1, 5, 1, [1, 2, 3, 4, 5])

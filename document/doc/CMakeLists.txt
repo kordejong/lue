@@ -38,6 +38,8 @@ foreach(name IN ITEMS
     contribute/documentation.md
     contribute/index.md
     contribute/release.md
+    developer/reference/index.md
+    developer/reference/python/api.md
     example/index.md
     faq.md
     index.md
@@ -142,6 +144,7 @@ foreach(name IN ITEMS
     quality_assurance/doc/index.md
     quality_assurance/cxx/doc/index.md
     quality_assurance/python/doc/index.md
+    quality_assurance/scalability/doc/index.md
 )
     configure_file(${PROJECT_SOURCE_DIR}/source/${name} source/${name} COPYONLY)
 endforeach()

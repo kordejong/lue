@@ -219,6 +219,8 @@ class SoftwareEnvironment(object):
 
 
 class Cluster(object):
+    scheduler: Scheduler
+
     def __init__(self, data):
         self.from_json(data)
 

@@ -1,5 +1,5 @@
-from ..core import json_to_data
-from . import worker
+from ..core.json import json_to_data
+from .worker import Worker
 
 
 class HPX(object):
@@ -33,17 +33,15 @@ class HPX(object):
 class Benchmark(object):
     def __init__(self, data, cluster):
         """
-        Class for storing information about the configuration of the
-        scalability experiment benchmarks
+        Class for storing information about the configuration of the scalability experiment benchmarks
 
         count: How many times a benchmark needs to be repeated
-        locality_per: Whether to launch a process per cluster node or
-            NUMA node
+        locality_per: Whether to launch a process per cluster node or NUMA node
         worker: Information about the workers to be used
         """
         self.from_json(data, cluster)
 
-        if self.worker.type == "thread":
+        if self.worker.scale_over_cores:
             if self.locality_per == "numa_node":
                 self.nr_logical_cores_per_locality = (
                     cluster.cluster_node.package.numa_node.nr_threads
@@ -52,41 +50,41 @@ class Benchmark(object):
                     cluster.cluster_node.package.numa_node.nr_cores
                 )
 
-                assert (
-                    self.worker.min_nr_cluster_nodes == 1
-                ), self.worker.min_nr_cluster_nodes
-                assert (
-                    self.worker.max_nr_cluster_nodes == 1
-                ), self.worker.max_nr_cluster_nodes
+                assert self.worker.min_nr_cluster_nodes == 1, (
+                    self.worker.min_nr_cluster_nodes
+                )
+                assert self.worker.max_nr_cluster_nodes == 1, (
+                    self.worker.max_nr_cluster_nodes
+                )
                 assert self.worker.min_nr_numa_nodes == 1, self.worker.min_nr_numa_nodes
                 assert self.worker.max_nr_numa_nodes == 1, self.worker.max_nr_numa_nodes
-                assert self.worker.min_nr_threads >= 1, self.worker.min_nr_threads
+                assert self.worker.min_nr_cores >= 1, self.worker.min_nr_cores
                 assert (
-                    self.worker.max_nr_threads <= self.nr_physical_cores_per_locality
-                ), self.worker.max_nr_threads
+                    self.worker.max_nr_cores <= self.nr_physical_cores_per_locality
+                ), self.worker.max_nr_cores
 
             elif self.locality_per == "cluster_node":
                 self.nr_logical_cores_per_locality = cluster.cluster_node.nr_threads
                 self.nr_physical_cores_per_locality = cluster.cluster_node.nr_cores
 
+                assert self.worker.min_nr_cluster_nodes == 1, (
+                    self.worker.min_nr_cluster_nodes
+                )
+                assert self.worker.max_nr_cluster_nodes == 1, (
+                    self.worker.max_nr_cluster_nodes
+                )
+                assert self.worker.min_nr_numa_nodes == self.worker.min_nr_numa_nodes, (
+                    self.worker.min_nr_numa_nodes
+                )
+                assert self.worker.max_nr_numa_nodes == self.worker.max_nr_numa_nodes, (
+                    self.worker.max_nr_numa_nodes
+                )
+                assert self.worker.min_nr_cores >= 1, self.worker.min_nr_cores
                 assert (
-                    self.worker.min_nr_cluster_nodes == 1
-                ), self.worker.min_nr_cluster_nodes
-                assert (
-                    self.worker.max_nr_cluster_nodes == 1
-                ), self.worker.max_nr_cluster_nodes
-                assert (
-                    self.worker.min_nr_numa_nodes == self.worker.min_nr_numa_nodes
-                ), self.worker.min_nr_numa_nodes
-                assert (
-                    self.worker.max_nr_numa_nodes == self.worker.max_nr_numa_nodes
-                ), self.worker.max_nr_numa_nodes
-                assert self.worker.min_nr_threads >= 1, self.worker.min_nr_threads
-                assert (
-                    self.worker.max_nr_threads <= self.nr_physical_cores_per_locality
-                ), self.worker.max_nr_threads
+                    self.worker.max_nr_cores <= self.nr_physical_cores_per_locality
+                ), self.worker.max_nr_cores
 
-        elif self.worker.type == "numa_node":
+        elif self.worker.scale_over_numa_nodes:
             assert self.locality_per == "numa_node"
 
             self.nr_logical_cores_per_locality = (
@@ -96,24 +94,24 @@ class Benchmark(object):
                 cluster.cluster_node.package.numa_node.nr_cores
             )
 
-            assert (
-                self.worker.min_nr_cluster_nodes == 1
-            ), self.worker.min_nr_cluster_nodes
-            assert (
-                self.worker.max_nr_cluster_nodes == 1
-            ), self.worker.max_nr_cluster_nodes
+            assert self.worker.min_nr_cluster_nodes == 1, (
+                self.worker.min_nr_cluster_nodes
+            )
+            assert self.worker.max_nr_cluster_nodes == 1, (
+                self.worker.max_nr_cluster_nodes
+            )
             assert self.worker.min_nr_numa_nodes >= 1, self.worker.min_nr_numa_nodes
             assert (
                 self.worker.max_nr_numa_nodes <= cluster.cluster_node.nr_numa_nodes
             ), self.worker.min_nr_numa_nodes
-            assert (
-                self.worker.min_nr_threads == self.nr_physical_cores_per_locality
-            ), self.worker.min_nr_threads
-            assert (
-                self.worker.max_nr_threads == self.nr_physical_cores_per_locality
-            ), self.worker.max_nr_threads
+            assert self.worker.min_nr_cores == self.nr_physical_cores_per_locality, (
+                self.worker.min_nr_cores
+            )
+            assert self.worker.max_nr_cores == self.nr_physical_cores_per_locality, (
+                self.worker.max_nr_cores
+            )
 
-        elif self.worker.type == "cluster_node":
+        elif self.worker.scale_over_cluster_nodes:
             assert self.locality_per == "numa_node"
 
             self.nr_logical_cores_per_locality = (
@@ -123,24 +121,24 @@ class Benchmark(object):
                 cluster.cluster_node.package.numa_node.nr_cores
             )
 
-            assert (
-                self.worker.min_nr_cluster_nodes >= 1
-            ), self.worker.min_nr_cluster_nodes
-            assert (
-                self.worker.max_nr_cluster_nodes <= cluster.nr_cluster_nodes
-            ), self.worker.max_nr_cluster_nodes
+            assert self.worker.min_nr_cluster_nodes >= 1, (
+                self.worker.min_nr_cluster_nodes
+            )
+            assert self.worker.max_nr_cluster_nodes <= cluster.nr_cluster_nodes, (
+                self.worker.max_nr_cluster_nodes
+            )
             assert (
                 self.worker.min_nr_numa_nodes == cluster.cluster_node.nr_numa_nodes
             ), self.worker.min_nr_numa_nodes
             assert (
                 self.worker.max_nr_numa_nodes == cluster.cluster_node.nr_numa_nodes
             ), self.worker.max_nr_numa_nodes
-            assert (
-                self.worker.min_nr_threads == self.nr_physical_cores_per_locality
-            ), self.worker.min_nr_threads
-            assert (
-                self.worker.max_nr_threads == self.nr_physical_cores_per_locality
-            ), self.nr_physical_cores_per_locality
+            assert self.worker.min_nr_cores == self.nr_physical_cores_per_locality, (
+                self.worker.min_nr_cores
+            )
+            assert self.worker.max_nr_cores == self.nr_physical_cores_per_locality, (
+                self.nr_physical_cores_per_locality
+            )
 
     def __str__(self):
         return "Benchmark(count={}, worker={})".format(self.count, self.worker)
@@ -152,7 +150,7 @@ class Benchmark(object):
         self.locality_per = data["locality_per"]
         assert self.locality_per in ["cluster_node", "numa_node"]
 
-        self.worker = worker.Worker(data["worker"], cluster, self.locality_per)
+        self.worker = Worker(data["worker"], cluster, self.locality_per)
 
         self.hpx = None
 
@@ -169,7 +167,7 @@ class Benchmark(object):
             "scenario": self.scenario_name,
             "count": self.count,
             "locality_per": self.locality_per,
-            "worker": self.worker.to_json(),
+            "worker": Worker.to_json(self.worker),
         }
 
         if self.hpx:

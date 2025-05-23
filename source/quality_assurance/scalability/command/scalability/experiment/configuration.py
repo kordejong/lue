@@ -1,6 +1,6 @@
 import os.path
 
-from ..core import json_to_data
+from ..core.json import json_to_data
 from .benchmark import Benchmark
 from .cluster import Cluster
 

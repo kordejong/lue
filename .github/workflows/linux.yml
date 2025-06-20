@@ -249,14 +249,12 @@ jobs:
           # a fork.
           cd ${{ env.lue_build_directory }}
           lftp \
-              -d \
-              -e "set sftp:auto-confirm yes; set ssl:verify-certificate false; put -O $remote_dir/download/build/linux-g++ .ninja_log; quit" \
-              -u $ftp_username \
+              -e "set sftp:auto-confirm yes; set ssl:verify-certificate false; put -O $remote_dir/download/build/linux-${{ matrix.compiler.name }} .ninja_log; quit" \
+              -u $ftp_username,$ftp_password \
               -p $ftp_port \
               sftp://$ftp_server
           cd document/doc
           lftp \
-              -d \
               -e "set sftp:auto-confirm yes; set ssl:verify-certificate false; mirror --reverse --delete --transfer-all --parallel=2 $local_dir $remote_dir/doc; quit" \
               -u $ftp_username,$ftp_password \
               -p $ftp_port \

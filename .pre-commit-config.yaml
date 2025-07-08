@@ -28,6 +28,7 @@ repos:
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
                   source/quality_assurance/scalability/.*|
+                  source/quality_assurance/python/test/.*|
                 )$
     - repo: https://github.com/RobertCraigie/pyright-python
       rev: v1.1.402
@@ -40,6 +41,7 @@ repos:
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
                   source/quality_assurance/scalability/.*|
+                  source/quality_assurance/python/test/.*|
                 )$
     - repo: https://github.com/astral-sh/ruff-pre-commit
       # Ruff version.

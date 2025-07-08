@@ -5,7 +5,6 @@ import lue.qa.scalability.instrument as lqi
 
 class ArrayExperimentTest(unittest.TestCase):
     def test_use_case_01(self):
-
         nr_workers = 5
         array_shape = (60, 40)
         partition_shape = (10, 10)

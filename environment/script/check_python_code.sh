@@ -11,17 +11,11 @@ lue_ad_hoc_prefix="$lue_python_prefix/lue/command"
 echo "ruff..."
 ruff check "$lue_ad_hoc_prefix"
 echo "pyright..."
-pyright --project $LUE "$lue_ad_hoc_prefix"
+pyright --project "$LUE" "$lue_ad_hoc_prefix"
 echo "mypy..."
 mypy --strict "$lue_ad_hoc_prefix"
-# mypy --check-untyped-defs --disallow-untyped-defs "$lue_ad_hoc_prefix"
 
-# TODO Create and install lib/python3.12/lue/data_model/__init__.pyi with this content:
-# def __getattr__(name: str) -> Any: ...
-#
 # Figure out whether it is better to use typings/lue/data_model/__init__.pyi
 # - https://peps.python.org/pep-0484/#stub-files
 # - https://microsoft.github.io/pyright/#/type-stubs
 # - https://github.com/microsoft/pyright/issues/10089
-#
-# TODO Make sure pyright and mypy are still in pre-commit

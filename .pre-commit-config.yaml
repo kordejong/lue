@@ -22,7 +22,7 @@ repos:
       rev: v1.17.1
       hooks:
           - id: mypy
-            # args: [--verbose]
+            args: [--strict]
             # Skip game_of_life.py because a same-named script exists in quick_start ...
             exclude: |
                 (?x)^(

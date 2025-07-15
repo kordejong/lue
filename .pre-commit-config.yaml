@@ -27,7 +27,6 @@ repos:
                   document/luepy/ext/.*|
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
-                  source/quality_assurance/scalability/.*|
                   source/quality_assurance/python/test/.*|
                 )$
     - repo: https://github.com/RobertCraigie/pyright-python
@@ -40,7 +39,6 @@ repos:
                   document/luepy/ext/.*|
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
-                  source/quality_assurance/scalability/.*|
                   source/quality_assurance/python/test/.*|
                 )$
     - repo: https://github.com/astral-sh/ruff-pre-commit

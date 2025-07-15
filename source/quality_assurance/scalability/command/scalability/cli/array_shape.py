@@ -6,7 +6,7 @@ import functools
 import os.path
 import sys
 
-import docopt
+import docopt  # type: ignore
 
 from lue import __version__ as lue_version
 from ..experiment.shape_range import array_shape

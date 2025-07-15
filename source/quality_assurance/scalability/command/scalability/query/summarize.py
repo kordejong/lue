@@ -11,9 +11,9 @@ from ..experiment.platform import Platform
 
 
 # Type aliases
-Durations = npt.NDArray[np.int64]
-NrCoresUsed = npt.NDArray[np.int64]
-NrWorkersUsed = npt.NDArray[np.int64]
+Durations = npt.NDArray[np.uint64]
+NrCoresUsed = npt.NDArray[np.uint64]
+NrWorkersUsed = npt.NDArray[np.uint64]
 
 
 MS_TO_S = 1 / 1000
@@ -26,7 +26,7 @@ def print_message(label: str, value: typing.Any) -> None:
 
 
 def print_total_duration(durations: Durations) -> None:
-    assert durations.dtype == np.int64  # If not, just fix the above  type alias
+    assert durations.dtype == np.uint64  # If not, just fix the above  type alias
 
     # Assumes duration is in millisconds
     total_duration_ms = durations.sum()
@@ -60,7 +60,11 @@ def scenario_name_to_kind_of_worker(name: str) -> str:
 def kind_of_worker_to_nr_cores_used(
     nr_workers_used: NrWorkersUsed, kind_of_worker: str, platform: Platform
 ) -> NrCoresUsed:
-    assert nr_workers_used.dtype == np.int64  # If not, just fix the above  type alias
+    assert nr_workers_used.dtype == np.uint64, (
+        nr_workers_used.dtype
+    )  # If not, just fix the above  type alias
+
+    nr_cores_used: NrCoresUsed
 
     if kind_of_worker == "core":
         # A worker is a single core
@@ -69,12 +73,14 @@ def kind_of_worker_to_nr_cores_used(
         # A worker is a single NUMA node
         nr_cores_used = (
             nr_workers_used * platform.cluster_node.package.numa_node.nr_cores
-        )
+        ).astype(np.uint64)
     elif kind_of_worker == "cluster_node":
         # A worker is a single cluster node
-        nr_cores_used = nr_workers_used * platform.cluster_node.nr_cores
+        nr_cores_used = (nr_workers_used * platform.cluster_node.nr_cores).astype(
+            np.uint64
+        )
     else:
-        nr_cores_used = np.array([-1])
+        nr_cores_used = np.full(shape=(1,), fill_value=0, dtype=nr_workers_used.dtype)
 
     assert np.all(nr_cores_used > 0), f"unknown kind of worker: {kind_of_worker}"
 

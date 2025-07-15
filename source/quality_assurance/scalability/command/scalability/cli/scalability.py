@@ -6,7 +6,7 @@ import datetime
 import sys
 from pathlib import Path
 
-import docopt
+import docopt  # type: ignore
 
 from lue import __version__ as lue_version
 from lue.command.scalability import (

@@ -31,7 +31,6 @@ repos:
                   document/doc/manual/quality_assurance/scalability/game_of_life.py|
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
-                  source/quality_assurance/scalability/.*|
                   source/quality_assurance/python/test/.*|
                 )$
             additional_dependencies:
@@ -46,7 +45,6 @@ repos:
                   document/luepy/ext/.*|
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
-                  source/quality_assurance/scalability/.*|
                   source/quality_assurance/python/test/.*|
                 )$
     - repo: https://github.com/astral-sh/ruff-pre-commit

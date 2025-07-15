@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- encoding: utf8 -*-
 # TODO Use the lue dataset for obtaining information, instead of the json files
 import matplotlib

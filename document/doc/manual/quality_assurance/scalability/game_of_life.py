@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 from pathlib import Path
 
@@ -60,7 +60,6 @@ def game_of_life_scalability(
     nr_generations: int,
     result_pathname: str,
 ) -> None:
-
     initial_generation = initialize_generation(array_shape, partition_shape)
     initial_generation.future().get()
 
@@ -106,9 +105,7 @@ Usage:
 
 Options:
     <nr_generations>  Number of Game of Life generations to calculate
-""".format(
-        command=Path(sys.argv[0]).name
-    )
+""".format(command=Path(sys.argv[0]).name)
 
     # Filter out arguments meant for the HPX runtime
     argv = [arg for arg in sys.argv[1:] if not arg.startswith("--hpx")]

@@ -27,6 +27,7 @@ repos:
             exclude: |
                 (?x)^(
                   source/data_model/python/test/.*|
+                  document/doc/manual/quality_assurance/scalability/game_of_life.py|
                   document/luepy/ext/.*|
                   document/doc/manual/quality_assurance/scalability/game_of_life.py|
                   source/framework/case_study/.*|
@@ -43,6 +44,7 @@ repos:
             exclude: |
                 (?x)^(
                   source/data_model/python/test/.*|
+                  document/doc/manual/quality_assurance/scalability/game_of_life.py|
                   document/luepy/ext/.*|
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|

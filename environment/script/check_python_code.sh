@@ -1,6 +1,7 @@
 set -euo pipefail
 
 build_type=Debug
+build_type=Release
 lue_build_prefix="$OBJECTS/$build_type/lue"
 lue_python_prefix="$(echo "$lue_build_prefix"/lib*/python3.*)"
 

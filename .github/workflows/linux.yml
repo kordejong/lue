@@ -180,6 +180,7 @@ jobs:
           pre-commit install
           ln -s ../${{ env.lue_build_directory }}/compile_commands.json .
           pre-commit run --all-files
+          environment/script/check_python_code.sh ${{ env.lue_build_directory }}
 
       - name: build
         run: |

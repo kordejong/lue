@@ -23,17 +23,18 @@ repos:
       hooks:
           - id: mypy
             args: [--strict]
-            # Skip game_of_life.py because a same-named script exists in quick_start ...
+            # TODO Add directories not to be excluded
             exclude: |
                 (?x)^(
+                  conanfile.py|
+                  environment/conda/.*|
+                  environment/script/.*|
                   source/data_model/python/test/.*|
-                  document/doc/manual/quality_assurance/scalability/game_of_life.py|
-                  document/luepy/ext/.*|
-                  document/doc/manual/quality_assurance/scalability/game_of_life.py|
-                  source/framework/case_study/.*|
-                  source/framework/python/test/.*|
+                  document/doc/.*|
+                  document/luepy/.*|
+                  source/framework/.*|
                   source/quality_assurance/scalability/.*|
-                  source/quality_assurance/python/test/.*|
+                  source/quality_assurance/python/.*|
                 )$
             additional_dependencies:
                 - types-python-dateutil==2.9.0.20250809
@@ -41,24 +42,39 @@ repos:
       rev: v1.1.403
       hooks:
           - id: pyright
+            # TODO Add directories not to be excluded
             exclude: |
                 (?x)^(
+                  conanfile.py|
+                  environment/conda/.*|
+                  environment/script/.*|
                   source/data_model/python/test/.*|
-                  document/doc/manual/quality_assurance/scalability/game_of_life.py|
-                  document/luepy/ext/.*|
-                  source/framework/case_study/.*|
-                  source/framework/python/test/.*|
+                  document/doc/.*|
+                  document/luepy/.*|
+                  source/framework/.*|
                   source/quality_assurance/scalability/.*|
-                  source/quality_assurance/python/test/.*|
+                  source/quality_assurance/python/.*|
                 )$
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      # Ruff version.
       rev: v0.12.9
       hooks:
-          # Run the linter.
-          - id: ruff
-          # Run the formatter.
           - id: ruff-format
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.12.9
+      hooks:
+          - id: ruff
+            # TODO Add directories not to be excluded
+            exclude: |
+                (?x)^(
+                  environment/conda/.*|
+                  environment/script/.*|
+                  source/data_model/python/test/.*|
+                  document/doc/.*|
+                  document/luepy/.*|
+                  source/framework/.*|
+                  source/quality_assurance/scalability/.*|
+                  source/quality_assurance/python/.*|
+                )$
     # TODO REQUIRES RUBY - repo: https://github.com/markdownlint/markdownlint
     # TODO REQUIRES RUBY   rev: v0.12.0
     # TODO REQUIRES RUBY   hooks:

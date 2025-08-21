@@ -44,15 +44,19 @@ class Benchmark(object):
         """
         self.from_data(data, platform)
 
+        if self.locality_per == "numa_node":
+            self.nr_logical_cores_per_locality = (
+                platform.cluster_node.package.numa_node.nr_threads
+            )
+            self.nr_physical_cores_per_locality = (
+                platform.cluster_node.package.numa_node.nr_cores
+            )
+        elif self.locality_per == "cluster_node":
+            self.nr_logical_cores_per_locality = platform.cluster_node.nr_threads
+            self.nr_physical_cores_per_locality = platform.cluster_node.nr_cores
+
         if self.worker.scale_over_cores:
             if self.locality_per == "numa_node":
-                self.nr_logical_cores_per_locality = (
-                    platform.cluster_node.package.numa_node.nr_threads
-                )
-                self.nr_physical_cores_per_locality = (
-                    platform.cluster_node.package.numa_node.nr_cores
-                )
-
                 assert self.worker.min_nr_cluster_nodes == 1, (
                     self.worker.min_nr_cluster_nodes
                 )
@@ -67,9 +71,6 @@ class Benchmark(object):
                 ), self.worker.max_nr_cores
 
             elif self.locality_per == "cluster_node":
-                self.nr_logical_cores_per_locality = platform.cluster_node.nr_threads
-                self.nr_physical_cores_per_locality = platform.cluster_node.nr_cores
-
                 assert self.worker.min_nr_cluster_nodes == 1, (
                     self.worker.min_nr_cluster_nodes
                 )
@@ -89,14 +90,6 @@ class Benchmark(object):
 
         elif self.worker.scale_over_numa_nodes:
             assert self.locality_per == "numa_node"
-
-            self.nr_logical_cores_per_locality = (
-                platform.cluster_node.package.numa_node.nr_threads
-            )
-            self.nr_physical_cores_per_locality = (
-                platform.cluster_node.package.numa_node.nr_cores
-            )
-
             assert self.worker.min_nr_cluster_nodes == 1, (
                 self.worker.min_nr_cluster_nodes
             )
@@ -116,14 +109,6 @@ class Benchmark(object):
 
         elif self.worker.scale_over_cluster_nodes:
             assert self.locality_per == "numa_node"
-
-            self.nr_logical_cores_per_locality = (
-                platform.cluster_node.package.numa_node.nr_threads
-            )
-            self.nr_physical_cores_per_locality = (
-                platform.cluster_node.package.numa_node.nr_cores
-            )
-
             assert self.worker.min_nr_cluster_nodes >= 1, (
                 self.worker.min_nr_cluster_nodes
             )

@@ -171,57 +171,57 @@ set -euo pipefail
         )
 
 
-def memory_requirements(
-    platform: Platform, benchmark: Benchmark, experiment: Experiment, nr_tasks: int
-) -> tuple[int, str]:
-    """
-    Return number of GiB of memory required per cluster node. This amount can be less than what is available
-    in a cluster node, or it can be the total amount available per cluster node.
-    """
-    amount = 0
-    binding = ""
-
-    if benchmark.worker.name == "core":
-        assert nr_tasks == 1, nr_tasks
-
-        if benchmark.locality_per == "numa_node":
-            amount = platform.cluster_node.package.numa_node.memory
-            binding = "local"
-        elif benchmark.locality_per == "cluster_node":
-            amount = platform.cluster_node.memory
-            binding = "none"
-    elif benchmark.worker.name == "numa_node":
-        assert benchmark.locality_per == "numa_node"
-        assert nr_tasks <= platform.cluster_node.nr_numa_nodes, nr_tasks
-
-        if experiment.name == "partition_shape":
-            # All memory must be available
-            amount = platform.cluster_node.memory
-
-            # A large problem is solved with all NUMA nodes. Each of them should only use its own memory.
-            binding = "local"
-        elif experiment.name == "strong_scalability":
-            # All memory must be available
-            amount = platform.cluster_node.memory
-
-            # A large problem is solved with increasingly more NUMA nodes. All of them should be able to use
-            # all memory
-            binding = "none"
-        elif experiment.name == "weak_scalability":
-            # Limit memory usage to what is available in a NUMA node
-            amount = nr_tasks * platform.cluster_node.package.numa_node.memory
-
-            # An increasingly large problem is solved with increasingly more NUMA nodes. Each of them should
-            # only use its own local memory.
-            binding = "local"
-    elif benchmark.worker.name == "cluster_node":
-        assert benchmark.locality_per == "numa_node"
-        assert nr_tasks >= platform.cluster_node.nr_numa_nodes, nr_tasks
-
-        amount = platform.cluster_node.memory
-        binding = "local"  # Since a process per NUMA node is used
-
-    return amount, binding
+# def memory_requirements(
+#     platform: Platform, benchmark: Benchmark, experiment: Experiment, nr_tasks: int
+# ) -> tuple[int, str]:
+#     """
+#     Return number of GiB of memory required per cluster node. This amount can be less than what is available
+#     in a cluster node, or it can be the total amount available per cluster node.
+#     """
+#     amount = 0
+#     binding = ""
+#
+#     if benchmark.worker.name == "core":
+#         assert nr_tasks == 1, nr_tasks
+#
+#         if benchmark.locality_per == "numa_node":
+#             amount = platform.cluster_node.package.numa_node.memory
+#             binding = "local"
+#         elif benchmark.locality_per == "cluster_node":
+#             amount = platform.cluster_node.memory
+#             binding = "none"
+#     elif benchmark.worker.name == "numa_node":
+#         assert benchmark.locality_per == "numa_node"
+#         assert nr_tasks <= platform.cluster_node.nr_numa_nodes, nr_tasks
+#
+#         if experiment.name == "partition_shape":
+#             # All memory must be available
+#             amount = platform.cluster_node.memory
+#
+#             # A large problem is solved with all NUMA nodes. Each of them should only use its own memory.
+#             binding = "local"
+#         elif experiment.name == "strong_scalability":
+#             # All memory must be available
+#             amount = platform.cluster_node.memory
+#
+#             # A large problem is solved with increasingly more NUMA nodes. All of them should be able to use
+#             # all memory
+#             binding = "none"
+#         elif experiment.name == "weak_scalability":
+#             # Limit memory usage to what is available in a NUMA node
+#             amount = nr_tasks * platform.cluster_node.package.numa_node.memory
+#
+#             # An increasingly large problem is solved with increasingly more NUMA nodes. Each of them should
+#             # only use its own local memory.
+#             binding = "local"
+#     elif benchmark.worker.name == "cluster_node":
+#         assert benchmark.locality_per == "numa_node"
+#         assert nr_tasks >= platform.cluster_node.nr_numa_nodes, nr_tasks
+#
+#         amount = platform.cluster_node.memory
+#         binding = "local"  # Since a process per NUMA node is used
+#
+#     return amount, binding
 
 
 def create_slurm_script2(
@@ -244,9 +244,9 @@ def create_slurm_script2(
     # On snellius, a CPU is a core (hyper threading is off)
     nr_cpus_per_task = benchmark.nr_logical_cores_per_locality
 
-    memory_required_per_cluster_node, memory_binding = memory_requirements(
-        platform, benchmark, experiment, nr_tasks
-    )
+    # memory_required_per_cluster_node, memory_binding = memory_requirements(
+    #     platform, benchmark, experiment, nr_tasks
+    # )
 
     # This makes sure that hyper threads are not used
     max_nr_tasks_per_core = 1  # implies --cpu-bind=cores
@@ -265,6 +265,9 @@ def create_slurm_script2(
         else False
     )
 
+    # #SBATCH --mem={memory}G
+    # #SBATCH --mem-bind={memory_binding}
+
     return """\
 #!/usr/bin/env bash
 
@@ -274,8 +277,6 @@ def create_slurm_script2(
 #SBATCH --cpus-per-task={nr_cpus_per_task}
 #SBATCH --ntasks-per-core={max_nr_tasks_per_core}
 #SBATCH --ntasks={nr_tasks}
-#SBATCH --mem={memory}G
-#SBATCH --mem-bind={memory_binding}
 #SBATCH --output={output_filename}
 {sbatch_options}
 {max_duration}
@@ -289,8 +290,8 @@ def create_slurm_script2(
         nr_cpus_per_task=nr_cpus_per_task,
         max_nr_tasks_per_core=max_nr_tasks_per_core,
         nr_tasks=nr_tasks,
-        memory=memory_required_per_cluster_node,
-        memory_binding=memory_binding,
+        # memory=memory_required_per_cluster_node,
+        # memory_binding=memory_binding,
         sbatch_options="\n".join(
             ["#SBATCH {}".format(option) for option in sbatch_options]
         ),

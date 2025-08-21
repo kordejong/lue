@@ -27,6 +27,9 @@ class Range(metaclass=ABCMeta):
         # Initialize max_size
         self.max_size = max_size
 
+    def __str__(self) -> str:
+        return f"Range(min_size={self.min_size}, max_size={self.max_size})"
+
     def clamp_max_size(self) -> None:
         """
         Update max_size to make it equal to :py:func:`size` (:py:func:`nr_sizes` - 1)
@@ -246,6 +249,9 @@ class SizeRange(object):
 
     def __init__(self, range: Range):
         self.range = range
+
+    def __str__(self) -> str:
+        return f"SizeRange(range={self.range})"
 
     @property
     def min_size(self) -> int:

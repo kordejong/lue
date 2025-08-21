@@ -268,7 +268,7 @@ class Worker(object):
 
     def __str__(self) -> str:
         return "Worker(type={}, size_range={})".format(
-            self.worker.name,
+            self.worker.name(),
             self.worker.size_range,
         )
 

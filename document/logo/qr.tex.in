@@ -1,0 +1,41 @@
+\documentclass{standalone}
+\usepackage{qrcode}
+\usepackage{tikz}
+
+\input{qr-style}
+\input{${style}}
+
+\def\wFrac{0.25}
+
+\newdimen\qrWidth
+\newdimen\imWidth
+
+\setlength{\qrWidth}{4cm}
+
+% TODO: Draw a white circle behind the figure, slightly larger than the figure. QR-code should still work.
+
+\begin{document}
+    \begin{tikzpicture}
+        \node [anchor=south west, inner sep=0] at (0, 0) (qr) {
+            \qrcode[
+                height=\qrWidth,
+                level=H,
+            ]{https://lue.computationalgeography.org}
+        };
+
+        \pgfmathsetlength{\imWidth}{\wFrac*\qrWidth}
+
+        \begin{scope}[x={(qr.south east)},y={(qr.north west)}]
+            \node [
+                inner sep=0,
+                anchor=south west
+            ] at (0.5-\wFrac/2, 0.5-\wFrac/2) {
+                \includegraphics[
+                    width=\imWidth,
+                    height=\imWidth]{
+                        icon-${style}
+                    }
+            };
+        \end{scope}
+    \end{tikzpicture}
+\end{document}

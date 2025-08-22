@@ -153,6 +153,29 @@ if(LATEX_FOUND)
                 VERBATIM
             )
         endif()
+
+        set(figure qr)
+        set(target_name lue.figure.${figure}.${style})
+
+        configure_file(${figure}.tex.in ${figure}-${style}.tex)
+
+        add_latex_document(${figure}-${style}.tex
+            TARGET_NAME
+                ${target_name}
+            INPUTS
+                ${figure}-style.tex
+                ${style}.tex
+                style.tex
+        )
+
+        add_custom_command(
+            TARGET ${target_name}
+            POST_BUILD
+            COMMENT "${figure}-${style}.pdf → ${figure}-${style}.svg"
+            BYPRODUCTS "${figure}-${style}.svg"
+            COMMAND ${dvisvgm_EXECUTABLE} --verbosity=0 --pdf ${figure}-${style}.pdf ${figure}-${style}.svg
+            VERBATIM
+        )
     endforeach()
 
     if(ImageMagick_FOUND)

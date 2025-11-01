@@ -21,11 +21,12 @@
             "name": "lue_clang_configuration",
             "hidden": true,
             "$comment": [
-                "https://clang.llvm.org/docs/DiagnosticsReference.html"
+                "https://clang.llvm.org/docs/DiagnosticsReference.html",
+                "Clang is buggy wrt warnings about lambda captures"
             ],
             "cacheVariables": {
                 "CMAKE_C_FLAGS_INIT": "-Wall -Wextra -Werror=missing-include-dirs",
-                "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror=missing-include-dirs"
+                "CMAKE_CXX_FLAGS_INIT": "-Wall -Wextra -Werror=missing-include-dirs -Wno-unused-lambda-capture"
             }
         },
         {

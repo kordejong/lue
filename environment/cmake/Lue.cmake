@@ -1,6 +1,10 @@
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
+if(PROJECT_IS_TOP_LEVEL)
+    include(Sanitizers)
+endif()
+
 include(CompilerCache)
 useCompilerCache()
 

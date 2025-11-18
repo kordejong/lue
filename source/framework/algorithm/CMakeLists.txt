@@ -892,6 +892,19 @@ block()
                     '{"Policies":"${Policies}","Element":"${Element}"}'
             )
             list(APPEND generated_source_files "${output_pathname}")
+
+            # Instantiate solve_pde
+            set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/solve_pde-${Policies}_${element}.cpp")
+
+            generate_template_instantiation(
+                INPUT_PATHNAME
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${offset}/solve_pde.cpp.in"
+                OUTPUT_PATHNAME
+                    "${output_pathname}"
+                DICTIONARY
+                    '{"Policies":"${Policies}","Element":"${Element}"}'
+            )
+            list(APPEND generated_source_files "${output_pathname}")
         endforeach()
     endforeach()
 

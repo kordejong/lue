@@ -45,6 +45,7 @@ set(focal_operation_names
     focal_minimum
     focal_sum
     slope
+    solve_pde
 )
 
 set(local_operation_names

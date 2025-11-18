@@ -1,0 +1,12 @@
+#include "lue/framework/algorithm/definition/solve_pde.hpp"
+#include "lue/framework/algorithm/serialize/kernel.hpp"
+#include "lue/framework/algorithm/value_policies/solve_pde.hpp"
+
+
+namespace lue {
+
+    LUE_INSTANTIATE_SOLVE_PDE(
+            ESC(policy::solve_pde::{{ Policies }}<{{ Element }}>)
+        );
+
+}  // namespace lue

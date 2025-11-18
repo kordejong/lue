@@ -182,7 +182,7 @@ namespace lue {
         // Only used for its radius. Weights are not used.
         auto kernel{box_kernel<bool, 2>(1, true)};
 
-        return focal_operation(policies, flow_direction, material, std::move(kernel), Functor{});
+        return focal_operation(policies, std::move(kernel), Functor{}, flow_direction, material);
     }
 
 }  // namespace lue

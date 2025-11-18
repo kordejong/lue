@@ -92,7 +92,7 @@ namespace lue {
     {
         using Functor = detail::FocalMean<lue::policy::InputElementT<Policies, 0>>;
 
-        return focal_operation(policies, array, kernel, Functor{});
+        return focal_operation(policies, kernel, Functor{}, array);
     }
 
 }  // namespace lue

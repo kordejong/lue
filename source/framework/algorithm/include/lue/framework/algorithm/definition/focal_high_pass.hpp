@@ -111,7 +111,7 @@ namespace lue {
         using Element = policy::InputElementT<Policies, 0>;
         using Functor = detail::FocalHighPass<Element>;
 
-        return focal_operation(policies, array, kernel, Functor{});
+        return focal_operation(policies, kernel, Functor{}, array);
     }
 
 }  // namespace lue

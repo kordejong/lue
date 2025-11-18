@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(unary_focal_operation_2d)
     InputArray1 input_array1{lue::create_partitioned_array(array_shape, partition_shape, InputElement1{1})};
 
     auto const kernel = lue::box_kernel<lue::BooleanElement, rank>(1, true);
-    OutputArray output_array = lue::focal_operation(Policies{fill_value1}, input_array1, kernel, Functor{});
+    OutputArray output_array = lue::focal_operation(Policies{fill_value1}, kernel, Functor{}, input_array1);
 
     auto array_we_want = lue::test::create_partitioned_array<OutputArray>(
         array_shape,
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(binary_focal_operation_2d)
 
     auto const kernel = lue::box_kernel<lue::BooleanElement, rank>(1, true);
     OutputArray output_array = lue::focal_operation(
-        Policies{fill_value1, fill_value2}, input_array1, input_array2, kernel, Functor{});
+        Policies{fill_value1, fill_value2}, kernel, Functor{}, input_array1, input_array2);
 
     auto array_we_want = lue::test::create_partitioned_array<OutputArray>(
         array_shape,

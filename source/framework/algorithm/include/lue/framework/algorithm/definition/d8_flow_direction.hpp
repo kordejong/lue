@@ -169,7 +169,7 @@ namespace lue {
 
         Kernel<Weight, 2> kernel{box_kernel<Weight, 2>(1, true)};
 
-        return focal_operation(policies, elevation, std::move(kernel), Functor{});
+        return focal_operation(policies, std::move(kernel), Functor{}, elevation);
     }
 
 }  // namespace lue

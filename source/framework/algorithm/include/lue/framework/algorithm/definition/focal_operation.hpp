@@ -2030,33 +2030,4 @@ namespace lue {
         return detail::focal_operation_2d(policies, kernel, std::move(functor), arrays...);
     }
 
-
-    template<typename Policies, typename InputElement, Rank rank, typename Kernel, typename Functor>
-    auto focal_operation(
-        Policies const& policies,
-        PartitionedArray<InputElement, rank> const& array,
-        Kernel const& kernel,
-        Functor functor) -> PartitionedArray<detail::OutputElementT<Functor>, rank>
-    {
-        return focal_operation(policies, kernel, std::move(functor), array);
-    }
-
-
-    template<
-        typename Policies,
-        typename InputElement1,
-        typename InputElement2,
-        Rank rank,
-        typename Kernel,
-        typename Functor>
-    auto focal_operation(
-        Policies const& policies,
-        PartitionedArray<InputElement1, rank> const& array1,
-        PartitionedArray<InputElement2, rank> const& array2,
-        Kernel const& kernel,
-        Functor functor) -> PartitionedArray<detail::OutputElementT<Functor>, rank>
-    {
-        return focal_operation(policies, kernel, std::move(functor), array1, array2);
-    }
-
 }  // namespace lue

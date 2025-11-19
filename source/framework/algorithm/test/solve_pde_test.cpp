@@ -92,9 +92,12 @@ BOOST_AUTO_TEST_CASE(all_no_data)
         auto const array1{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
         auto const array2{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
         auto const array3{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const array4{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const array5{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const array6{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
 
-        auto const result_we_got =
-            lue::value_policies::solve_pde(dirichlet_boundary_condition, array1, array2, array3);
+        auto const result_we_got = lue::value_policies::solve_pde(
+            dirichlet_boundary_condition, array1, array2, array3, array4, array5, array6);
 
         // TODO: lue::test::check_arrays_are_equal(result_we_got, result_we_want);
     }
@@ -105,9 +108,12 @@ BOOST_AUTO_TEST_CASE(all_no_data)
         auto const array1{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
         auto const array2{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
         auto const array3{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+        auto const array4{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+        auto const array5{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+        auto const array6{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
 
-        auto const result_we_got =
-            lue::value_policies::solve_pde(dirichlet_boundary_condition, array1, array2, array3);
+        auto const result_we_got = lue::value_policies::solve_pde(
+            dirichlet_boundary_condition, array1, array2, array3, array4, array5, array6);
 
         // TODO: lue::test::check_arrays_are_equal(result_we_got, result_we_want);
     }

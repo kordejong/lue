@@ -3,13 +3,16 @@
 #include "lue/framework/algorithm/focal_operation_export.hpp"
 #include "lue/framework/algorithm/kernel.hpp"
 #include "lue/framework/algorithm/solve_pde.hpp"
+// #include "lue/framework/algorithm/value_policies/add.hpp"
 
 
 namespace lue {
     namespace detail {
 
+        // Central difference requires Upwind kernel
+
         template<std::floating_point Element>
-        class SolvePDE
+        class SolvePDE  // Upwind: single kernel, multiply by -1 depending on values
         {
 
             public:
@@ -27,13 +30,24 @@ namespace lue {
                     [[maybe_unused]] InputPolicies const& dirichlet_boundary_condition_policies,
                     [[maybe_unused]] InputPolicies const& argument1_policies,
                     [[maybe_unused]] InputPolicies const& argument2_policies,
-                    [[maybe_unused]] InputPolicies const& argument3_policies,
+                    // [[maybe_unused]] InputPolicies const& argument3_policies,
+                    // [[maybe_unused]] InputPolicies const& argument4_policies,
+                    // [[maybe_unused]] InputPolicies const& argument5_policies,
+                    // [[maybe_unused]] InputPolicies const& argument6_policies,
                     [[maybe_unused]] Subspan const& dirichlet_boundary_condition_window,
                     [[maybe_unused]] Subspan const& argument1_window,
-                    [[maybe_unused]] Subspan const& argument2_window,
-                    [[maybe_unused]] Subspan const& argument3_window) const -> OutputElement
+                    [[maybe_unused]] Subspan const& argument2_window
+                    // [[maybe_unused]] Subspan const& argument3_window,
+                    // [[maybe_unused]] Subspan const& argument4_window,
+                    // [[maybe_unused]] Subspan const& argument5_window,
+                    // [[maybe_unused]] Subspan const& argument6_window
+                ) const -> OutputElement
                 {
                     // using Weight = ElementT<Kernel>;
+
+                    // TODO: Skip computation where dirichlet is_valid
+                    // TODO: Neumann / fixed rate cells should use value passed
+                    // TODO: Only pass Neumann for first order derivatives
 
                     lue_hpx_assert(argument1_window.extent(0) == kernel.size());
                     lue_hpx_assert(argument1_window.extent(1) == kernel.size());
@@ -85,35 +99,48 @@ namespace lue {
 
         TODO
     */
-    template<typename Policies /* , typename Kernel */>
+    template<typename Policies>
         requires std::floating_point<policy::OutputElementT<Policies, 0>> &&
                  std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>> &&
                  std::same_as<policy::InputElementT<Policies, 1>, policy::OutputElementT<Policies, 0>> &&
                  std::same_as<policy::InputElementT<Policies, 2>, policy::OutputElementT<Policies, 0>> &&
-                 std::same_as<policy::InputElementT<Policies, 3>, policy::OutputElementT<Policies, 0>>
-    // && std::integral<ElementT<Kernel>> && (rank<Kernel> == 2)
+                 std::same_as<policy::InputElementT<Policies, 3>, policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 4>, policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 5>, policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 6>, policy::OutputElementT<Policies, 0>>
     auto solve_pde(
         Policies const& policies,
         PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& dirichlet_boundary_condition,
         PartitionedArray<policy::InputElementT<Policies, 1>, 2> const& argument1,
         PartitionedArray<policy::InputElementT<Policies, 2>, 2> const& argument2,
-        PartitionedArray<policy::InputElementT<Policies, 3>, 2> const& argument3
-        /* , Kernel const& kernel */) -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
+        PartitionedArray<policy::InputElementT<Policies, 3>, 2> const& argument3,
+        PartitionedArray<policy::InputElementT<Policies, 4>, 2> const& argument4,
+        PartitionedArray<policy::InputElementT<Policies, 5>, 2> const& argument5,
+        PartitionedArray<policy::InputElementT<Policies, 6>, 2> const& argument6)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
     {
         using Element = lue::policy::OutputElementT<Policies, 0>;
         using Functor = detail::SolvePDE<Element>;
 
         // TODO: Configure kernel correctly
-        auto kernel = lue::box_kernel<Element, 2>(1, 1);
+        auto const kernel = lue::box_kernel<Element, 2>(1, 1);
 
-        return focal_operation(
-            policies,
-            std::move(kernel),
-            Functor{},
-            dirichlet_boundary_condition,
-            argument1,
-            argument2,
-            argument3);
+        // TODO: Call focal_operation for each order of derivative (three times). Sum the results.
+        // TODO: Tweak policies so indp and ondp are related to the arguments passed in.
+        // TODO: Iterate:
+        auto /* const */ derivative1 = focal_operation(
+            policies, kernel, Functor{/* xxxxx */}, dirichlet_boundary_condition, argument1, argument2);
+        auto const derivative2 =
+            focal_operation(policies, kernel, Functor{}, dirichlet_boundary_condition, argument3, argument4);
+        auto const derivative3 =
+            focal_operation(policies, kernel, Functor{}, dirichlet_boundary_condition, argument5, argument6);
+        // TODO: Assemble for internal time step, repeat
+        // TODO: /Iterate
+
+        // TODO: Anything else?
+        // TODO: Call add with custom policies, based on policies passed in
+
+        return derivative1;  //  + derivative2 + derivative3;
     }
 
 }  // namespace lue
@@ -126,5 +153,8 @@ namespace lue {
         PartitionedArray<policy::InputElementT<Policies, 0>, 2> const&,                                      \
         PartitionedArray<policy::InputElementT<Policies, 1>, 2> const&,                                      \
         PartitionedArray<policy::InputElementT<Policies, 2>, 2> const&,                                      \
-        PartitionedArray<policy::InputElementT<Policies, 3>, 2> const&)                                      \
+        PartitionedArray<policy::InputElementT<Policies, 3>, 2> const&,                                      \
+        PartitionedArray<policy::InputElementT<Policies, 4>, 2> const&,                                      \
+        PartitionedArray<policy::InputElementT<Policies, 5>, 2> const&,                                      \
+        PartitionedArray<policy::InputElementT<Policies, 6>, 2> const&)                                      \
         -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>;

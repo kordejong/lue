@@ -38,26 +38,11 @@ TYPE = enum.Enum("TYPE", ["Spatial", "NonSpatial"])
 (Spatial, NonSpatial) = TYPE
 
 
-# @dataclass
-# class PCRasterArguments:
-#     spatial = dict()
-#     non_spatial = dict()
-#         # argument_data.pcraster[argument.type][argument.value_scale]
-
-
-# @dataclass
-# class LUEArguments:
-#     array = dict()
-#     scalar = dict()
-
-
 @dataclass
 class ArgumentData:
-    # pcraster = PCRasterArguments()
-    # lue = LUEArguments()
     pcraster: dict[TYPE, dict[lpcr.VALUESCALE, typing.Any]]
     lue: dict[TYPE, dict[lpcr.VALUESCALE, typing.Any]]
-    value: dict[lpcr.VALUESCALE, typing.Any] = dict()
+    value: dict[lpcr.VALUESCALE, typing.Any]  #  = dict()
 
     def __init__(self):
         self.pcraster = {
@@ -68,13 +53,29 @@ class ArgumentData:
             Spatial: dict(),
             NonSpatial: dict(),
         }
+        self.value = dict()
         raster_shape = (
             random.randrange(start=1, stop=100 + 1),
             random.randrange(start=1, stop=100 + 1),
         )
         cell_size = 10.0
 
-        pcr.setclone(*raster_shape, cell_size, 0.0, 0.0)
+        nr_rows, nr_cols = raster_shape
+        north = 0.0
+        west = 0.0
+        east = west + nr_cols * cell_size
+        south = north - nr_rows * cell_size
+
+        pcr.setclone(nr_rows, nr_cols, cell_size, west, north)
+
+        lpcr.configuration = lpcr.Configuration(
+            bounding_box=lpcr.BoundingBox(
+                north=north, west=west, south=south, east=east
+            ),
+            cell_size=cell_size,
+            array_shape=raster_shape,
+        )
+
         generator = np.random.default_rng()
 
         self.add_boolean(generator, raster_shape)
@@ -113,7 +114,7 @@ class ArgumentData:
     def add_ldd(
         self, generator: np.random.Generator, raster_shape: tuple[int, int]
     ) -> None:
-        # TODO: Use numpy routines only to create a surface. Trigoniomety can help.
+        # TODO: Use numpy routines only to create a surface. Trigoniometry can help.
         pass
 
     def add_nominal(
@@ -417,9 +418,9 @@ def verify_arguments(argument_data: ArgumentData, logger: logging.Logger) -> Non
         for value_scale in lpcr.VALUESCALE:
             # TODO: Support Ldd too
             if value_scale not in (lpcr.Directional, lpcr.Ldd):
-                assert (
-                    value_scale in argument_data.pcraster[type]
-                ), f"{type}: {value_scale}"
+                assert value_scale in argument_data.pcraster[type], (
+                    f"{type}: {value_scale}"
+                )
                 assert value_scale in argument_data.lue[type], f"{type}: {value_scale}"
 
 
@@ -478,6 +479,14 @@ def call_lue_operation(
         argument_data.lue[argument.type][argument.value_scale]
         for argument in overload.arguments
     ]
+
+    # If the operation accepts a window length (focal operation), make sure it is a whole number of cell
+    # sizes
+    if overload.name.startswith("window") and overload.name != "window4total":
+        assert overload.arguments[1].name in ["windowsize", "windowSize"], (
+            overload.arguments[1]
+        )
+        arguments[1] = lpcr.configuration.cell_size
 
     status, results = call_operation(function, arguments, logger)
 
@@ -749,14 +758,25 @@ def verify_operations(
         "divergence",
         "drain",
         "ellipseaverage",
+        "extentofview",
         "gradx",
         "grady",
         "ibngauss",
+        "inversedistance",
+        "influencesimplegauss",
         "laplacian",
         "lax",
+        "markwhilesumge",
+        "markwhilesumle",
         "move",
+        "plancurv",
+        "profcurv",
         "riksfraction",
+        "shift",
+        "shift0",
         "squarefraction",
+        "transient",
+        "view",
     ]
 
     for element in operations_root.findall("Operation"):
@@ -845,6 +865,8 @@ def verify_lue_pcraster(logger: logging.Logger, output_directory: Path) -> None:
     if status != STATUS.OK:
         write_arguments(argument_data, output_directory / "data")
         logger.info("The lue.pcraster subpackage is not ready yet")
+    else:
+        logger.info("The lue.pcraster subpackage is ready, given the tests performed")
 
 
 def main() -> int:
@@ -864,6 +886,26 @@ Options:
 
 PCRaster's operations.{{dtd,xml}} will be downloaded unless they are already
 present in the output directory.
+
+This script is intended to be used from a Conda environment with both LUE and
+PCRaster packages installed. The folowing procedure can be used for convenient
+change / build / test cycles of the LUE software:
+
+- Make a change
+- Build and test as usual
+- Create a new LUE Conda package:
+    - In a shell with Conda base environment containing conda-build (and
+      conda-verify)
+    - $ conda-build environment/conda --python=3.13 --numpy=2
+- Test the new LUE Conda package:
+    - In a shell with Conda environment containing lxml pcraster requests tqdm
+    - $ conda install --force-reinstall --channel <prefix> --use-local lue
+    - $ LD_PRELOAD=$(find $CONDA_PREFIX -name libtcmalloc_minimal.so.4) \
+            source/framework/python/script/lue_verify_pcraster.py /tmp/blah
+
+Notes:
+
+- Make sure the Python versions in the Conda environments match.
 """
     arguments = sys.argv[1:]
     arguments = docopt.docopt(usage, arguments)

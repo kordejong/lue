@@ -252,7 +252,14 @@ def is_boolean(expression):
     """
     Return whether `expression`'s value scale is boolean
     """
-    return lue_is_uint8_raster(expression) or lue_is_uint8_scalar(expression)
+    return (
+        lue_is_uint8_raster(expression)
+        or lue_is_uint8_scalar(expression)
+        or (
+            isinstance(expression, (int, np.uint8))
+            and (expression == 0 or expression == 1)
+        )
+    )
 
 
 def is_ldd(expression):
@@ -280,7 +287,11 @@ def is_scalar(expression):
     """
     Return whether `expression`'s value scale is scalar
     """
-    return lue_is_float32_raster(expression) or lue_is_float32_scalar(expression)
+    return (
+        lue_is_float32_raster(expression)
+        or lue_is_float32_scalar(expression)
+        or isinstance(expression, (float, np.float32))
+    )
 
 
 def is_directional(expression):
@@ -378,9 +389,9 @@ def harmonize_types(expression1, expression2):
 
     assert not lue_is_value(expression1), expression1
     assert not lue_is_value(expression2), expression2
-    assert (
-        expression1.dtype == expression2.dtype
-    ), f"{expression1.dtype} != {expression2.dtype}"
+    assert expression1.dtype == expression2.dtype, (
+        f"{expression1.dtype} != {expression2.dtype}"
+    )
 
     return expression1, expression2
 

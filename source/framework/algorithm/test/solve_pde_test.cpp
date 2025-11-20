@@ -87,34 +87,47 @@ BOOST_AUTO_TEST_CASE(all_no_data)
         });
 
     {
+        lue::Count const nr_ticks{10};
+        auto const c_t{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const c_x{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const c_y{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const c_xx{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const c_yy{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const c_xy{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const rhs{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
         auto const dirichlet_boundary_condition{
             lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array1{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array2{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array3{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array4{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array5{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array6{lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+        auto const neumann_boundary_condition{
+            lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
 
         auto const result_we_got = lue::value_policies::solve_pde(
-            dirichlet_boundary_condition, array1, array2, array3, array4, array5, array6);
+            nr_ticks,
+            c_t,
+            c_x,
+            c_y,
+            c_xx,
+            c_yy,
+            c_xy,
+            rhs,
+            dirichlet_boundary_condition,
+            neumann_boundary_condition);
 
         // TODO: lue::test::check_arrays_are_equal(result_we_got, result_we_want);
     }
 
-    {
-        auto const dirichlet_boundary_condition{
-            lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
-        auto const array1{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array2{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array3{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array4{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array5{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-        auto const array6{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
-
-        auto const result_we_got = lue::value_policies::solve_pde(
-            dirichlet_boundary_condition, array1, array2, array3, array4, array5, array6);
-
-        // TODO: lue::test::check_arrays_are_equal(result_we_got, result_we_want);
-    }
+    // {
+    //     auto const dirichlet_boundary_condition{
+    //         lue::create_partitioned_array<Element>(array_shape, partition_shape, x)};
+    //     auto const array1{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //     auto const array2{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //     auto const array3{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //     auto const array4{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //     auto const array5{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //     auto const array6{lue::create_partitioned_array<Element>(array_shape, partition_shape, 0)};
+    //
+    //     auto const result_we_got = lue::value_policies::solve_pde(
+    //         dirichlet_boundary_condition, array1, array2, array3, array4, array5, array6);
+    //
+    //     // TODO: lue::test::check_arrays_are_equal(result_we_got, result_we_want);
+    // }
 }

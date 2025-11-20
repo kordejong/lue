@@ -1,8 +1,69 @@
 \documentclass[crop, tikz]{standalone}
+\usetikzlibrary{calc,intersections}
+
+\renewcommand{\familydefault}{\sfdefault}
+
 
 \input{logo-style}
 \input{${style}}
 
 \begin{document}
-    \input{logo}
+    \begin{tikzpicture}[]
+
+        % TODO: Why isn't the ratio correct?
+        \skipdef\width=0
+        \pgfmathsetlength\width{1.0cm}
+
+        \skipdef\height=0
+        \pgfmathsetlength\height{1.618cm}  % Golden ratio
+
+        \pgfmathsetmacro\letterxshift{\width}
+
+        \def\parabola path{parabola[bend at end] (\width, 0)}
+
+        \begin{scope}[
+            local bounding box=logobox,
+        ]
+            % L
+            \pgfmathsetmacro \letteridx {0}
+            \pgfmathsetmacro \xshift {\letteridx * (\letterxshift - 0.3 * \letterxshift)}
+            \draw[
+                lue logo letter,
+                draw=l colour,
+                xshift=\xshift,
+            ] (0, \height) \parabola path;
+
+            % U
+            \pgfmathsetmacro \letteridx {1}
+            \pgfmathsetmacro \xshift {\letteridx * (\letterxshift - 0.3 * \letterxshift)}
+            \draw[
+                lue logo letter,
+                draw=u colour,
+                xshift=\xshift,
+            ] (0, \height) \parabola path -- ++(0, \height);
+
+            % E
+            \pgfmathsetmacro \letteridx {2}
+            \pgfmathsetmacro \xshift {\letteridx * (\letterxshift - 0.3 * \letterxshift)}
+            \draw[
+                lue logo letter,
+                draw=e colour,
+                xshift=\xshift,
+                name path=parabola,
+            ] (\width, \height) -- (0, \height) \parabola path;
+            \path[
+                xshift=\xshift,
+                name path=line,
+            ] (0.25 * \width, 0) -- (0.25 * \width, 0.9 * \height);
+            \draw[
+                lue logo letter,
+                draw=e colour,
+                xshift=\xshift,
+                name intersections={of=parabola and line, by=y},
+            ] (y) -- ++(0.75 * \width, 0);
+        \end{scope}
+
+        \draw[
+        ] ($(logobox.south)$) node [lue logo letter, below=3pt] {High Performance Geocomputing};
+    \end{tikzpicture}
 \end{document}

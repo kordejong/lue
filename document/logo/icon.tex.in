@@ -1,8 +1,74 @@
 \documentclass[crop, tikz]{standalone}
+\usetikzlibrary{intersections}
 
 \input{icon-style}
 \input{${style}}
 
+% NOTE: Whatever you do, keep the favicon square. Tweaking the spacing helps with that.
+% TODO: How to force square output?
+% TODO: Fixate units. Use relative coordinates?
 \begin{document}
-    \input{icon}
+    \begin{tikzpicture}[]
+
+        \pgfmathsetmacro \width {1.0}
+        \pgfmathsetmacro \height {1.618}  % Golden ratio
+
+        % TODO: Make shift and scale dependant on ratio between width and height so top and right of icon
+        % align
+        % \pgfmathsetmacro \xshift {(\width / \height) * 0.5 * 8pt}  % TODO: Grab line width
+        % \pgfmathsetmacro \yshift {(\height / \width) * 0.5 * 8pt}  % TODO: Grab line width
+
+        \pgfmathsetmacro \xshift {0.309cm}  % TODO: Compute: (\height - \width) / 2
+        \pgfmathsetmacro \yshift {0}
+        \pgfmathsetmacro \scale {1.0}
+
+        % \useasboundingbox (..., ...);
+
+        \def\parabola path{parabola[bend at end] (\width, 0)}
+
+        % L
+        \pgfmathsetmacro \letteridx {0}
+        \draw[
+            lue icon letter,
+            draw=l colour,
+            xshift={\letteridx * \xshift},
+            yshift={\letteridx * \yshift},
+            % scale={(1.0 - \letteridx * 0.1) * \scale},
+        ] (0, \height) \parabola path;
+
+        % U
+        \pgfmathsetmacro \letteridx {1}
+        \draw[
+            lue icon letter,
+            draw=u colour,
+            xshift={\letteridx * \xshift},
+            yshift={\letteridx * \yshift},
+            % scale={(1.0 - \letteridx * 0.1) * \scale},
+        ] (0, \height) \parabola path -- ++(0, \height);
+
+        % E
+        \pgfmathsetmacro \letteridx {2}
+        \draw[
+            lue icon letter,
+            draw=e colour,
+            xshift={\letteridx * \xshift},
+            yshift={\letteridx * \yshift},
+            % scale={(1.0 - \letteridx * 0.1) * \scale},
+            name path=parabola,
+        ] (\width, \height) -- (0, \height) \parabola path;
+        \path[
+            xshift={\letteridx * \xshift},
+            yshift={\letteridx * \yshift},
+            % scale={(1.0 - \letteridx * 0.1) * \scale},
+            name path=line,
+        ] (0.25 * \width, 0) -- (0.25 * \width, 0.9 * \height);
+        \draw[
+            lue icon letter,
+            draw=e colour,
+            xshift={\letteridx * \xshift},
+            yshift={\letteridx * \yshift},
+            % scale={(1.0 - \letteridx * 0.1) * \scale},
+            name intersections={of=parabola and line, by=y},
+        ] (y) -- ++(0.75 * \width, 0);
+    \end{tikzpicture}
 \end{document}

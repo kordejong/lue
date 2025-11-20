@@ -51,7 +51,6 @@ if(LATEX_FOUND)
             TARGET_NAME
                 ${target_name}
             INPUTS
-                ${figure}.tex
                 ${figure}-style.tex
                 ${style}.tex
                 style.tex
@@ -109,7 +108,6 @@ if(LATEX_FOUND)
             TARGET_NAME
                 ${target_name}
             INPUTS
-                ${figure}.tex
                 ${figure}-style.tex
                 ${style}.tex
                 style.tex

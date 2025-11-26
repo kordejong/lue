@@ -28,22 +28,25 @@ namespace lue {
 
 
     template<typename T>
-    using RankT = TypeTraits<T>::Rank;
-
-    template<typename T>
-    using ShapeT = TypeTraits<T>::Shape;
-
-    template<typename T>
-    using IndexT = TypeTraits<T>::Index;
+    using CountT = TypeTraits<T>::Count;
 
     template<typename T>
     using ElementT = TypeTraits<T>::Element;
 
     template<typename T>
+    using IndexT = TypeTraits<T>::Index;
+
+    template<typename T>
     using PartitionT = TypeTraits<T>::Partition;
 
-    // template<typename T>
-    // using PartitionT = typename T::Partition;
+    template<typename T>
+    using PartitionsT = TypeTraits<T>::Partitions;
+
+    template<typename T>
+    using RankT = TypeTraits<T>::Rank;
+
+    template<typename T>
+    using ShapeT = TypeTraits<T>::Shape;
 
 
     /*!
@@ -66,6 +69,7 @@ namespace lue {
     concept RegularGrid =
         MultiDimensional<T> && std::ranges::contiguous_range<T> && requires(T object, IndexT<T> idx) {
             { shape(object) } -> std::same_as<ShapeT<T> const&>;
+            { CountT<T>{} };
             // TODO: Make this work
             // { object[idx] } -> std::same_as<ElementT<T> const&>;
         };
@@ -89,8 +93,10 @@ namespace lue {
         - TODO: locality_id
     */
     template<typename T>
-    concept ArrayPartition =
-        std::default_initializable<T> && RegularGrid<T> && std::is_arithmetic_v<ElementT<T>>;
+    concept ArrayPartition = std::default_initializable<T> && RegularGrid<T> &&
+                             std::is_arithmetic_v<ElementT<T>>; /* && requires(T object) {
+                                 { locality(object) } -> std::same_as<hpx::locality_id>;
+                             }; */
 
 
     /*!
@@ -100,7 +106,23 @@ namespace lue {
         the array elements.
     */
     template<typename T>
-    concept Array = std::default_initializable<T> && RegularGrid<T> && ArrayPartition<PartitionT<T>>;
+    concept Array = std::default_initializable<T> && RegularGrid<T> && ArrayPartition<PartitionT<T>> &&
+                    requires(T object, ShapeT<T> shape, PartitionsT<T> partitions_) {
+                        { partitions(object) } -> std::same_as<PartitionsT<T> const&>;
+                        { nr_partitions(object) } -> std::same_as<CountT<T>>;
+                        { T{shape, std::move(partitions_)} };
+                        { partitions_.reserve(CountT<T>{}) };
+                        { partitions_.push_back(PartitionT<T>{}) };
+                    };
+
+    // { object[idx] } -> std::same_as<ElementT<T> const&>;
+
     // std::is_class_v<PartitionT<T>>;
+
+    // template<Array A>
+    // auto nr_partitions(A const&) -> CountT<A> const;
+    //
+    // template<Array A>
+    // auto shape(A const&) -> ShapeT<A> const&;
 
 }  // namespace lue

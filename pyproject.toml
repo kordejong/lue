@@ -18,6 +18,7 @@ ignore-words-list = "nD"
 [tool.typos]
 default.extend-ignore-identifiers-re = [
     ".*_FPR_.*",
+    "arange",
     "InputElemenT",
     "nd",
     "ND",

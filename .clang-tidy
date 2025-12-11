@@ -4,6 +4,6 @@ Checks: >
     bugprone-*,
     cppcoreguidelines-*,
     modernize-*,
+    -modernize-use-nodiscard,
     performance-*,
     readability-*
-...

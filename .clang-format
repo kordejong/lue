@@ -93,6 +93,8 @@ IncludeCategories:
       Priority: 50
     - Regex: '^"lue/python/'
       Priority: 60
+    - Regex: '^"lue/gdal/'
+      Priority: 70
     - Regex: '^"lue/imgui/'
       Priority: 70
     - Regex: '^"lue/netcdf/'

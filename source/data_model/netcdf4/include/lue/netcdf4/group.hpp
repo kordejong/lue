@@ -28,32 +28,33 @@ namespace lue::netcdf4 {
 
             auto operator=(Group&& other) noexcept -> Group&;
 
-            [[nodiscard]] auto id() const -> int;
+            auto id() const -> int;
 
-            [[nodiscard]] auto name() const -> std::string;
+            auto name() const -> std::string;
 
-            [[nodiscard]] auto full_name() const -> std::string;
+            auto full_name() const -> std::string;
 
-            [[nodiscard]] auto add_dimension(std::string const& name, size_t length) const -> Dimension;
+            auto add_dimension(std::string const& name, size_t length) const -> Dimension;
 
-            [[nodiscard]] auto has_dimension(std::string const& name) const -> bool;
+            auto add_dimension(std::string const& name) const -> Dimension;
 
-            [[nodiscard]] auto dimension(std::string const& name) const -> Dimension;
+            auto has_dimension(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto nr_dimensions() const -> int;
+            auto dimension(std::string const& name) const -> Dimension;
 
-            [[nodiscard]] auto dimensions() const -> std::vector<Dimension>;
+            auto nr_dimensions() const -> int;
 
-            [[nodiscard]] auto add_variable(
-                std::string const& name,
-                nc_type data_type,
-                std::vector<Dimension> const& dimensions = {}) -> Variable;
+            auto dimensions() const -> std::vector<Dimension>;
 
-            [[nodiscard]] auto has_variable(std::string const& name) const -> bool;
+            auto add_variable(
+                std::string const& name, nc_type data_type, std::vector<Dimension> const& dimensions = {})
+                -> Variable;
 
-            [[nodiscard]] auto variable(std::string const& name) const -> Variable;
+            auto has_variable(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto variables() const -> std::vector<Variable>;
+            auto variable(std::string const& name) const -> Variable;
+
+            auto variables() const -> std::vector<Variable>;
 
             auto add_attribute(std::string name, std::string const& value) -> Attribute;
 
@@ -82,31 +83,31 @@ namespace lue::netcdf4 {
             }
 
 
-            [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
+            auto has_attribute(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto attribute(std::string name) const -> Attribute;
+            auto attribute(std::string name) const -> Attribute;
 
-            [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
+            auto attributes() const -> std::vector<Attribute>;
 
-            [[nodiscard]] auto parent_group() const -> Group;
+            auto parent_group() const -> Group;
 
-            [[nodiscard]] auto add_child_group(std::string const& name) const -> Group;
+            auto add_child_group(std::string const& name) const -> Group;
 
-            [[nodiscard]] auto has_child_group(std::string const& name) const -> bool;
+            auto has_child_group(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto child_group(std::string const& name) const -> Group;
+            auto child_group(std::string const& name) const -> Group;
 
-            [[nodiscard]] auto child_groups() const -> std::vector<Group>;
+            auto child_groups() const -> std::vector<Group>;
 
         protected:
 
             auto reset_id() -> int;
 
-            [[nodiscard]] auto id_is_valid() const -> bool;
+            auto id_is_valid() const -> bool;
 
         private:
 
-            [[nodiscard]] auto name_length() const -> std::size_t;
+            auto name_length() const -> std::size_t;
 
             //! ID of the group
             int _id;

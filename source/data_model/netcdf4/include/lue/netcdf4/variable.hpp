@@ -17,6 +17,64 @@ namespace lue::netcdf4 {
 
 
         template<>
+        struct VariableValue<char>
+        {
+                using ValueType = char;
+
+                static auto get(
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType* value) -> int
+                {
+                    return nc_get_var1_text(group_id, variable_id, idxs.data(), value);
+                }
+
+                static auto get(
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
+                {
+                    return nc_get_vars_text(
+                        group_id,
+                        variable_id,
+                        hyperslab.starts().data(),
+                        hyperslab.counts().data(),
+                        hyperslab.strides().data(),
+                        values);
+                }
+
+                static auto get(int const group_id, int const variable_id, ValueType* values) -> int
+                {
+                    return nc_get_var_text(group_id, variable_id, values);
+                }
+
+                static auto put(
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
+                {
+                    return nc_put_var1_text(group_id, variable_id, idxs.data(), values);
+                }
+
+                static auto put(
+                    int const group_id,
+                    int const variable_id,
+                    Hyperslab const& hyperslab,
+                    ValueType const* values) -> int
+                {
+                    return nc_put_vars_text(
+                        group_id,
+                        variable_id,
+                        hyperslab.starts().data(),
+                        hyperslab.counts().data(),
+                        hyperslab.strides().data(),
+                        values);
+                }
+
+                static auto put(int const group_id, int const variable_id, ValueType const* values) -> int
+                {
+                    return nc_put_var_text(group_id, variable_id, values);
+                }
+        };
+
+
+        template<>
         struct VariableValue<std::int8_t>
         {
                 using ValueType = std::int8_t;
@@ -28,10 +86,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_schar(
                         group_id,
@@ -48,10 +104,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_schar(group_id, variable_id, idxs.data(), values);
                 }
@@ -90,10 +144,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_ubyte(
                         group_id,
@@ -110,10 +162,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_ubyte(group_id, variable_id, idxs.data(), values);
                 }
@@ -152,10 +202,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_int(
                         group_id,
@@ -172,10 +220,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_int(group_id, variable_id, idxs.data(), values);
                 }
@@ -214,10 +260,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_uint(
                         group_id,
@@ -234,10 +278,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_uint(group_id, variable_id, idxs.data(), values);
                 }
@@ -276,10 +318,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_long(
                         group_id,
@@ -296,10 +336,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_long(group_id, variable_id, idxs.data(), values);
                 }
@@ -344,10 +382,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_ulonglong(
                         group_id,
@@ -364,10 +400,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_ulonglong(
                         group_id, variable_id, idxs.data(), (unsigned long long const*)values);
@@ -407,10 +441,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_float(
                         group_id,
@@ -427,10 +459,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_float(group_id, variable_id, idxs.data(), values);
                 }
@@ -469,10 +499,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    Hyperslab const& hyperslab,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, Hyperslab const& hyperslab, ValueType* values)
+                    -> int
                 {
                     return nc_get_vars_double(
                         group_id,
@@ -489,10 +517,8 @@ namespace lue::netcdf4 {
                 }
 
                 static auto put(
-                    int const group_id,
-                    int const variable_id,
-                    Indices const& idxs,
-                    ValueType const* values) -> int
+                    int const group_id, int const variable_id, Indices const& idxs, ValueType const* values)
+                    -> int
                 {
                     return nc_put_var1_double(group_id, variable_id, idxs.data(), values);
                 }
@@ -534,17 +560,17 @@ namespace lue::netcdf4 {
 
             Variable(int group_id, int variable_id);
 
-            [[nodiscard]] auto group_id() const -> int;
+            auto group_id() const -> int;
 
-            [[nodiscard]] auto id() const -> int;
+            auto id() const -> int;
 
-            [[nodiscard]] auto type() const -> nc_type;
+            auto type() const -> nc_type;
 
-            [[nodiscard]] auto nr_dimensions() const -> int;
+            auto nr_dimensions() const -> int;
 
-            [[nodiscard]] auto dimensions() const -> std::vector<Dimension>;
+            auto dimensions() const -> std::vector<Dimension>;
 
-            [[nodiscard]] auto name() const -> std::string;
+            auto name() const -> std::string;
 
             enum class Kind {
                 // auxiliary_coordinate,
@@ -555,7 +581,7 @@ namespace lue::netcdf4 {
                 regular,
             };
 
-            [[nodiscard]] auto kind() const -> Kind;
+            auto kind() const -> Kind;
 
             /*!
                 @brief      Set the fill value to @a value
@@ -573,7 +599,7 @@ namespace lue::netcdf4 {
 
             void unset_fill_value() const;
 
-            [[nodiscard]] auto has_fill_value() const -> bool;
+            auto has_fill_value() const -> bool;
 
             /*!
                 @brief      Retrieve the fill value
@@ -627,11 +653,13 @@ namespace lue::netcdf4 {
             }
 
 
-            [[nodiscard]] auto has_attribute(std::string const& name) const -> bool;
+            auto add_attribute(std::string name, std::string const& value) -> Attribute;
 
-            [[nodiscard]] auto attribute(std::string name) const -> Attribute;
+            auto has_attribute(std::string const& name) const -> bool;
 
-            [[nodiscard]] auto attributes() const -> std::vector<Attribute>;
+            auto attribute(std::string name) const -> Attribute;
+
+            auto attributes() const -> std::vector<Attribute>;
 
 
             /*!

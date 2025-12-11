@@ -156,6 +156,16 @@ namespace lue::netcdf4 {
 
 
     /*!
+        @brief      Add an unlimited dimension with name @a name
+        @exception  std::runtime_error In case the dimension cannot be added
+    */
+    auto Group::add_dimension(std::string const& name) const -> Dimension
+    {
+        return add_dimension(name, NC_UNLIMITED);
+    }
+
+
+    /*!
         @brief      Return whether the group contains a dimension with name @a name
     */
     auto Group::has_dimension(std::string const& name) const -> bool
@@ -307,9 +317,8 @@ namespace lue::netcdf4 {
         A default fill value will be set (as per NetCDF convention), which is dependent on the data type.
     */
     auto Group::add_variable(
-        std::string const& name,
-        nc_type const data_type,
-        std::vector<Dimension> const& dimensions) -> Variable
+        std::string const& name, nc_type const data_type, std::vector<Dimension> const& dimensions)
+        -> Variable
     {
         int variable_id{};
 

@@ -50,5 +50,11 @@ lue_install_development_libraries(
 )
 
 if(LUE_BUILD_TESTS)
+    lue_configure_static_library_for_tests(
+        TARGET_NAME_SHARED_LIB lue_cf
+        TARGET_NAME_STATIC_LIB lue_cf_static
+        EXPORT_MACRO_BASENAME CF
+    )
+
     add_subdirectory(test)
 endif()

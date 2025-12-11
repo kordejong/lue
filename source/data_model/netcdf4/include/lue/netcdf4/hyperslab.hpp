@@ -20,15 +20,15 @@ namespace lue::netcdf4 {
 
             Hyperslab(Starts&& starts, Counts&& counts);
 
-            [[nodiscard]] auto starts() const -> Starts;
+            auto starts() const -> Starts;
 
-            [[nodiscard]] auto counts() const -> Counts;
+            auto counts() const -> Counts;
 
-            [[nodiscard]] auto strides() const -> Strides;
+            auto strides() const -> Strides;
 
-            [[nodiscard]] auto nr_dimensions() const -> int;
+            auto nr_dimensions() const -> int;
 
-            [[nodiscard]] auto is_strided() const -> bool;
+            auto is_strided() const -> bool;
 
         private:
 

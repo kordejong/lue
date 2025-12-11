@@ -25,10 +25,8 @@ namespace lue::netcdf4 {
                 using ValueType = std::int8_t;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_schar(group_id, variable_id, name.c_str(), values);
                 }
@@ -57,10 +55,8 @@ namespace lue::netcdf4 {
                 using ValueType = std::uint8_t;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_ubyte(group_id, variable_id, name.c_str(), values);
                 }
@@ -89,10 +85,8 @@ namespace lue::netcdf4 {
                 using ValueType = std::int32_t;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_int(group_id, variable_id, name.c_str(), values);
                 }
@@ -121,10 +115,8 @@ namespace lue::netcdf4 {
                 using ValueType = std::uint32_t;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_uint(group_id, variable_id, name.c_str(), values);
                 }
@@ -154,10 +146,8 @@ namespace lue::netcdf4 {
                 static_assert(std::is_same_v<ValueType, long>);
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_long(group_id, variable_id, name.c_str(), values);
                 }
@@ -191,10 +181,8 @@ namespace lue::netcdf4 {
                 static_assert(sizeof(ValueType) == sizeof(unsigned long long));
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_ulonglong(
                         group_id, variable_id, name.c_str(), (unsigned long long*)values);
@@ -224,10 +212,8 @@ namespace lue::netcdf4 {
                 using ValueType = float;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_float(group_id, variable_id, name.c_str(), values);
                 }
@@ -256,10 +242,8 @@ namespace lue::netcdf4 {
                 using ValueType = double;
 
                 static auto get(
-                    int const group_id,
-                    int const variable_id,
-                    std::string const& name,
-                    ValueType* values) -> int
+                    int const group_id, int const variable_id, std::string const& name, ValueType* values)
+                    -> int
                 {
                     return nc_get_att_double(group_id, variable_id, name.c_str(), values);
                 }
@@ -302,10 +286,8 @@ namespace lue::netcdf4 {
                 @exception  std::runtime_error In case the attribute cannot be added
             */
             static auto add_attribute(
-                int const group_id,
-                int const variable_id,
-                std::string name,
-                std::string const& value) -> Attribute
+                int const group_id, int const variable_id, std::string name, std::string const& value)
+                -> Attribute
             {
                 if (auto const status =
                         nc_put_att_text(group_id, variable_id, name.c_str(), value.size(), value.c_str());
@@ -372,11 +354,11 @@ namespace lue::netcdf4 {
 
             Attribute(int group_id, int variable_id, std::string name);
 
-            [[nodiscard]] auto name() const -> std::string const&;
+            auto name() const -> std::string const&;
 
-            [[nodiscard]] auto type() const -> nc_type;
+            auto type() const -> nc_type;
 
-            [[nodiscard]] auto length() const -> std::size_t;
+            auto length() const -> std::size_t;
 
 
             /*!
@@ -386,7 +368,7 @@ namespace lue::netcdf4 {
                 @exception  std::runtime_error In case attribute value's length or the value itself cannot be
                             obtained
             */
-            [[nodiscard]] auto value(std::optional<std::string> default_value = {}) const -> std::string
+            auto value(std::optional<std::string> default_value = {}) const -> std::string
             {
                 std::size_t length{0};
 

@@ -22,13 +22,13 @@ namespace lue::netcdf4 {
 
             Dimension(int group_id, int dimension_id);
 
-            [[nodiscard]] auto id() const -> int;
+            auto id() const -> int;
 
-            [[nodiscard]] auto group_id() const -> int;
+            auto group_id() const -> int;
 
-            [[nodiscard]] auto name() const -> std::string;
+            auto name() const -> std::string;
 
-            [[nodiscard]] auto length() const -> std::size_t;
+            auto length() const -> std::size_t;
 
         private:
 

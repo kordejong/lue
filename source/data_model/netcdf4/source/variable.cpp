@@ -160,6 +160,12 @@ namespace lue::netcdf4 {
     }
 
 
+    auto Variable::add_attribute(std::string name, std::string const& value) -> Attribute
+    {
+        return Attribute::add_attribute(_group_id, _variable_id, std::move(name), value);
+    }
+
+
     /*!
         @brief      Return whether attribute @a name is available
     */

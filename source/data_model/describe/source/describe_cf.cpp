@@ -256,7 +256,7 @@ namespace lue::cf {
     // }
 
 
-    void to_json(nlohmann::ordered_json& json, Domain::Axis const& axis)
+    void to_json([[maybe_unused]] nlohmann::ordered_json& json, [[maybe_unused]] Domain::Axis const& axis)
     {
         // TODO
     }

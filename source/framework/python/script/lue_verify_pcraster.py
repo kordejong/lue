@@ -3,6 +3,7 @@ import enum
 import itertools
 import logging
 import math
+import operator
 import os
 import random
 import shutil
@@ -11,6 +12,7 @@ import traceback
 import typing
 from dataclasses import dataclass
 from pathlib import Path
+# import pprint
 
 import docopt
 import numpy as np
@@ -141,7 +143,9 @@ class ArgumentData:
         self.lue[Spatial][lpcr.Nominal] = lpcr.numpy2pcr(
             lpcr.Nominal, array, no_data_value=20
         )
-        self.lue[NonSpatial][lpcr.Nominal] = lpcr.scalar(self.value[lpcr.Nominal])
+        self.lue[NonSpatial][lpcr.Nominal] = lfr.create_scalar(
+            np.int32, self.value[lpcr.Nominal]
+        )
 
     def add_ordinal(
         self, generator: np.random.Generator, raster_shape: tuple[int, int]
@@ -167,7 +171,9 @@ class ArgumentData:
         self.lue[Spatial][lpcr.Ordinal] = lpcr.numpy2pcr(
             lpcr.Ordinal, array, no_data_value=20
         )
-        self.lue[NonSpatial][lpcr.Ordinal] = lpcr.scalar(self.value[lpcr.Ordinal])
+        self.lue[NonSpatial][lpcr.Ordinal] = lfr.create_scalar(
+            np.int32, self.value[lpcr.Ordinal]
+        )
 
     def add_scalar(
         self, generator: np.random.Generator, raster_shape: tuple[int, int]
@@ -191,7 +197,27 @@ class ArgumentData:
         self.lue[Spatial][lpcr.Scalar] = lpcr.numpy2pcr(
             lpcr.Scalar, array, no_data_value=1000.0
         )
-        self.lue[NonSpatial][lpcr.Scalar] = lpcr.scalar(self.value[lpcr.Scalar])
+        self.lue[NonSpatial][lpcr.Scalar] = lfr.create_scalar(
+            np.float32, self.value[lpcr.Scalar]
+        )
+
+
+# Global:
+# - Value scale of result is fixed or same as value scale of argument
+# - The cell representation and value scale of an argument are independent of those of other arguments
+# Poly:
+# - First input having more than one type determines result, if not yet fixed
+# SameBin:
+# - Binary operation
+# - Argument value scales are the same
+# - Result value scale is the same as the argument value scales
+EXEC_RESULT = enum.Enum("EXEC_RESULT", ["ExecGlobal", "ExecPoly", "ExecSameBin"])
+(ExecGlobal, ExecPoly, ExecSameBin) = EXEC_RESULT
+
+SYNTAX = enum.Enum("SYNTAX", ["SyntaxFunction", "SyntaxOperator"])
+(SyntaxFunction, SyntaxOperator) = SYNTAX
+
+STATUS = enum.Enum("STATUS", ["OK", "NOT_OK"])
 
 
 @dataclass
@@ -219,22 +245,13 @@ class Overload:
     name: str
     arguments: tuple[OverloadArgument, ...]
     results: tuple[OverloadResult, ...]
+    syntax: SYNTAX
 
     def __str__(self) -> str:
         formatted_arguments = [f"{argument}" for argument in self.arguments]
         formatted_results = [f"{result}" for result in self.results]
 
         return f"{self.name}({', '.join(formatted_arguments)}) -> {', '.join(formatted_results)}"
-
-
-# Global:
-# - Value scale of result is fixed or same as value scale of argument
-# - The cell representation and value scale of an argument are independent of those of other arguments
-EXEC_RESULT = enum.Enum("EXEC_RESULT", ["ExecGlobal"])
-(ExecGlobal,) = EXEC_RESULT
-
-
-STATUS = enum.Enum("STATUS", ["OK", "NOT_OK"])
 
 
 @dataclass
@@ -265,6 +282,7 @@ class Operation:
     name: str
     arguments: list[OperationArgument]
     results: list[OperationResult]
+    syntax: SYNTAX
     result_category: EXEC_RESULT
 
     def overload_arguments(
@@ -272,8 +290,16 @@ class Operation:
     ) -> list[tuple[OverloadArgument, ...]]:
         overload_arguments = []
 
-        # TODO: Generalize, based on ...
-        overload_arguments = potential_overload_arguments
+        match self.result_category:
+            case EXEC_RESULT.ExecGlobal:
+                overload_arguments = potential_overload_arguments
+            case EXEC_RESULT.ExecPoly | EXEC_RESULT.ExecSameBin:
+                # Select those tuples of arguments whose value scale is the same
+                overload_arguments = [
+                    arguments
+                    for arguments in potential_overload_arguments
+                    if len(set(argument.value_scale for argument in arguments)) == 1
+                ]
 
         # # Skip overloads taking a directional argument. LUE doesn't do directionals
         # overload_arguments = [
@@ -294,28 +320,104 @@ class Operation:
         potential_overload_results: list[tuple[OverloadResult, ...]],
         overload_arguments: list[tuple[OverloadArgument, ...]],
     ) -> list[tuple[OverloadResult, ...]]:
+        """
+        For each tuple of arguments, return a tuple of results
+        """
         overload_results = []
 
-        if self.result_category == ExecGlobal:
-            for arguments in overload_arguments:
-                first_argument = arguments[0]
+        # if self.result_category == ExecGlobal:
+        match self.result_category:
+            case EXEC_RESULT.ExecGlobal:
+                for arguments in overload_arguments:
+                    # first_argument = arguments[0]
 
-                for results in potential_overload_results:
-                    overload_results.append(tuple(results))
-                    break
-                    # for result in results:
-                    #     if result.value_scale == first_argument.value_scale:
-                    #         overload_results.append(tuple(results))
-                    #         break
-        else:
-            assert False, self.result_category
+                    for results in potential_overload_results:
+                        overload_results.append(tuple(results))
+                        break
+                        # for result in results:
+                        #     if result.value_scale == first_argument.value_scale:
+                        #         overload_results.append(tuple(results))
+                        #         break
+            case EXEC_RESULT.ExecPoly:
+                assert len(overload_arguments) > 0
 
-        assert overload_results, potential_overload_results
+                for arguments in overload_arguments:
+                    # first_argument = arguments[0]
+                    # argument_value_scale = first_argument.value_scale
+                    at_least_one_argument_is_spatial = any(
+                        argument.type == TYPE.Spatial for argument in arguments
+                    )
+                    type_ = (
+                        TYPE.Spatial
+                        if at_least_one_argument_is_spatial
+                        else TYPE.NonSpatial
+                    )
+
+                    for results in potential_overload_results:
+                        result_value_scale_is_fixed = (
+                            len(set(result.value_scale for result in results)) == 1
+                        )
+                        assert result_value_scale_is_fixed, self.name
+
+                        for result in results:
+                            if (
+                                result.type == type_
+                                # and result.value_scale == argument_value_scale
+                            ):
+                                overload_results.append(tuple(results))
+                                break
+
+                # print(f"operator: {self.name}")
+                # print(f"    arguments: {pprint.pformat(overload_arguments)}")
+                # print(f"      results: {pprint.pformat(overload_results)}")
+                #
+                # assert False
+            case EXEC_RESULT.ExecSameBin:
+                assert len(overload_arguments) > 0
+
+                for arguments in overload_arguments:
+                    assert len(arguments) == 2, f"{self.name}: {arguments}"
+
+                    argument_value_scale_is_fixed = (
+                        len(set(argument.value_scale for argument in arguments)) == 1
+                    )
+                    assert argument_value_scale_is_fixed, self.name
+                    argument_value_scale = arguments[0].value_scale
+
+                    at_least_one_argument_is_spatial = any(
+                        argument.type == TYPE.Spatial for argument in arguments
+                    )
+                    type_ = (
+                        TYPE.Spatial
+                        if at_least_one_argument_is_spatial
+                        else TYPE.NonSpatial
+                    )
+
+                    for results in potential_overload_results:
+                        result_value_scale_is_fixed = (
+                            len(set(result.value_scale for result in results)) == 1
+                        )
+                        assert result_value_scale_is_fixed, self.name
+                        result_value_scale = results[0].value_scale
+
+                        for result in results:
+                            assert result_value_scale == argument_value_scale
+
+                            if result.type == type_:
+                                overload_results.append(tuple(results))
+                                break
+
+        # else:
+        #     assert False, self.result_category
+
+        assert len(overload_results) == len(overload_arguments)
+
+        # assert overload_results, potential_overload_results
 
         return overload_results
 
     def overloads(self) -> list[Overload]:
-        # For each overload a combination of arguments
+        # For each overload a combination of arguments. This set is likely too large.
         potential_overload_arguments = list(
             itertools.product(
                 *tuple(
@@ -357,7 +459,7 @@ class Operation:
         assert len(overload_arguments) == len(overload_results)
 
         overloads = [
-            Overload(self.name, arguments, results)
+            Overload(self.name, arguments, results, self.syntax)
             for arguments, results in zip(overload_arguments, overload_results)
         ]
 
@@ -439,13 +541,57 @@ def call_operation(function, arguments, logger: logging.Logger) -> tuple[STATUS,
     return status, results
 
 
+pcr_unary_operator_name_to_python_operator_name = {
+    "+": "pos",
+    "-": "neg",
+    "not": "invert",
+}
+
+
+pcr_binary_operator_name_to_python_operator_name = {
+    "*": "mul",
+    "**": "pow",
+    "/": "truediv",
+    "idiv": "floordiv",
+    "+": "add",
+    "-": "sub",
+    "lt": "lt",
+    "le": "le",
+    "eq": "eq",
+    "ne": "ne",
+    "ge": "ge",
+    "gt": "gt",
+    "and": "and_",
+    "or": "or_",
+    "xor": "xor",
+    "mod": "mod",
+}
+
+
 def call_pcraster_operation(
     overload: Overload,
     argument_data: ArgumentData,
     logger: logging.Logger,
     output_directory: Path,
 ) -> tuple[STATUS, tuple]:
-    function = getattr(pcr, overload.name)
+    match overload.syntax:
+        case SYNTAX.SyntaxFunction:
+            function = getattr(pcr, overload.name)
+        case SYNTAX.SyntaxOperator:
+            match len(overload.arguments):
+                case 1:
+                    function = getattr(
+                        operator,
+                        pcr_unary_operator_name_to_python_operator_name[overload.name],
+                    )
+                case 2:
+                    function = getattr(
+                        operator,
+                        pcr_binary_operator_name_to_python_operator_name[overload.name],
+                    )
+                case _:
+                    assert False
+
     arguments = [
         argument_data.pcraster[argument.type][argument.value_scale]
         for argument in overload.arguments
@@ -474,7 +620,24 @@ def call_lue_operation(
     logger: logging.Logger,
     output_directory: Path,
 ) -> tuple[STATUS, tuple]:
-    function = getattr(lpcr, overload.name)
+    match overload.syntax:
+        case SYNTAX.SyntaxFunction:
+            function = getattr(lpcr, overload.name)
+        case SYNTAX.SyntaxOperator:
+            match len(overload.arguments):
+                case 1:
+                    function = getattr(
+                        operator,
+                        pcr_unary_operator_name_to_python_operator_name[overload.name],
+                    )
+                case 2:
+                    function = getattr(
+                        operator,
+                        pcr_binary_operator_name_to_python_operator_name[overload.name],
+                    )
+                case _:
+                    assert False
+
     arguments = [
         argument_data.lue[argument.type][argument.value_scale]
         for argument in overload.arguments
@@ -496,12 +659,12 @@ def call_lue_operation(
             if lpcr.is_spatial(result):
                 lpcr.report(result, str(output_directory / f"result-{idx}.tif"))
 
-            logger.info(
-                format_overload_message(
-                    overload,
-                    "Error while calling LUE operation. See error message before this line.",
-                )
+        logger.info(
+            format_overload_message(
+                overload,
+                "Error while calling LUE operation. See error message before this line.",
             )
+        )
 
     return status, results
 
@@ -517,7 +680,23 @@ def compare_results(
 
 
 def operation_as_path(operation: Operation) -> Path:
-    return Path(operation.name)
+    match operation.syntax:
+        case SYNTAX.SyntaxFunction:
+            name = operation.name
+        case SYNTAX.SyntaxOperator:
+            match len(operation.arguments):
+                case 1:
+                    name = pcr_unary_operator_name_to_python_operator_name[
+                        operation.name
+                    ]
+                case 2:
+                    name = pcr_binary_operator_name_to_python_operator_name[
+                        operation.name
+                    ]
+                case _:
+                    assert False
+
+    return Path(name)
 
 
 def overload_as_path(overload: Overload) -> Path:
@@ -607,13 +786,39 @@ def verify_operation(
     operation_output_directory = output_directory / operation_as_path(operation)
     operation_output_directory.mkdir()
 
-    assert hasattr(pcr, operation.name), operation.name
-
     operation_status = STATUS.NOT_OK
 
-    if not hasattr(lpcr, operation.name):
-        logger.info(f"Operation {operation.name} is not available in lue.pcraster")
-    else:
+    if operation.syntax == SyntaxFunction:
+        assert hasattr(pcr, operation.name), operation.name
+
+        if not hasattr(lpcr, operation.name):
+            logger.info(f"Operation {operation.name} is not available in lue.pcraster")
+        else:
+            nr_failed_overloads = 0
+
+            for overload in operation.overloads():
+                # TODO: Support Ldd
+                if not any(
+                    argument.value_scale in [lpcr.Directional, lpcr.Ldd]
+                    for argument in overload.arguments
+                ):
+                    overload_status = verify_overload(
+                        overload, argument_data, logger, operation_output_directory
+                    )
+
+                    if overload_status != STATUS.OK:
+                        nr_failed_overloads += 1
+
+            if nr_failed_overloads > 0:
+                logger.info(
+                    format_operation_message(
+                        operation,
+                        f"Number of overloads that failed: {nr_failed_overloads}",
+                    )
+                )
+            else:
+                operation_status = STATUS.OK
+    elif operation.syntax == SyntaxOperator:
         nr_failed_overloads = 0
 
         for overload in operation.overloads():
@@ -632,11 +837,14 @@ def verify_operation(
         if nr_failed_overloads > 0:
             logger.info(
                 format_operation_message(
-                    operation, f"Number of overloads that failed: {nr_failed_overloads}"
+                    operation,
+                    f"Number of overloads that failed: {nr_failed_overloads}",
                 )
             )
         else:
             operation_status = STATUS.OK
+    else:
+        assert False, operation
 
     if not os.listdir(operation_output_directory):
         # All is fine, clean-up
@@ -745,7 +953,10 @@ def element_to_result(element: etree.Element) -> OperationResult:
 
 
 def verify_operations(
-    argument_data: ArgumentData, logger: logging.Logger, output_directory: Path
+    argument_data: ArgumentData,
+    logger: logging.Logger,
+    output_directory: Path,
+    show_progress: bool,
 ) -> STATUS:
     operations_root = read_operation_xml(output_directory)
     operations: list[Operation] = []
@@ -828,17 +1039,49 @@ def verify_operations(
                                 name,
                                 [element_to_argument(input) for input in inputs],
                                 [element_to_result(result) for result in results],
+                                SyntaxFunction,
                                 ExecGlobal,
                             )
                         )
             else:
                 logger.debug(f"Skipping operation {name}: exec {syntax}")
+        elif syntax == "Operator":
+            commutative = element.attrib["commutative"]
+
+            assert exec in ["POLY", "SAME_BIN", "SAME_UN"], exec
+            assert commutative, commutative
+
+            match exec:
+                case "POLY":
+                    operations.append(
+                        Operation(
+                            name,
+                            [element_to_argument(input) for input in inputs],
+                            [element_to_result(result) for result in results],
+                            SyntaxOperator,
+                            ExecPoly,
+                        )
+                    )
+                case "SAME_BIN":
+                    operations.append(
+                        Operation(
+                            name,
+                            [element_to_argument(input) for input in inputs],
+                            [element_to_result(result) for result in results],
+                            SyntaxOperator,
+                            ExecSameBin,
+                        )
+                    )
+                case _:
+                    # TODO: Support all kinds of operators
+                    # print(etree.tostring(element))
+                    logger.debug(f"Skipping operation {name}: exec {syntax}")
         else:
             logger.debug(f"Skipping operation {name}: syntax {syntax}")
 
     nr_failed_operations = 0
 
-    for i in tqdm(range(len(operations))):
+    for i in tqdm(range(len(operations)), disable=not show_progress):
         status = verify_operation(
             operations[i], argument_data, logger, output_directory
         )
@@ -851,7 +1094,9 @@ def verify_operations(
 
 
 @lfr.runtime_scope
-def verify_lue_pcraster(logger: logging.Logger, output_directory: Path) -> None:
+def verify_lue_pcraster(
+    logger: logging.Logger, output_directory: Path, show_progress: bool
+) -> None:
     """
     For each overload of each PCRaster operation, compare the outputs of lue.pcraster with PCRaster
     """
@@ -860,7 +1105,7 @@ def verify_lue_pcraster(logger: logging.Logger, output_directory: Path) -> None:
     argument_data = ArgumentData()
 
     verify_arguments(argument_data, logger)
-    status = verify_operations(argument_data, logger, output_directory)
+    status = verify_operations(argument_data, logger, output_directory, show_progress)
 
     if status != STATUS.OK:
         write_arguments(argument_data, output_directory / "data")
@@ -881,6 +1126,7 @@ Options:
     directory   Directory to store results in. If it exists, then it is assumed
                 that its contents can be overwritten. To prevent errors, make
                 this an (almost) empty directory.
+    --debug     Turn on debug log level
     -h --help   Show this screen and exit
     --version   Show version and exit
 
@@ -910,22 +1156,25 @@ Notes:
     arguments = sys.argv[1:]
     arguments = docopt.docopt(usage, arguments)
     logger = logging.getLogger(command)
-    # logging.basicConfig(level=logging.DEBUG)
-    logging.basicConfig(level=logging.INFO)
-    # logging.basicConfig(level=logging.WARNING)
-    # logging.basicConfig(level=logging.ERROR)
+
+    if arguments["--debug"]:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
     output_directory = Path(arguments["<directory>"])
+
+    show_progress = not arguments["--debug"]
 
     status = 1
 
     try:
-        verify_lue_pcraster(logger, output_directory)
+        verify_lue_pcraster(logger, output_directory, show_progress)
         status = 0
     except Exception as exception:
+        # This should never happen, except during development. Dump the trace.
         logger.error(exception)
-        # # This should never happen. Dump the trace.
-        # logger.error(traceback.format_exc())
+        logger.error(traceback.format_exc())
 
     return status
 

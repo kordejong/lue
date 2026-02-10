@@ -7,6 +7,9 @@ list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/doc)
 add_subdirectory(core)
 list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/core)
 
+add_subdirectory(data_frame)
+list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/data_frame)
+
 add_subdirectory(partitioned_array)
 list(APPEND doxygen_input ${CMAKE_CURRENT_SOURCE_DIR}/partitioned_array)
 

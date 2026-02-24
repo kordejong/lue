@@ -681,7 +681,7 @@ namespace lue {
 #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
 
         // When the last process has finished, all processes have finished
-        auto to_lue_finished_f = localities_finished.back()
+        hpx::future<void>& to_lue_finished_f = localities_finished.back();
 
         // // When the last process has finished, all partitions have been written
         // auto to_lue_finished = localities_finished.back().share();
@@ -694,11 +694,12 @@ namespace lue {
 
 #else
 
-        auto to_lue_finished_f = hpx::when_all(localities_finished.begin(), localities_finished.end());
+        hpx::future<void> to_lue_finished_f =
+            hpx::when_all(localities_finished.begin(), localities_finished.end());
 
 #endif
 
-                                     lue_hpx_assert(to_lue_finished_f.valid());
+        lue_hpx_assert(to_lue_finished_f.valid());
 
         return to_lue_finished_f.then(
             [dataset_path, to_lue_order, to_lue_p = std::move(to_lue_p)](
@@ -765,13 +766,13 @@ namespace lue {
         auto const from_lue_order = root::current_from_lue_order(dataset_path);
         hpx::promise<void> to_lue_p = root::to_lue_promise_for(dataset_path, to_lue_order);
 
-#ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
-        // Make this to_lue call dependent on any previous calls to to_lue / from_lue to the same
-        // dataset, if done so. This ensures the dataset is closed.
-        auto precondition_f = hpx::when_all(
-            to_lue_when_predecessor_done(dataset_path, to_lue_order),
-            from_lue_done(dataset_path, from_lue_order));
-#else
+        // #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+        //         // Make this to_lue call dependent on any previous calls to to_lue / from_lue to the same
+        //         // dataset, if done so. This ensures the dataset is closed.
+        //         auto precondition_f = hpx::when_all(
+        //             root::to_lue_when_predecessor_done(dataset_path, to_lue_order),
+        //             root::from_lue_done(dataset_path, from_lue_order));
+        // #else
         // // TODO: Isn't this process only about ordering calls? Synchronization can happen іn the workers,
         // // right?
 
@@ -788,7 +789,7 @@ namespace lue {
         auto precondition_f = hpx::when_all(
             root::to_lue_when_predecessor_done(dataset_path, to_lue_order),
             root::from_lue_done(dataset_path, from_lue_order));
-#endif
+        // #endif
 
         // Partitions and localities
         auto const partition_idxs_by_locality{detail::partition_idxs_by_locality(array)};
@@ -808,7 +809,12 @@ namespace lue {
             {
                 // Prevent re-allocation. We're using references below.
                 std::vector<hpx::future<void>> localities_finished{};
+#ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+                localities_finished.reserve(partition_idxs_by_locality.size() + 1);
+                localities_finished.push_back(hpx::make_ready_future());
+#else
                 localities_finished.reserve(partition_idxs_by_locality.size());
+#endif
 
                 Action action{};
 
@@ -830,8 +836,7 @@ namespace lue {
                     // Writing gets serialized. Localities get to write their partitions in turn.
                     // Don't allow a process to open the dataset before the previous process has closed it
                     // again
-                    auto& precondition_f =
-                        localities_finished.empty() ? precondition_f : localities_finished.back();
+                    auto& precondition_f = localities_finished.back();
 #else
                     // Writing by all processes only depends on the dataset being closed by any previous read
                     // or write. This has happend already.
@@ -868,13 +873,13 @@ namespace lue {
 
 #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
                 // When the last process has finished, all processes have finished
-                auto to_lue_finished_f = localities_finished.back()
+                hpx::future<void>& to_lue_finished_f = localities_finished.back();
 #else
-                auto to_lue_finished_f =
+                hpx::future<void> to_lue_finished_f =
                     hpx::when_all(localities_finished.begin(), localities_finished.end());
 #endif
 
-                                             lue_hpx_assert(to_lue_finished_f.valid());
+                lue_hpx_assert(to_lue_finished_f.valid());
 
                 return to_lue_finished_f.then(
                     [dataset_path, to_lue_order, to_lue_p = std::move(to_lue_p)](

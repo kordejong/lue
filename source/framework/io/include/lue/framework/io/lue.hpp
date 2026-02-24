@@ -49,68 +49,107 @@ namespace lue::detail {
     LUE_FRAMEWORK_IO_EXPORT auto normalize(std::string const& pathname) -> std::filesystem::path;
 
 
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_order(std::filesystem::path const& dataset_path) -> Count;
+    namespace root {
 
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_order(std::filesystem::path const& dataset_path) -> Count;
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_order(std::filesystem::path const& dataset_path) -> Count;
 
-
-    LUE_FRAMEWORK_IO_EXPORT auto current_from_lue_order(std::filesystem::path const& dataset_path) -> Count;
-
-    LUE_FRAMEWORK_IO_EXPORT auto current_to_lue_order(std::filesystem::path const& dataset_path) -> Count;
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_order(std::filesystem::path const& dataset_path) -> Count;
 
 
-#ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+        LUE_FRAMEWORK_IO_EXPORT auto current_from_lue_order(std::filesystem::path const& dataset_path)
+            -> Count;
 
-    LUE_FRAMEWORK_IO_EXPORT void add_to_lue_finished(
-        std::filesystem::path const& path, Count count, hpx::shared_future<void> future);
-
-    LUE_FRAMEWORK_IO_EXPORT void add_from_lue_finished(
-        std::filesystem::path const& path, Count count, hpx::shared_future<void> future);
-
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_finished(std::filesystem::path const& path, Count count)
-        -> hpx::shared_future<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_finished(std::filesystem::path const& path, Count count)
-        -> hpx::shared_future<void>;
-#endif
+        LUE_FRAMEWORK_IO_EXPORT auto current_to_lue_order(std::filesystem::path const& dataset_path) -> Count;
 
 
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_open_dataset_promise_for(
-        std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_promise_for(
-        std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_open_dataset_promise_for(
-        std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_promise_for(
-        std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
-
-
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_open_dataset_when_predecessor_done(
-        std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_when_predecessor_done(
-        std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_open_dataset_when_predecessor_done(
-        std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
-
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_when_predecessor_done(
-        std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+        // #if 0
+        //         // #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+        //         // TODO: REMOVE
+        //         LUE_FRAMEWORK_IO_EXPORT void add_to_lue_finished(
+        //             std::filesystem::path const& path, Count count, hpx::shared_future<void> future);
+        //
+        //         LUE_FRAMEWORK_IO_EXPORT void add_from_lue_finished(
+        //             std::filesystem::path const& path, Count count, hpx::shared_future<void> future);
+        //
+        //         LUE_FRAMEWORK_IO_EXPORT auto to_lue_finished(std::filesystem::path const& path, Count
+        //         count)
+        //             -> hpx::shared_future<void>;
+        //
+        //         LUE_FRAMEWORK_IO_EXPORT auto from_lue_finished(std::filesystem::path const& path, Count
+        //         count)
+        //             -> hpx::shared_future<void>;
+        //         // TODO: /REMOVE
+        //         // #endif
+        // #endif
 
 
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_done_available(
-        std::filesystem::path const& path, Count count) -> bool;
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_promise_for(std::filesystem::path const& path, Count open_count)
+            -> hpx::promise<void>;
 
-    LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_done(std::filesystem::path const& path, Count count)
-        -> hpx::shared_future<void>;
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
 
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_done_available(
-        std::filesystem::path const& path, Count count) -> bool;
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_done(std::filesystem::path const& path, Count count)
+            -> hpx::shared_future<void>;
 
-    LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_done(std::filesystem::path const& path, Count count)
-        -> hpx::shared_future<void>;
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_promise_for(std::filesystem::path const& path, Count open_count)
+            -> hpx::promise<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_done(std::filesystem::path const& path, Count count)
+            -> hpx::shared_future<void>;
+
+    }  // namespace root
+
+
+    namespace worker {
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_open_dataset_promise_for(
+            std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_promise_for(
+            std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_open_dataset_promise_for(
+            std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_promise_for(
+            std::filesystem::path const& path, Count open_count) -> hpx::promise<void>;
+
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_open_dataset_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_open_dataset_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_when_predecessor_done(
+            std::filesystem::path const& path, Count open_count) -> hpx::shared_future<void>;
+
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_open_dataset_done(
+            std::filesystem::path const& path, Count count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_done_available(
+            std::filesystem::path const& path, Count count) -> bool;
+
+        LUE_FRAMEWORK_IO_EXPORT auto from_lue_close_dataset_done(
+            std::filesystem::path const& path, Count count) -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_open_dataset_done(std::filesystem::path const& path, Count count)
+            -> hpx::shared_future<void>;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_done_available(
+            std::filesystem::path const& path, Count count) -> bool;
+
+        LUE_FRAMEWORK_IO_EXPORT auto to_lue_close_dataset_done(std::filesystem::path const& path, Count count)
+            -> hpx::shared_future<void>;
+
+    }  // namespace worker
 
 }  // namespace lue::detail

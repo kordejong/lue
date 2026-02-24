@@ -336,87 +336,41 @@ namespace lue {
 
             std::filesystem::path const dataset_path{normalize(dataset_pathname)};
 
-            // TODO: If all works fine like this, we can get rid of the {to,from}_lue_{open,close} stuff
-            // again. Dependencies are handled at the root locality.
+            hpx::promise<void> to_lue_open_dataset_p =
+                worker::to_lue_open_dataset_promise_for(dataset_path, to_lue_order);
+            hpx::promise<void> to_lue_close_dataset_p =
+                worker::to_lue_close_dataset_promise_for(dataset_path, to_lue_order);
 
-            // hpx::promise<void> to_lue_open_dataset_p =
-            //     worker::to_lue_open_dataset_promise_for(dataset_path, to_lue_order);
+#ifndef NDEBUG
+            // This must be true as the root locality waits for a previous read to have finished
+            lue_hpx_assert(
+                from_lue_order == 0 ||
+                worker::from_lue_close_dataset_done_available(dataset_path, from_lue_order));
+            hpx::shared_future<void> from_lue_close_dataset_done_f =
+                worker::from_lue_close_dataset_done(dataset_path, from_lue_order);
+            lue_hpx_assert(from_lue_close_dataset_done_f.is_ready());
+
+            // This must be true as the root locality waits for a previous write to have finished
+            lue_hpx_assert(
+                to_lue_order == 1 ||
+                worker::to_lue_close_dataset_done_available(dataset_path, to_lue_order - 1));
+            hpx::shared_future<void> to_lue_close_dataset_predecessor_done_f =
+                worker::to_lue_close_dataset_done(dataset_path, to_lue_order - 1);
+            lue_hpx_assert(to_lue_close_dataset_predecessor_done_f.is_ready());
+#endif
 
             hpx::future<void> precondition_f{};
 
-            if constexpr (serial_io)
+            if constexpr (serial_io_non_thread_safe)
             {
-                // Serial I/O: we can only start writing once the dataset is closed. The dataset is closed
-                // if:
-                //
-                // - Any previous from_lue call has finished (from_lue_order)
-                //     - This is handled in the root locality and must therefore be true already
-                //
-                // - Any previous to_lue call has finished (to_lue_order - 1)
-                //     - This is handled in the root locality and must therefore be true already
-                //
-                // - Any previous locality has finished writing its partitions (to_lue_close_dataset_done)
-                //     - This is handled in the root locality and must therefore be true already
-
-#ifndef NDEBUG
-                lue_hpx_assert(
-                    from_lue_order == 0 ||
-                    worker::from_lue_close_dataset_done_available(dataset_path, from_lue_order));
-                hpx::shared_future<void> from_lue_close_dataset_done_f =
-                    worker::from_lue_close_dataset_done(dataset_path, from_lue_order);
-                lue_hpx_assert(from_lue_close_dataset_done_f.is_ready());
-
-                lue_hpx_assert(
-                    to_lue_order == 1 ||
-                    worker::to_lue_close_dataset_done_available(dataset_path, to_lue_order - 1));
-                hpx::shared_future<void> to_lue_close_dataset_predecessor_done_f =
-                    worker::to_lue_close_dataset_done(dataset_path, to_lue_order - 1);
-                lue_hpx_assert(to_lue_close_dataset_predecessor_done_f.is_ready());
-#endif
-
-                if constexpr (serial_io_non_thread_safe)
-                {
-                    // Wait before opening the dataset. We need to make sure all HDF5 API calls are done from
-                    // the same OS thread. We therefore make sure we don't have to wait anywhere else (and
-                    // potentially get rescheduled on another OS thread) during the write.
-                    precondition_f = hpx::when_all(partitions);
-                }
-
-                if constexpr (serial_io_thread_safe)
-                {
-                    // All preconditions are true already
-                    precondition_f = hpx::make_ready_future();
-                }
+                // Wait before opening the dataset. We need to make sure all HDF5 API calls are done from
+                // the same OS thread. We therefore make sure we don't have to wait anywhere else (and
+                // potentially get rescheduled on another OS thread) during the write.
+                precondition_f = hpx::when_all(partitions);
             }
-
-            if constexpr (parallel_io)
+            else
             {
-#ifndef NDEBUG
-                // This must be true as the root locality waits for a previous read to have finished
-                lue_hpx_assert(
-                    from_lue_order == 0 ||
-                    worker::from_lue_close_dataset_done_available(dataset_path, from_lue_order));
-                hpx::shared_future<void> from_lue_close_dataset_done_f =
-                    worker::from_lue_close_dataset_done(dataset_path, from_lue_order);
-                lue_hpx_assert(from_lue_close_dataset_done_f.is_ready());
-
-                // This must be true as the root locality waits for a previous write to have finished
-                lue_hpx_assert(
-                    to_lue_order == 1 ||
-                    worker::to_lue_close_dataset_done_available(dataset_path, to_lue_order - 1));
-                hpx::shared_future<void> to_lue_close_dataset_predecessor_done_f =
-                    worker::to_lue_close_dataset_done(dataset_path, to_lue_order - 1);
-                lue_hpx_assert(to_lue_close_dataset_predecessor_done_f.is_ready());
-#endif
-
-                // All preconditions are true already
                 precondition_f = hpx::make_ready_future();
-
-                // // Opening a dataset is a collective operation: only open the dataset when it is our turn
-                // to
-                // // do so.
-                // hpx::shared_future<void> to_lue_open_dataset_predecessor_f =
-                //     to_lue_open_dataset_when_predecessor_done(dataset_path, to_lue_order);
             }
 
             return hpx::dataflow(
@@ -425,14 +379,14 @@ namespace lue {
                  array_hyperslab_start,
                  dataset_path,
                  to_lue_order,
-                 // // to_lue_open_dataset_p = to_lue_open_dataset_promise_for(dataset_path, to_lue_order),
-                 // to_lue_open_dataset_p = std::move(to_lue_open_dataset_p),
+                 to_lue_open_dataset_p = std::move(to_lue_open_dataset_p),
+                 to_lue_close_dataset_p = std::move(to_lue_close_dataset_p),
                  phenomenon_name,
                  property_set_name,
                  property_name,
                  object_id,
-                 time_step_idx]([[maybe_unused]] auto const& precondition_f, auto&& when_any_result_f) mutable
-                    -> hpx::future<void>
+                 time_step_idx](
+                    [[maybe_unused]] auto const& precondition_f, auto&& when_any_result_f) mutable -> void
                 {
                     AnnotateFunction const annotate{"to_lue: partitions variable"};
 
@@ -466,11 +420,9 @@ namespace lue {
                         // hdf5::Dataset
                         auto array{value[object_id]};
 
-                        // to_lue_open_dataset_p.set_value();
-
                         // Done with the collective calls. Note that H5DOpen is collective in case of write.
                         // Writing partitions can happen independently now.
-                        worker::to_lue_open_dataset_promise_for(dataset_path, to_lue_order).set_value();
+                        to_lue_open_dataset_p.set_value();
 
                         lue_hpx_assert(
                             worker::to_lue_open_dataset_done(dataset_path, to_lue_order).is_ready());
@@ -483,54 +435,20 @@ namespace lue {
                         write_partitions(policies, partitions, create_hyperslab, array);
                     }
 
+                    lue_hpx_assert(
+                        worker::to_lue_close_dataset_when_predecessor_done(dataset_path, to_lue_order)
+                            .is_ready());
+
+                    // The dataset must go out of scope before we set the promise's value
+                    [](auto&& dataset) -> auto { HPX_UNUSED(dataset); }(std::move(dataset));
+
                     // Closing a dataset is a collective operation: only close the dataset (let it go out
                     // of scope) when it is our turn to do so.
-                    hpx::promise<void> to_lue_close_dataset_p =
-                        worker::to_lue_close_dataset_promise_for(dataset_path, to_lue_order);
-                    hpx::shared_future<void> to_lue_close_dataset_predecessor_f =
-                        worker::to_lue_close_dataset_when_predecessor_done(dataset_path, to_lue_order);
+                    to_lue_close_dataset_p.set_value();
 
-                    auto close_dataset =
-                        [dataset = std::move(dataset),
-                         dataset_path,
-                         to_lue_order,
-                         to_lue_close_dataset_p = std::move(to_lue_close_dataset_p)  // ,
-                         /* partitions = std::move(partitions) */](
-                            [[maybe_unused]] auto const& to_lue_close_dataset_predecessor_f) mutable -> auto
-                    {
-                        lue_hpx_assert(to_lue_close_dataset_predecessor_f.is_ready());
+                    lue_hpx_assert(worker::to_lue_close_dataset_done(dataset_path, to_lue_order).is_ready());
 
-                        // The dataset must go out of scope before we set the promise's value
-                        [](auto&& dataset) -> auto { HPX_UNUSED(dataset); }(std::move(dataset));
-
-                        to_lue_close_dataset_p.set_value();
-
-                        lue_hpx_assert(
-                            worker::to_lue_close_dataset_done(dataset_path, to_lue_order).is_ready());
-
-                        print_debug("to_lue/close {}", to_lue_order);
-                    };
-
-                    if constexpr (serial_io)
-                    {
-                        // No reason to go async. Any predecessor is done already.
-                        close_dataset(to_lue_close_dataset_predecessor_f);
-
-                        return hpx::make_ready_future();
-                    }
-
-                    if constexpr (parallel_io)
-                    {
-                        // TODO: Actually, this is already true, since the root locality has been waiting for
-                        // this already
-                        lue_hpx_assert(to_lue_close_dataset_predecessor_f.is_ready());
-
-                        close_dataset(to_lue_close_dataset_predecessor_f);
-
-                        return hpx::make_ready_future();
-
-                        // return to_lue_close_dataset_predecessor_f.then(std::move(close_dataset));
-                    }
+                    print_debug("to_lue/close {}", to_lue_order);
                 },
                 precondition_f,
                 hpx::when_any(partitions));
@@ -611,7 +529,7 @@ namespace lue {
         // Dependencies
         auto const to_lue_order = detail::root::to_lue_order(dataset_path);
         auto const from_lue_order = detail::root::current_from_lue_order(dataset_path);
-        hpx::promise<void> to_lue_p = detail::root::to_lue_promise_for(dataset_path, to_lue_order);
+        // hpx::promise<void> to_lue_p = detail::root::to_lue_promise_for(dataset_path, to_lue_order);
 
         // if constexpr (detail::serial_io)
         // {
@@ -702,11 +620,12 @@ namespace lue {
         lue_hpx_assert(to_lue_finished_f.valid());
 
         return to_lue_finished_f.then(
-            [dataset_path, to_lue_order, to_lue_p = std::move(to_lue_p)](
-                [[maybe_unused]] auto const& to_lue_finished_f) mutable -> auto
+            [dataset_path, to_lue_order
+             // , to_lue_p = std::move(to_lue_p)
+        ]([[maybe_unused]] auto const& to_lue_finished_f) mutable -> auto
             {
-                to_lue_p.set_value();
-                lue_hpx_assert(detail::root::to_lue_done(dataset_path, to_lue_order).is_ready());
+                // to_lue_p.set_value();
+                // lue_hpx_assert(detail::root::to_lue_done(dataset_path, to_lue_order).is_ready());
             });
     }
 
@@ -764,16 +683,15 @@ namespace lue {
         // Management of dependencies between calls
         auto const to_lue_order = root::to_lue_order(dataset_path);
         auto const from_lue_order = root::current_from_lue_order(dataset_path);
-        hpx::promise<void> to_lue_p = root::to_lue_promise_for(dataset_path, to_lue_order);
 
         auto precondition_f = hpx::when_all(
-            root::to_lue_when_predecessor_done(dataset_path, to_lue_order),
-            root::from_lue_done(dataset_path, from_lue_order));
+            root::to_lue_finished(dataset_path, to_lue_order - 1),
+            root::from_lue_finished(dataset_path, from_lue_order));
 
         // Partitions and localities
         auto const partition_idxs_by_locality{detail::partition_idxs_by_locality(array)};
 
-        return precondition_f.then(
+        hpx::future<void> to_lue_finished_f = precondition_f.then(
             [policies,
              array_shape = array.shape(),
              array_partitions = array.partitions(),
@@ -782,7 +700,6 @@ namespace lue {
              dataset_path,
              to_lue_order,
              from_lue_order,
-             to_lue_p = std::move(to_lue_p),
              object_id,
              time_step_idx]([[maybe_unused]] auto const& precondition_f) mutable -> hpx::future<void>
             {
@@ -800,11 +717,17 @@ namespace lue {
                 for (auto const& [locality, partition_idxs] : partition_idxs_by_locality)
                 {
                     // Copy current selection of partitions from input array to a new collection
-                    std::vector<Partition> partitions(partition_idxs.size());
+                    std::vector<Partition> locality_partitions(partition_idxs.size());
 
                     for (std::size_t idx = 0; auto const partition_idx : partition_idxs)
                     {
-                        partitions[idx++] = array_partitions[partition_idx];
+                        lue_hpx_assert(!locality_partitions[idx].valid());
+                        lue_hpx_assert(array_partitions[partition_idx].valid());
+
+                        locality_partitions[idx++] = array_partitions[partition_idx];
+
+                        lue_hpx_assert(locality_partitions[idx - 1]);
+                        lue_hpx_assert(array_partitions[partition_idx].valid());
                     }
 
 #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
@@ -828,12 +751,12 @@ namespace lue {
                          action,
                          policies,
                          array_hyperslab = shape_to_hyperslab(array_shape),
-                         partitions = std::move(partitions),
+                         partitions = std::move(locality_partitions),
                          array_pathname,
                          to_lue_order,
                          from_lue_order,
                          object_id,
-                         time_step_idx]([[maybe_unused]] auto const& locality_finished) -> auto
+                         time_step_idx]([[maybe_unused]] auto const& precondition_f) -> hpx::future<void>
                         {
                             return hpx::async(
                                 action,
@@ -859,14 +782,13 @@ namespace lue {
 
                 lue_hpx_assert(to_lue_finished_f.valid());
 
-                return to_lue_finished_f.then(
-                    [dataset_path, to_lue_order, to_lue_p = std::move(to_lue_p)](
-                        [[maybe_unused]] auto const& to_lue_finished_f) mutable -> void
-                    {
-                        to_lue_p.set_value();
-                        lue_hpx_assert(root::to_lue_done(dataset_path, to_lue_order).is_ready());
-                    });
+                return std::move(to_lue_finished_f);
             });
+
+        root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));
+
+        return root::to_lue_finished(dataset_path, to_lue_order)
+            .then([]([[maybe_unused]] hpx::shared_future<void> const& to_lue_finished_f) -> void {});
     }
 
 

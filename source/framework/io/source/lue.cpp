@@ -1,6 +1,7 @@
 #include "lue/framework/io/lue.hpp"
 #include "lue/framework/core/define.hpp"
 #include <hpx/runtime.hpp>
+#include <array>
 
 // #include <hpx/iostream.hpp>
 // #include <format>
@@ -121,229 +122,227 @@ namespace lue::detail {
         }
 
 
-        // #if 0
-        // // #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
-        //
-        //         namespace {
-        //
-        //             using CallFinished = std::map<std::filesystem::path, std::map<Count,
-        //             hpx::shared_future<void>>>;
-        //
-        //
-        //             /*!
-        //                 @brief      .
-        //                 @tparam     .
-        //                 @param      .
-        //                 @return     .
-        //                 @exception  .
-        //
-        //                 This function must be called from the root locality, on the main thread.
-        //             */
-        //             auto to_lue_finished() -> CallFinished&
-        //             {
-        //                 static CallFinished to_lue_finished;
-        //
-        //                 return to_lue_finished;
-        //             }
-        //
-        //
-        //             /*!
-        //                 @brief      .
-        //                 @tparam     .
-        //                 @param      .
-        //                 @return     .
-        //                 @exception  .
-        //
-        //                 This function must be called from the root locality, on the main thread.
-        //             */
-        //             auto from_lue_finished() -> CallFinished&
-        //             {
-        //                 static CallFinished from_lue_finished;
-        //
-        //                 return from_lue_finished;
-        //             }
-        //
-        //
-        //             /*!
-        //                 @brief      .
-        //                 @tparam     .
-        //                 @param      .
-        //                 @return     .
-        //                 @exception  .
-        //
-        //                 This function must be called from the root locality, on the main thread.
-        //             */
-        //             void add_call_finished(
-        //                 CallFinished& call_finished,
-        //                 std::filesystem::path const& path,
-        //                 Count const count,
-        //                 hpx::shared_future<void> future)
-        //             {
-        //                 lue_hpx_assert(on_root_locality());
-        //
-        //                 lue_hpx_assert((!call_finished.contains(path)) ||
-        //                 (!call_finished.at(path).contains(count))); lue_hpx_assert(future.valid());
-        //
-        //                 call_finished[path][count] = std::move(future);
-        //
-        //                 lue_hpx_assert(call_finished.contains(path));
-        //                 lue_hpx_assert(call_finished[path].contains(count));
-        //                 lue_hpx_assert(call_finished.at(path).at(count).valid());
-        //             }
-        //
-        //
-        //             /*!
-        //                 @brief      .
-        //                 @tparam     .
-        //                 @param      .
-        //                 @return     .
-        //                 @exception  .
-        //
-        //                 This function must be called from the root locality, on the main thread.
-        //             */
-        //             auto call_finished(
-        //                 CallFinished& call_finished, std::filesystem::path const& path, Count const count)
-        //                 -> hpx::shared_future<void>
-        //             {
-        // #ifndef NDEBUG
-        //                 lue_hpx_assert(on_root_locality());
-        //
-        //                 if (count > 0)
-        //                 {
-        //                     lue_hpx_assert(call_finished.contains(path));
-        //                     lue_hpx_assert(call_finished[path].contains(count));
-        //                     lue_hpx_assert(call_finished[path][count].valid());
-        //                 }
-        // #endif
-        //
-        //                 return count > 0 ? call_finished.at(path).at(count) :
-        //                 hpx::make_ready_future().share();
-        //             }
-        //
-        //         }  // Anonymous namespace
-        //
-        //
-        //         /*!
-        //             @brief      Add a @ future which becomes ready once call @a count to to_lue to @a path
-        //             finishes
-        //
-        //             This function must be called from the root locality, on the main thread.
-        //         */
-        //         void add_to_lue_finished(
-        //             std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
-        //         {
-        //             add_call_finished(to_lue_finished(), path, count, std::move(future));
-        //         }
-        //
-        //
-        //         /*!
-        //             @brief      Add a @ future which becomes ready once call @a count to from_lue from @a
-        //             path
-        //            finishes
-        //
-        //             This function must be called from the root locality, on the main thread.
-        //         */
-        //         void add_from_lue_finished(
-        //             std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
-        //         {
-        //             add_call_finished(from_lue_finished(), path, count, std::move(future));
-        //         }
-        //
-        //
-        //         /*!
-        //             @brief      Return a future which becomes ready once call @a count to to_lue finishes
-        //
-        //             This function must be called from the root locality, on the main thread.
-        //         */
-        //         auto to_lue_finished(std::filesystem::path const& path, Count const count) ->
-        //         hpx::shared_future<void>
-        //         {
-        //             return call_finished(to_lue_finished(), path, count);
-        //         }
-        //
-        //
-        //         /*!
-        //             @brief      Return a future which becomes ready once call @a count to from_lue from @a
-        //             path
-        //            finishes
-        //
-        //             This function must be called from the root locality, on the main thread.
-        //         */
-        //         auto from_lue_finished(std::filesystem::path const& path, Count const count)
-        //             -> hpx::shared_future<void>
-        //         {
-        //             return call_finished(from_lue_finished(), path, count);
-        //         }
-        //
-        //         // #endif
-        // #endif
-
-
-        /*!
-            @brief      Type for serializing calls to functions
-
-            This type is intended to be used on the root locality only.
-        */
-        using CallSerializer = Serializer<std::filesystem::path, Count>;
-
-
         namespace {
 
-            auto to_lue_serializer() -> CallSerializer&
-            {
-                static Serializer<std::filesystem::path, Count> serializer{};
+            // TODO: Add logic to remove information again. When adding a future, previous futures can be
+            //       removed, right?
 
-                return serializer;
+
+            // Shared future because multiple future calls may depend on the same previous call
+            using CallFinished = std::map<std::filesystem::path, std::map<Count, hpx::shared_future<void>>>;
+
+
+            /*!
+                @brief      .
+                @tparam     .
+                @param      .
+                @return     .
+                @exception  .
+
+                This function must be called from the root locality, on the main thread.
+            */
+            auto to_lue_finished() -> CallFinished&
+            {
+                static CallFinished to_lue_finished{};
+
+                return to_lue_finished;
             }
 
 
-            auto from_lue_serializer() -> CallSerializer&
-            {
-                static Serializer<std::filesystem::path, Count> serializer{};
+            /*!
+                @brief      .
+                @tparam     .
+                @param      .
+                @return     .
+                @exception  .
 
-                return serializer;
+                This function must be called from the root locality, on the main thread.
+            */
+            auto from_lue_finished() -> CallFinished&
+            {
+                static CallFinished from_lue_finished;
+
+                return from_lue_finished;
+            }
+
+
+            /*!
+                @brief      .
+                @tparam     .
+                @param      .
+                @return     .
+                @exception  .
+
+                This function must be called from the root locality, on the main thread.
+            */
+            void add_call_finished(
+                CallFinished& call_finished,
+                std::filesystem::path const& path,
+                Count const count,
+                hpx::shared_future<void> future)
+            {
+                lue_hpx_assert(on_root_locality());
+
+                lue_hpx_assert((!call_finished.contains(path)) || (!call_finished.at(path).contains(count)));
+                lue_hpx_assert(future.valid());
+
+                call_finished[path][count] = std::move(future);
+
+                lue_hpx_assert(call_finished.contains(path));
+                lue_hpx_assert(call_finished[path].contains(count));
+                lue_hpx_assert(call_finished.at(path).at(count).valid());
+            }
+
+
+            /*!
+                @brief      .
+                @tparam     .
+                @param      .
+                @return     .
+                @exception  .
+
+                This function must be called from the root locality, on the main thread.
+            */
+            auto call_finished(
+                CallFinished& call_finished, std::filesystem::path const& path, Count const count)
+                -> hpx::shared_future<void>
+            {
+#ifndef NDEBUG
+                lue_hpx_assert(on_root_locality());
+
+                if (count > 0)
+                {
+                    lue_hpx_assert(call_finished.contains(path));
+                    lue_hpx_assert(call_finished[path].contains(count));
+                    lue_hpx_assert(call_finished[path][count].valid());
+                }
+#endif
+
+                return count > 0 ? call_finished.at(path).at(count) : hpx::make_ready_future().share();
             }
 
         }  // Anonymous namespace
 
 
-        auto from_lue_promise_for(std::filesystem::path const& path, Count open_count) -> hpx::promise<void>
+        /*!
+            @brief      Add a @ future which becomes ready once call @a count to to_lue to @a path
+            finishes
+
+            This function must be called from the root locality, on the main thread.
+        */
+        void add_to_lue_finished(
+            std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
         {
-            return from_lue_serializer().promise_for(path, open_count);
+            add_call_finished(to_lue_finished(), path, count, std::move(future));
         }
 
 
-        auto from_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
+        /*!
+            @brief      Add a @ future which becomes ready once call @a count to from_lue from @a
+            path
+           finishes
+
+            This function must be called from the root locality, on the main thread.
+        */
+        void add_from_lue_finished(
+            std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
+        {
+            add_call_finished(from_lue_finished(), path, count, std::move(future));
+        }
+
+
+        /*!
+            @brief      Return a future which becomes ready once call @a count to to_lue finishes
+
+            This function must be called from the root locality, on the main thread.
+        */
+        auto to_lue_finished(std::filesystem::path const& path, Count const count) -> hpx::shared_future<void>
+        {
+            return call_finished(to_lue_finished(), path, count);
+        }
+
+
+        /*!
+            @brief      Return a future which becomes ready once call @a count to from_lue from @a
+            path
+           finishes
+
+            This function must be called from the root locality, on the main thread.
+        */
+        auto from_lue_finished(std::filesystem::path const& path, Count const count)
             -> hpx::shared_future<void>
         {
-            return from_lue_serializer().when_predecessor_done(path, open_count);
+            return call_finished(from_lue_finished(), path, count);
         }
 
 
-        auto from_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
-        {
-            return count > 0 ? from_lue_serializer().when_done(path, count)
-                             : hpx::make_ready_future().share();
-        }
+        // /*!
+        //     @brief      Type for serializing calls to functions
+        //
+        //     This type is intended to be used on the root locality only.
+        // */
+        // using CallSerializer = Serializer<std::filesystem::path, Count>;
+        //
+        //
+        // namespace {
+        //
+        //     auto to_lue_serializer() -> CallSerializer&
+        //     {
+        //         static Serializer<std::filesystem::path, Count> serializer{};
+        //
+        //         return serializer;
+        //     }
+        //
+        //
+        //     auto from_lue_serializer() -> CallSerializer&
+        //     {
+        //         static Serializer<std::filesystem::path, Count> serializer{};
+        //
+        //         return serializer;
+        //     }
+        //
+        // }  // Anonymous namespace
 
 
-        auto to_lue_promise_for(std::filesystem::path const& path, Count open_count) -> hpx::promise<void>
-        {
-            return to_lue_serializer().promise_for(path, open_count);
-        }
+        // auto from_lue_promise_for(std::filesystem::path const& path, Count open_count) ->
+        // hpx::promise<void>
+        // {
+        //     return from_lue_serializer().promise_for(path, open_count);
+        // }
+        //
+        //
+        // auto from_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
+        //     -> hpx::shared_future<void>
+        // {
+        //     return from_lue_serializer().when_predecessor_done(path, open_count);
+        // }
+        //
+        //
+        // auto from_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
+        // {
+        //     return count > 0 ? from_lue_serializer().when_done(path, count)
+        //                      : hpx::make_ready_future().share();
+        // }
+        //
+        //
+        // auto to_lue_promise_for(std::filesystem::path const& path, Count open_count) -> hpx::promise<void>
+        // {
+        //     return to_lue_serializer().promise_for(path, open_count);
+        // }
+        //
+        //
+        // auto to_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
+        //     -> hpx::shared_future<void>
+        // {
+        //     return to_lue_serializer().when_predecessor_done(path, open_count);
+        // }
 
 
-        auto to_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
-            -> hpx::shared_future<void>
-        {
-            return to_lue_serializer().when_predecessor_done(path, open_count);
-        }
-
-
-        auto to_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
-        {
-            return count > 0 ? to_lue_serializer().when_done(path, count) : hpx::make_ready_future().share();
-        }
+        // auto to_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
+        // {
+        //     return count > 0 ? to_lue_serializer().when_done(path, count) :
+        //     hpx::make_ready_future().share();
+        // }
 
     }  // namespace root
 

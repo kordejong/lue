@@ -578,20 +578,20 @@ namespace lue {
 
             hpx::shared_future<void> dataset_closed_f{};
 
-            if constexpr (detail::serial_io_non_thread_safe)
-            {
-                // When reading multiple times from the same dataset, these reads must be serialized.
-                // Otherwise multiple reads may start in parallel and from different threads.
-                dataset_closed_f = hpx::when_all(
-                                       detail::from_lue_finished(dataset_path, from_lue_order - 1),
-                                       detail::to_lue_finished(dataset_path, to_lue_order))
-                                       .share();
-            }
-
-            if constexpr (detail::serial_io_thread_safe)
-            {
-                dataset_closed_f = detail::to_lue_finished(dataset_path, to_lue_order);
-            }
+            // if constexpr (detail::serial_io_non_thread_safe)
+            // {
+            //     // When reading multiple times from the same dataset, these reads must be serialized.
+            //     // Otherwise multiple reads may start in parallel and from different threads.
+            //     dataset_closed_f = hpx::when_all(
+            //                            detail::from_lue_finished(dataset_path, from_lue_order - 1),
+            //                            detail::to_lue_finished(dataset_path, to_lue_order))
+            //                            .share();
+            // }
+            //
+            // if constexpr (detail::serial_io_thread_safe)
+            // {
+            //     dataset_closed_f = detail::to_lue_finished(dataset_path, to_lue_order);
+            // }
 
             lue_hpx_assert(dataset_closed_f.valid());
 #endif
@@ -774,46 +774,46 @@ namespace lue {
                             lue_hpx_assert(!array_partitions[partition_idx].valid());
                         }
 
-                    // Spawn a task that reads from the dataset into the partitions. This returns a
-                    // collection of futures to partitions, each of which becomes ready once its data is
-                    // read. Also, a future is returned which becomes ready once the dataset has been
-                    // closed. This happens later than when the partitions have become ready.
+                        // Spawn a task that reads from the dataset into the partitions. This returns a
+                        // collection of futures to partitions, each of which becomes ready once its data is
+                        // read. Also, a future is returned which becomes ready once the dataset has been
+                        // closed. This happens later than when the partitions have become ready.
 
-#ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
-// TODO:
-//                 auto [partitions_f, dataset_closed_f] =
-//                 hpx::split_future(localities_finished.then(
-//                     [action,
-//                      locality,
-//                      policies,
-//                      array_pathname,
-//                      from_lue_order,
-//                      to_lue_order,
-//                      array_hyperslab_start,
-//                      object_id,
-//                      time_step_idx,
-//                      partitions = std::move(partitions)]([[maybe_unused]] auto
-//                      const& localities_finished)
-//                         -> hpx::future<std::tuple<std::vector<Partition>,
-//                         hpx::future<void>>>
-//                     {
-//                         return hpx::async(
-//                             action,
-//                             locality,
-//                             policies,
-//                             array_pathname,
-//                             from_lue_order,
-//                             to_lue_order,
-//                             array_hyperslab_start,
-//                             object_id,
-//                             time_step_idx,
-//                             std::move(partitions));
-//                     }));
-//                 // partition_fs =
-//                 //     hpx::split_future<Partition>(std::move(partitions_f),
-//                 //     std::size(partition_idxs));
-//                 // localities_finished.push_back(std::move(dataset_closed_f));
-#else
+                        // #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+                        // TODO:
+                        //                 auto [partitions_f, dataset_closed_f] =
+                        //                 hpx::split_future(localities_finished.then(
+                        //                     [action,
+                        //                      locality,
+                        //                      policies,
+                        //                      array_pathname,
+                        //                      from_lue_order,
+                        //                      to_lue_order,
+                        //                      array_hyperslab_start,
+                        //                      object_id,
+                        //                      time_step_idx,
+                        //                      partitions = std::move(partitions)]([[maybe_unused]] auto
+                        //                      const& localities_finished)
+                        //                         -> hpx::future<std::tuple<std::vector<Partition>,
+                        //                         hpx::future<void>>>
+                        //                     {
+                        //                         return hpx::async(
+                        //                             action,
+                        //                             locality,
+                        //                             policies,
+                        //                             array_pathname,
+                        //                             from_lue_order,
+                        //                             to_lue_order,
+                        //                             array_hyperslab_start,
+                        //                             object_id,
+                        //                             time_step_idx,
+                        //                             std::move(partitions));
+                        //                     }));
+                        //                 // partition_fs =
+                        //                 //     hpx::split_future<Partition>(std::move(partitions_f),
+                        //                 //     std::size(partition_idxs));
+                        //                 // localities_finished.push_back(std::move(dataset_closed_f));
+                        // #else
                         // partition_fs = hpx::split_future<Partition>(
                         //     hpx::async(
                         //         action,
@@ -849,7 +849,7 @@ namespace lue {
                             [](auto&& future_of_future)
                                 -> hpx::future<std::tuple<std::vector<Partition>, hpx::future<void>>>
                             { return future_of_future.get(); }));
-#endif
+                        // #endif
 
                         // [[maybe_unused]] hpx::future<hpx::future<void>>& mih = dataset_closed_f;
 
@@ -896,20 +896,20 @@ namespace lue {
                             array_partitions.end(),
                             [](auto const& partition) -> auto { return partition.valid(); }));
 
-                // if constexpr (serial_io)
-                // {
-                //     root::add_from_lue_finished(
-                //         dataset_path, from_lue_order, hpx::when_all(localities_finished).share());
-                // }
+                    // if constexpr (serial_io)
+                    // {
+                    //     root::add_from_lue_finished(
+                    //         dataset_path, from_lue_order, hpx::when_all(localities_finished).share());
+                    // }
 
-#ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
-                // TODO:
-                // // When the last process has finished, all processes have finished
-                // auto from_lue_finished_f = localities_finished.back()
-#else
+                    // #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
+                    // TODO:
+                    // // When the last process has finished, all processes have finished
+                    // auto from_lue_finished_f = localities_finished.back()
+                    // #else
                     hpx::future<void> from_lue_finished_f =
                         hpx::when_all(localities_finished.begin(), localities_finished.end());
-#endif
+                    // #endif
 
                     lue_hpx_assert(from_lue_finished_f.valid());
 

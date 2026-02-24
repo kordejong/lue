@@ -10,8 +10,7 @@
 
 
 // TODO:
-// - Add tests for constant rasters. Requires update in data model code
-// - Revamp parallel I/O logic
+// - Add tests for constant rasters. Requires update in data model code.
 
 
 namespace {
@@ -186,11 +185,13 @@ BOOST_AUTO_TEST_CASE(variable_raster)
         layout_variable_raster<Element>(array_pathname);
 
     // Create, write, read, and compare arrays
-    for (lue::Index time_step = 0; time_step < nr_time_steps; ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
     {
         Array<Element> array_written =
             lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
-        hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id, time_step);
+
+        hpx::future<void> write_finished =
+            lue::to_lue(array_written, array_pathname, object_id, time_step_idx);
 
         // TODO:
         // Waiting for the write to finish here fixes an error from occurring in ~5% of the cases:
@@ -257,13 +258,12 @@ BOOST_AUTO_TEST_CASE(variable_raster)
         // synchronization points elsewhere, like into to_lue or from_lue does not prevent the issue.
         // See https://github.com/computationalgeography/lue/issues/945
 
-#ifndef BOOST_OS_WINDOWS
-        // write_finished.get();  // Also fine
-        lue::detail::to_lue_finished(lue::detail::normalize(dataset_pathname), time_step + 1).wait();
+#if !BOOST_OS_WINDOWS
+        write_finished.wait();
 #endif
 
         Array<Element> array_read =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step_idx);
 
         lue::test::check_arrays_are_equal(array_read, array_written);
     }
@@ -304,37 +304,47 @@ BOOST_AUTO_TEST_CASE(multiple_read_write_variable_raster_same_file_1)
 
     // Create arrays
     std::vector<Array<Element>> arrays_written(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < static_cast<lue::Count>(nr_time_steps);
+         ++time_step_idx)
     {
-        arrays_written[time_step] =
+        arrays_written[time_step_idx] =
             lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
     }
 
     // Write arrays
     std::vector<hpx::future<void>> writes_finished(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < static_cast<lue::Count>(nr_time_steps);
+         ++time_step_idx)
     {
-        writes_finished[time_step] =
-            lue::to_lue(arrays_written[time_step], array_pathname, object_id, time_step);
+        writes_finished[time_step_idx] =
+            lue::to_lue(arrays_written[time_step_idx], array_pathname, object_id, time_step_idx);
     }
 
-#ifndef BOOST_OS_WINDOWS
+#if !BOOST_OS_WINDOWS
     // TODO: See variable_raster test case
-    writes_finished.back().wait();
+    hpx::wait_all(writes_finished);
 #endif
 
     // Read arrays
     std::vector<Array<Element>> arrays_read(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < static_cast<lue::Count>(nr_time_steps);
+         ++time_step_idx)
     {
-        arrays_read[time_step] =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+        arrays_read[time_step_idx] =
+            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step_idx);
+
+#if !BOOST_OS_WINDOWS
+        // TODO: See variable_raster test case
+        hpx::wait_all(
+            arrays_read[time_step_idx].partitions().begin(), arrays_read[time_step_idx].partitions().end());
+#endif
     }
 
     // Compare arrays
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < static_cast<lue::Count>(nr_time_steps);
+         ++time_step_idx)
     {
-        lue::test::check_arrays_are_equal(arrays_read[time_step], arrays_written[time_step]);
+        lue::test::check_arrays_are_equal(arrays_read[time_step_idx], arrays_written[time_step_idx]);
     }
 }
 
@@ -357,20 +367,27 @@ BOOST_AUTO_TEST_CASE(multiple_read_write_variable_raster_same_file_2)
         layout_variable_raster<Element>(array_pathname);
 
     // Create, write, read, and compare arrays
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < static_cast<lue::Count>(nr_time_steps);
+         ++time_step_idx)
     {
         Array<Element> array_written =
             lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
 
-        hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id, time_step);
+        hpx::future<void> write_finished =
+            lue::to_lue(array_written, array_pathname, object_id, time_step_idx);
 
-#ifndef BOOST_OS_WINDOWS
+#if !BOOST_OS_WINDOWS
         // TODO: See variable_raster test case
         write_finished.wait();
 #endif
 
         Array<Element> array_read =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step_idx);
+
+#if !BOOST_OS_WINDOWS
+        // TODO: See variable_raster test case
+        hpx::wait_all(array_read.partitions().begin(), array_read.partitions().end());
+#endif
 
         lue::test::check_arrays_are_equal(array_read, array_written);
     }

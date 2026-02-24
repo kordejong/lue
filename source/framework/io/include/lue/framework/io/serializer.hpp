@@ -187,10 +187,10 @@ namespace lue {
                 std::lock_guard<std::mutex> lock_tuples{_tuples_mutex};
 
                 lue_hpx_assert(_tuples.contains(key));
-                auto& map{_tuples[key]};
+                auto& map{_tuples.at(key)};
                 lue_hpx_assert(map.contains(generation));
 
-                hpx::shared_future<void> future = std::get<1>(map[generation]);
+                hpx::shared_future<void> future = std::get<1>(map.at(generation));
                 lue_hpx_assert(future.valid());
 
                 return future;

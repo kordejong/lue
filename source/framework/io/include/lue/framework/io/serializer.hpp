@@ -79,6 +79,10 @@ namespace lue {
                 It is fine if this function is called for future generations first. That is the point of this
                 class. It allows to serialize code in a context where calls can not easily be serialized.
 
+                You likely want to call this function ASAP, as it will "fill in the blanks" for any earlier
+                generations. For example, calling when_predecessor_done() may fail before this function has
+                been called.
+
                 The caller is responsible for setting the value of the promise (call set_value()
                 on it). Otherwise none of the tasks associated with a higher generation will ever be
                 scheduled.

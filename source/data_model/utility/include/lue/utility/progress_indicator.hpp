@@ -2,42 +2,40 @@
 #include <ostream>
 
 
-namespace lue {
-    namespace utility {
+namespace lue::utility {
 
-        class ProgressIndicator
-        {
+    class ProgressIndicator
+    {
 
-            public:
+        public:
 
-                ProgressIndicator(std::ostream& stream, std::string const& label, size_t nr_tasks);
+            ProgressIndicator(std::ostream& stream, std::string label, size_t nr_tasks);
 
-                ProgressIndicator(ProgressIndicator const&) = delete;
+            ProgressIndicator(ProgressIndicator const&) = delete;
 
-                ProgressIndicator(ProgressIndicator&&) = delete;
+            ProgressIndicator(ProgressIndicator&&) = delete;
 
-                ~ProgressIndicator();
+            ~ProgressIndicator();
 
-                ProgressIndicator& operator=(ProgressIndicator const&) = delete;
+            auto operator=(ProgressIndicator const&) -> ProgressIndicator& = delete;
 
-                ProgressIndicator& operator=(ProgressIndicator&&) = delete;
+            auto operator=(ProgressIndicator&&) -> ProgressIndicator& = delete;
 
-                void update_progress(size_t task);
+            void update_progress(size_t task);
 
-            private:
+        private:
 
-                void init_stream();
+            void init_stream();
 
-                void update_stream(std::string const& string);
+            void update_stream(std::string const& string);
 
-                void finish_stream();
+            void finish_stream();
 
-                std::ostream& _stream;
+            std::ostream& _stream;
 
-                std::string const _label;
+            std::string const _label;
 
-                size_t const _nr_tasks;
-        };
+            size_t const _nr_tasks;
+    };
 
-    }  // namespace utility
-}  // namespace lue
+}  // namespace lue::utility

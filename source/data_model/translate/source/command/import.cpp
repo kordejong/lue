@@ -20,19 +20,25 @@ namespace lue::utility {
             []() -> cxxopts::Options
             {
                 cxxopts::Options options{Import::name, "Translate data into the LUE dataset format"};
-                options.add_options()("h,help", "Show usage")(
-                    "m,meta", "File containing metadata to use during import", cxxopts::value<std::string>())(
-                    "add",
-                    "Add data to the output dataset instead of overwriting it",
-                    cxxopts::value<bool>()->default_value("false"))(
-                    "skip-validate",
-                    "Skip validating the resulting LUE dataset",
-                    cxxopts::value<bool>()->default_value("false"))(
-                    "output", "Output dataset", cxxopts::value<std::string>())(
-                    "input", "Input dataset(s)", cxxopts::value<std::vector<std::string>>());
-                options.parse_positional({"output", "input"});
+
                 options.positional_help("<output> <input>...");
-                options.show_positional_help();
+                options.add_options()
+                    // clang-format off
+                    ("h,help", "Show usage")
+                    ("m,meta", "File containing metadata to use during import",
+                        cxxopts::value<std::string>())
+                    ("add", "Add data to the output dataset instead of overwriting it",
+                        cxxopts::value<bool>()->default_value("false"))
+                    ("skip-validate", "Skip validating the resulting LUE dataset",
+                        cxxopts::value<bool>()->default_value("false"))
+                    ("output", "Output dataset",
+                        cxxopts::value<std::string>())
+                    ("input", "Input dataset(s)",
+                        cxxopts::value<std::vector<std::string>>())
+                    // clang-format on
+                    ;
+                options.parse_positional({"output", "input"});
+
                 return options;
             }(),
             argc,

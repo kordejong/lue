@@ -4,6 +4,6 @@
 
 namespace lue {
 
-    std::string expand_environment_variables(std::string string);
+    auto expand_environment_variables(std::string string) -> std::string;
 
 }  // namespace lue

@@ -3,6 +3,7 @@
 #include "lue/translate/format/gdal.hpp"
 #include "lue/utility/environment.hpp"
 #include <algorithm>
+#include <fstream>
 #include <optional>
 
 
@@ -23,7 +24,7 @@ namespace lue::utility {
         }
 
 
-        auto contains(::json const& json, std::string const& name) -> bool
+        auto contains(nlohmann::json const& json, std::string const& name) -> bool
         {
             return json.contains(name);
         }
@@ -53,7 +54,8 @@ namespace lue::utility {
         }
 
 
-        void add_object_tracker(::json const& object_tracker_json, data_model::ObjectTracker& object_tracker)
+        void add_object_tracker(
+            nlohmann::json const& object_tracker_json, data_model::ObjectTracker& object_tracker)
         {
             if (contains(object_tracker_json, "active_set_index"))
             {
@@ -106,7 +108,7 @@ namespace lue::utility {
         }
 
 
-        void add_time_points(::json const& time_point_json, data_model::TimeDomain& time_domain)
+        void add_time_points(nlohmann::json const& time_point_json, data_model::TimeDomain& time_domain)
         {
             std::vector<data_model::time::DurationCount> const time_points = time_point_json;
             auto value = time_domain.value<data_model::TimePoint>();
@@ -135,7 +137,7 @@ namespace lue::utility {
 
 
         template<typename SpaceBox, typename Coordinate>
-        void add_space_boxes(::json const& space_box_json, data_model::SpaceDomain& space_domain)
+        void add_space_boxes(nlohmann::json const& space_box_json, data_model::SpaceDomain& space_domain)
         {
             if (!space_box_json.empty())
             {
@@ -187,7 +189,7 @@ namespace lue::utility {
 
 
         void add_space_domain_items(
-            ::json const& item_type_json,
+            nlohmann::json const& item_type_json,
             hdf5::Datatype const& datatype,
             data_model::PropertySet& property_set)
         {
@@ -213,7 +215,13 @@ namespace lue::utility {
 
                         case data_model::SpaceDomainItemType::box:
                         {
-                            if (datatype == hdf5::native_float64)
+                            // TODO: Support all
+                            if (datatype == hdf5::native_float32)
+                            {
+                                add_space_boxes<data_model::StationarySpaceBox, float>(
+                                    item_type_json, property_set.space_domain());
+                            }
+                            else if (datatype == hdf5::native_float64)
                             {
                                 add_space_boxes<data_model::StationarySpaceBox, double>(
                                     item_type_json, property_set.space_domain());
@@ -244,11 +252,11 @@ namespace lue::utility {
 
         template<typename Datatype>
         void add_same_shape_property(
-            ::json const& property_json, data_model::same_shape::Properties& properties)
+            nlohmann::json const& property_json, data_model::same_shape::Properties& properties)
         {
             std::string const name = property_json.at("name");
 
-            hdf5::Shape shape;
+            hdf5::Shape shape{};
 
             if (contains(property_json, "shape"))
             {
@@ -257,7 +265,7 @@ namespace lue::utility {
 
             auto const nr_elements_in_object_array = size_of_shape(shape, 1);
             auto const datatype = hdf5::native_datatype<Datatype>();
-            std::vector<Datatype> const values = property_json.at("value");
+            std::vector<Datatype> const values = property_json.at("value").get<std::vector<Datatype>>();
 
             if (values.size() % nr_elements_in_object_array != 0)
             {
@@ -278,6 +286,7 @@ namespace lue::utility {
             property.value().expand(nr_object_arrays);
             property.value().write(index_range, values.data());
 
+            // TODO: parse and use no-data value
 
             // TODO(KDJ)
             // datatype, shape must match, etc
@@ -287,7 +296,7 @@ namespace lue::utility {
 
         template<typename Datatype>
         void add_different_shape_property(
-            ::json const& property_json, data_model::different_shape::Properties& properties)
+            nlohmann::json const& property_json, data_model::different_shape::Properties& properties)
         {
             std::string const name = property_json.at("name");
             std::size_t rank = property_json.at("rank");
@@ -349,13 +358,13 @@ namespace lue::utility {
         // template<
         //     typename Properties,
         //     typename Datatype>
-        // void               add_property        (::json const& property_json,
+        // void               add_property        (nlohmann::json const& property_json,
         //                                         Properties& properties);
 
 
         // template<>
         // void add_property<same_shape::Properties, std::uint32_t>(
-        //     ::json const& property_json,
+        //     nlohmann::json const& property_json,
         //     same_shape::Properties& properties)
         // {
         //     std::string const name = property_json.at("name");
@@ -404,7 +413,8 @@ namespace lue::utility {
 
         template<typename Datatype>
         void add_same_shape_constant_shape_property(
-            ::json const& property_json, data_model::same_shape::constant_shape::Properties& properties)
+            nlohmann::json const& property_json,
+            data_model::same_shape::constant_shape::Properties& properties)
         {
             std::string const name = property_json.at("name");
 
@@ -453,7 +463,7 @@ namespace lue::utility {
 
         // template<>
         // void add_property<same_shape::constant_shape::Properties, std::uint32_t>(
-        //     ::json const& property_json,
+        //     nlohmann::json const& property_json,
         //     same_shape::constant_shape::Properties& properties)
         // {
         //     std::string const name = property_json.at("name");
@@ -508,7 +518,8 @@ namespace lue::utility {
 
         template<typename Datatype>
         void add_different_shape_constant_shape_property(
-            ::json const& property_json, data_model::different_shape::constant_shape::Properties& properties)
+            nlohmann::json const& property_json,
+            data_model::different_shape::constant_shape::Properties& properties)
         {
             std::string const name = property_json.at("name");
             data_model::Rank const rank = property_json.at("rank");
@@ -570,7 +581,8 @@ namespace lue::utility {
 
         template<typename Datatype>
         void add_different_shape_variable_shape_property(
-            ::json const& property_json, data_model::different_shape::variable_shape::Properties& properties)
+            nlohmann::json const& property_json,
+            data_model::different_shape::variable_shape::Properties& properties)
         {
             std::string const name = property_json.at("name");
             data_model::Rank const rank = property_json.at("rank");
@@ -607,7 +619,7 @@ namespace lue::utility {
         }
 
 
-        void add_property(::json const& property_json, data_model::Properties& properties)
+        void add_property(nlohmann::json const& property_json, data_model::Properties& properties)
         {
             // std::string const description = property_json["description"];
 
@@ -873,12 +885,31 @@ namespace lue::utility {
         }
 
 
-        auto parse_space_domain(::json const& space_domain_json)
-            -> std::tuple<data_model::SpaceConfiguration, hdf5::Datatype, std::size_t, ::json>
+        auto string_to_datatype(std::string const& string) -> hdf5::Datatype
+        {
+            // TODO: Support all
+
+            if (string == "float32")
+            {
+                return hdf5::native_float32;
+            }
+
+            if (string == "float64")
+            {
+                return hdf5::native_float64;
+            }
+
+            throw std::runtime_error(
+                std::format("Datatype {} used for space discretization not supported yet", string));
+        }
+
+
+        auto parse_space_domain(nlohmann::json const& space_domain_json)
+            -> std::tuple<data_model::SpaceConfiguration, hdf5::Datatype, std::size_t, nlohmann::json>
         {
             data_model::Mobility mobility{data_model::Mobility::stationary};
             data_model::SpaceDomainItemType item_type{};
-            ::json item_type_json;
+            nlohmann::json item_type_json;
 
             if (contains(space_domain_json, "space_box"))
             {
@@ -891,8 +922,8 @@ namespace lue::utility {
             }
 
             [[maybe_unused]] std::string const datatype_json = space_domain_json.at("datatype");
-            assert(datatype_json == "float64");
-            auto const datatype = hdf5::native_float64;
+            auto const datatype = string_to_datatype(datatype_json);
+
             std::size_t const rank = space_domain_json.at("rank");
 
             return std::make_tuple(
@@ -925,7 +956,8 @@ namespace lue::utility {
         }
 
 
-        void add_property_set(::json const& property_set_json, data_model::PropertySets& property_sets)
+        void add_property_set(
+            nlohmann::json const& property_set_json, data_model::PropertySets& property_sets)
         {
             std::string const name = property_set_json.at("name");
 
@@ -1087,7 +1119,7 @@ namespace lue::utility {
         }
 
 
-        void add_phenomenon(::json const& phenomenon_json, data_model::Phenomena& phenomena)
+        void add_phenomenon(nlohmann::json const& phenomenon_json, data_model::Phenomena& phenomena)
         {
             std::string const name = phenomenon_json.at("name");
             auto& phenomenon = phenomena.contains(name) ? phenomena[name] : phenomena.add(name);
@@ -1125,7 +1157,7 @@ namespace lue::utility {
         }
 
 
-        void add_universe(::json const& universe_json, data_model::Universes& universes)
+        void add_universe(nlohmann::json const& universe_json, data_model::Universes& universes)
         {
             std::string const name = universe_json.at("name");
 
@@ -1142,7 +1174,7 @@ namespace lue::utility {
         }
 
 
-        void translate_json_to_lue(::json const& lue_json, data_model::Dataset& dataset)
+        void translate_json_to_lue(nlohmann::json const& lue_json, data_model::Dataset& dataset)
         {
             if (!contains(lue_json, "dataset"))
             {
@@ -1171,7 +1203,8 @@ namespace lue::utility {
     }  // Anonymous namespace
 
 
-    auto translate_json_to_lue(::json const& lue_json, std::string const& dataset_name) -> data_model::Dataset
+    auto translate_json_to_lue(nlohmann::json const& lue_json, std::string const& dataset_name)
+        -> data_model::Dataset
     {
         auto dataset = data_model::create_in_memory_dataset(dataset_name);
 
@@ -1181,7 +1214,8 @@ namespace lue::utility {
     }
 
 
-    void translate_json_to_lue(::json const& lue_json, std::string const& lue_pathname, bool const add)
+    void translate_json_to_lue(
+        nlohmann::json const& lue_json, std::string const& lue_pathname, bool const add)
     {
         // Either create a new dataset or add the information stored in the
         // JSON to an existing dataset
@@ -1206,7 +1240,7 @@ namespace lue::utility {
             throw std::runtime_error("Cannot open " + json_pathname);
         }
 
-        ::json lue_json;
+        nlohmann::json lue_json;
         stream >> lue_json;
 
         if (!contains(lue_json, "dataset"))

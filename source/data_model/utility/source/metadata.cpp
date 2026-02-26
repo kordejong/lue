@@ -1,21 +1,21 @@
 #include "lue/utility/metadata.hpp"
 #include "lue/core/aspect.hpp"
-#include <exception>
 #include <filesystem>
 #include <format>
+#include <fstream>
 
 
 namespace lue {
     namespace utility {
         namespace json {
 
-            bool has_key(JSON const& object, std::string const& name)
+            auto has_key(JSON const& object, std::string const& name) -> bool
             {
-                return !object.is_null() && object.find(name) != object.end();
+                return !object.is_null() && object.contains(name);
             }
 
 
-            bool has_key(JSON const& object, JSONPointer const& pointer)
+            auto has_key(JSON const& object, JSONPointer const& pointer) -> bool
             {
                 return !object.is_null() && !object.value(pointer, JSON()).is_null();
             }
@@ -40,7 +40,7 @@ namespace lue {
             }
 
 
-            JSON object(JSON const& object, std::string const& name)
+            auto object(JSON const& object, std::string const& name) -> JSON
             {
                 assert_has_key(object, name);
 
@@ -48,7 +48,7 @@ namespace lue {
             }
 
 
-            JSON object(JSON const& object, JSONPointer const& pointer)
+            auto object(JSON const& object, JSONPointer const& pointer) -> JSON
             {
                 assert_has_key(object, pointer);
 
@@ -64,11 +64,11 @@ namespace lue {
                 @param      value Value of element to compare
                 @exception  std::runtime_error In case the object cannot be found
             */
-            JSON object(
+            auto object(
                 JSON const& object,
                 JSONPointer const& pointer,
                 std::string const& key,
-                std::string const& value)
+                std::string const& value) -> JSON
             {
                 assert_has_key(object, pointer);
 
@@ -96,7 +96,7 @@ namespace lue {
                 @param      value Value of element to compare
                 @exception  std::runtime_error In case the object cannot be found
             */
-            JSON object(JSON const& object, std::string const& key, std::string const& value)
+            auto object(JSON const& object, std::string const& key, std::string const& value) -> JSON
             {
                 auto const object_json_it = json::find(object, key, value);
 
@@ -110,25 +110,25 @@ namespace lue {
             }
 
 
-            std::string string(JSON const& object, std::string const& name)
+            auto string(JSON const& object, std::string const& name) -> std::string
             {
                 return json::object(object, name);
             }
 
 
-            std::string string(JSON const& object, JSONPointer const& pointer)
+            auto string(JSON const& object, JSONPointer const& pointer) -> std::string
             {
                 return json::object(object, pointer);
             }
 
 
-            bool boolean(JSON const& object, JSONPointer const& pointer)
+            auto boolean(JSON const& object, JSONPointer const& pointer) -> bool
             {
                 return json::object(object, pointer);
             }
 
 
-            JSONPointer pointer(JSON const& object, std::string const& name)
+            auto pointer(JSON const& object, std::string const& name) -> JSONPointer
             {
                 return JSONPointer(string(object, name));
             }
@@ -140,7 +140,7 @@ namespace lue {
                 @param      key Name of element to check
                 @param      value Value of element to find
             */
-            JSONCIterator find(JSON const& object, std::string const& key, std::string const& value)
+            auto find(JSON const& object, std::string const& key, std::string const& value) -> JSONCIterator
             {
                 JSONCIterator it;
 
@@ -159,7 +159,7 @@ namespace lue {
             }
 
 
-            data_model::Clock clock(JSON const& object)
+            auto clock(JSON const& object) -> data_model::Clock
             {
                 return data_model::Clock{object.at("unit"), object.at("nr_units")};
             }
@@ -202,30 +202,31 @@ namespace lue {
         }
 
 
-        JSON const& Metadata::object() const
+        auto Metadata::object() const -> JSON const&
         {
             return _json;
         }
 
 
-        std::string Metadata::string(JSONPointer const& pointer, std::string const& default_value) const
+        auto Metadata::string(JSONPointer const& pointer, std::string const& default_value) const
+            -> std::string
         {
             return json::has_key(_json, pointer) ? json::string(_json, pointer) : default_value;
         }
 
 
-        bool Metadata::boolean(JSONPointer const& pointer, bool const default_value) const
+        auto Metadata::boolean(JSONPointer const& pointer, bool const default_value) const -> bool
         {
             return json::has_key(_json, pointer) ? json::boolean(_json, pointer) : default_value;
         }
 
 
-        std::string Metadata::string(
+        auto Metadata::string(
             std::string const& list_name,
             std::string const& key,
             std::string const& value,
             JSONPointer const& pointer,
-            std::string const& default_value) const
+            std::string const& default_value) const -> std::string
         {
             std::string result = default_value;
 
@@ -255,13 +256,13 @@ namespace lue {
         }
 
 
-        std::string Metadata::string(
+        auto Metadata::string(
             std::string const& list_name,
             std::string const& key,
             std::string const& value,
             JSONPointer const& pointer,
             std::string const& value_key,
-            std::string const& default_value) const
+            std::string const& default_value) const -> std::string
         {
             std::string result = default_value;
 
@@ -299,16 +300,14 @@ namespace lue {
     }  // namespace utility
 
 
-    namespace data_model {
-        namespace time {
+    namespace data_model::time {
 
-            void from_json(utility::JSON const& object, Unit& unit)
-            {
-                unit = string_to_aspect<Unit>(object.get<std::string>());
-                // unit = string_to_unit(object.get<std::string>());
-            }
+        void from_json(utility::JSON const& object, Unit& unit)
+        {
+            unit = string_to_aspect<Unit>(object.get<std::string>());
+            // unit = string_to_unit(object.get<std::string>());
+        }
 
-        }  // namespace time
-    }  // namespace data_model
+    }  // namespace data_model::time
 
 }  // namespace lue

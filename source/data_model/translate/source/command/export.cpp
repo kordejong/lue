@@ -22,13 +22,19 @@ namespace lue::utility {
             []() -> cxxopts::Options
             {
                 cxxopts::Options options{Export::name, "Translate data from the LUE dataset format"};
-                options.add_options()("h,help", "Show usage")(
-                    "m,meta", "File containing metadata to use during export", cxxopts::value<std::string>())(
-                    "input", "Input dataset", cxxopts::value<std::string>())(
-                    "output", "Output dataset", cxxopts::value<std::string>());
-                options.parse_positional({"input", "output"});
+
                 options.positional_help("<input> <output>");
-                options.show_positional_help();
+                options.add_options()
+                    // clang-format off
+                    ("h,help", "Show usage")
+                    ("m,meta", "File containing metadata to use during export",
+                        cxxopts::value<std::string>())
+                    ("input", "Input dataset", cxxopts::value<std::string>())
+                    ("output", "Output dataset", cxxopts::value<std::string>())
+                    // clang-format on
+                    ;
+                options.parse_positional({"input", "output"});
+
                 return options;
             }(),
             argc,

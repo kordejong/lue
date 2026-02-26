@@ -31,12 +31,18 @@ namespace lue::utility {
             {
                 cxxopts::Options options{
                     "lue_translate", "Translate data into or from the LUE dataset format"};
-                options.add_options()("h,help", "Show usage")("v,version", "Show version")(
-                    "command", "Command to use: either import or export", cxxopts::value<std::string>());
+
+                options.positional_help("<convert | import | export>");
+                options.add_options()
+                    // clang-format off
+                    ("h,help", "Show usage")
+                    ("v,version", "Show version")
+                    ("command", "Command to use", cxxopts::value<std::string>())
+                    // clang-format on
+                    ;
                 options.parse_positional({"command"});
-                options.positional_help("<command>");
-                options.show_positional_help();
                 options.allow_unrecognised_options();
+
                 return options;
             }(),
             argc,

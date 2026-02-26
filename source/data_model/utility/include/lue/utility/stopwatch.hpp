@@ -3,47 +3,45 @@
 #include <string>
 
 
-namespace lue {
-    namespace utility {
+namespace lue::utility {
 
-        class Stopwatch
-        {
+    class Stopwatch
+    {
 
-            public:
+        public:
 
-                using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+            using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
 
-                Stopwatch() = default;
+            Stopwatch() = default;
 
-                Stopwatch(Stopwatch const&) = default;
+            Stopwatch(Stopwatch const&) = default;
 
-                Stopwatch(Stopwatch&&) = default;
+            Stopwatch(Stopwatch&&) = default;
 
-                ~Stopwatch() = default;
+            ~Stopwatch() = default;
 
-                Stopwatch& operator=(Stopwatch const&) = default;
+            auto operator=(Stopwatch const&) -> Stopwatch& = default;
 
-                Stopwatch& operator=(Stopwatch&&) = default;
+            auto operator=(Stopwatch&&) -> Stopwatch& = default;
 
-                void start();
+            void start();
 
-                void stop();
+            void stop();
 
-                TimePoint const& start() const;
+            auto start() const -> TimePoint const&;
 
-                TimePoint const& end() const;
+            auto end() const -> TimePoint const&;
 
-                double elapsed_seconds() const;
+            auto elapsed_seconds() const -> double;
 
-            private:
+        private:
 
-                TimePoint _start;
+            TimePoint _start;
 
-                TimePoint _end;
-        };
+            TimePoint _end;
+    };
 
 
-        std::string to_string(Stopwatch::TimePoint const& time_point);
+    auto to_string(Stopwatch::TimePoint const& time_point) -> std::string;
 
-    }  // namespace utility
-}  // namespace lue
+}  // namespace lue::utility

@@ -1,4 +1,5 @@
 #include "lue/data_model/hl/raster_view.hpp"
+#include "lue/hdf5/datatype_traits.hpp"
 #include <algorithm>
 #include <format>
 #include <utility>
@@ -161,7 +162,9 @@ namespace lue::data_model {
                         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
                         auto space_box = const_cast<SpaceDomain&>(space_domain).value<StationarySpaceBox>();
 
-                        if (space_box.nr_boxes() == 1)
+                        if (space_box.file_datatype() ==
+                                hdf5::Datatype{hdf5::StandardDatatypeTraits<double>::type_id()} &&
+                            space_box.nr_boxes() == 1)
                         {
                             space_domain_ok = true;
                         }

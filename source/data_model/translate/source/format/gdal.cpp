@@ -368,6 +368,11 @@ namespace lue::utility {
         // Find information about where to read the raster from: phenomenon/property_set/property
         std::string const dataset_name{std::filesystem::path(raster_name).stem().string()};
 
+        if (metadata.object().empty())
+        {
+            throw std::runtime_error("Metadata is required to export to a raster");
+        }
+
         auto const& root_json = metadata.object();
         auto const datasets_json = json::object(root_json, "datasets");
         auto const dataset_json = json::object(datasets_json, "name", dataset_name);
@@ -380,15 +385,16 @@ namespace lue::utility {
 
         if (nr_bands == 0)
         {
-            return;
+            throw std::runtime_error("No bands found in the metadata");
         }
 
         std::string const driver_name{gdal::driver_name(raster_name)};
 
-        // If the constant raster view finds a raster with the property name
-        // requested, export it to a single GDAL raster
         if (data_model::constant::contains_raster(dataset, phenomenon_name, property_set_name))
         {
+            // If the constant raster view finds a raster with the property name requested, export it to a
+            // single GDAL raster
+
             using RasterView = data_model::constant::RasterView<data_model::Dataset*>;
             using RasterLayer = RasterView::Layer;
 
@@ -469,10 +475,11 @@ namespace lue::utility {
             //     lue_to_gdal(layer, raster_band);
             // }
         }
-        // If the variable raster view finds a raster layer with the property
-        // name requested, export it to a stack of GDAL rasters
         else if (data_model::variable::contains_raster(dataset, phenomenon_name, property_set_name))
         {
+            // If the variable raster view finds a raster layer with the property
+            // name requested, export it to a stack of GDAL rasters
+
             using RasterView = data_model::variable::RasterView<data_model::Dataset*>;
             // using RasterLayer = RasterView::Layer;
 

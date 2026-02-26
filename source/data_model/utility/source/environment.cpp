@@ -4,7 +4,7 @@
 
 namespace lue {
 
-    std::string expand_environment_variables(std::string string)
+    auto expand_environment_variables(std::string string) -> std::string
     {
         static std::regex const expression{R"(\$\{([^}]+)\})"};
         std::smatch match_results;
@@ -18,7 +18,11 @@ namespace lue {
         // Index of first character of range of characters to search in
         std::size_t idx = 0;
 
-        while (std::regex_search(string.cbegin() + idx, string.cend(), match_results, expression))
+        while (std::regex_search(
+            string.cbegin() + static_cast<std::string::difference_type>(idx),
+            string.cend(),
+            match_results,
+            expression))
         {
 
             // A variable name was found in the range of characters

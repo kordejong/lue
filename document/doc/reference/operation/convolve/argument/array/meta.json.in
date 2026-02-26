@@ -1,0 +1,16 @@
+{
+    "datasets": [
+        {
+            "name": "${name}",
+            "phenomenon": "${phenomenon}",
+            "property_set": "${property_set}",
+            "raster": {
+                "bands": [
+                    {
+                        "name": "${property_name}"
+                    }
+                ]
+            }
+        }
+    ]
+}

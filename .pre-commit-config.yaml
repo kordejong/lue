@@ -76,7 +76,6 @@ repos:
                   source/data_model/.*/test/.*|
                   source/data_model/gdal/include/lue/gdal/library.hpp|
                   source/data_model/python/.*|
-                  source/data_model/utility/.*|
                   source/data_model/validate/.*|
                   source/framework/.*|
                   source/python/.*|

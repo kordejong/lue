@@ -1,8 +1,7 @@
 #pragma once
 #include "lue/core/clock.hpp"
 #include "lue/core/time/unit.hpp"
-#include <fstream>
-#include <iostream>
+#include <istream>
 #include <nlohmann/json.hpp>
 
 
@@ -16,33 +15,33 @@ namespace lue {
 
         namespace json {
 
-            bool has_key(JSON const& object, std::string const& name);
+            auto has_key(JSON const& object, std::string const& name) -> bool;
 
-            bool has_key(JSON const& object, JSONPointer const& pointer);
+            auto has_key(JSON const& object, JSONPointer const& pointer) -> bool;
 
-            JSON object(JSON const& object, std::string const& name);
+            auto object(JSON const& object, std::string const& name) -> JSON;
 
-            JSON object(JSON const& object, JSONPointer const& pointer);
+            auto object(JSON const& object, JSONPointer const& pointer) -> JSON;
 
-            JSON object(
+            auto object(
                 JSON const& object,
                 JSONPointer const& pointer,
                 std::string const& key,
-                std::string const& value);
+                std::string const& value) -> JSON;
 
-            JSON object(JSON const& object, std::string const& key, std::string const& value);
+            auto object(JSON const& object, std::string const& key, std::string const& value) -> JSON;
 
-            std::string string(JSON const& object, std::string const& name);
+            auto string(JSON const& object, std::string const& name) -> std::string;
 
-            std::string string(JSON const& object, JSONPointer const& pointer);
+            auto string(JSON const& object, JSONPointer const& pointer) -> std::string;
 
-            bool boolean(JSON const& object, JSONPointer const& pointer);
+            auto boolean(JSON const& object, JSONPointer const& pointer) -> bool;
 
-            JSONPointer pointer(JSON const& object, std::string const& name);
+            auto pointer(JSON const& object, std::string const& name) -> JSONPointer;
 
-            JSONCIterator find(JSON const& object, std::string const& key, std::string const& value);
+            auto find(JSON const& object, std::string const& key, std::string const& value) -> JSONCIterator;
 
-            data_model::Clock clock(JSON const& object);
+            auto clock(JSON const& object) -> data_model::Clock;
 
         }  // namespace json
 
@@ -67,30 +66,31 @@ namespace lue {
 
                 ~Metadata() = default;
 
-                Metadata& operator=(Metadata&& other) = default;
+                auto operator=(Metadata&& other) -> Metadata& = default;
 
-                Metadata& operator=(Metadata const& other) = delete;
+                auto operator=(Metadata const& other) -> Metadata& = delete;
 
-                JSON const& object() const;
+                auto object() const -> JSON const&;
 
-                std::string string(JSONPointer const& pointer, std::string const& default_value) const;
+                auto string(JSONPointer const& pointer, std::string const& default_value) const
+                    -> std::string;
 
-                std::string string(
+                auto string(
                     std::string const& list_name,
                     std::string const& key,
                     std::string const& value,
                     JSONPointer const& pointer,
-                    std::string const& default_value) const;
+                    std::string const& default_value) const -> std::string;
 
-                std::string string(
+                auto string(
                     std::string const& list_name,
                     std::string const& key,
                     std::string const& value,
                     JSONPointer const& pointer,
                     std::string const& value_key,
-                    std::string const& default_value) const;
+                    std::string const& default_value) const -> std::string;
 
-                bool boolean(JSONPointer const& pointer, bool default_value) const;
+                auto boolean(JSONPointer const& pointer, bool default_value) const -> bool;
 
             private:
 
@@ -100,11 +100,10 @@ namespace lue {
     }  // namespace utility
 
 
-    namespace data_model {
-        namespace time {
+    namespace data_model::time {
 
-            void from_json(utility::JSON const& object, Unit& unit);
+        void from_json(utility::JSON const& object, Unit& unit);
 
-        }  // namespace time
-    }  // namespace data_model
+    }  // namespace data_model::time
+
 }  // namespace lue

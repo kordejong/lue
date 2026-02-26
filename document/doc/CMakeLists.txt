@@ -1,3 +1,5 @@
+add_subdirectory(reference)
+
 set(LUE_TITLE "LUE documentation")
 set(LUE_AUTHOR "Computational Geography R&D Team")
 set(LUE_BOOK_BASENAME "lue-${CMAKE_PROJECT_VERSION}")

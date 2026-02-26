@@ -1,0 +1,61 @@
+{
+    "dataset": {
+        "phenomena": [
+            {
+                "name": "phenomenon",
+                "object_id": [5],
+                "property_sets": [
+                    {
+                        "name": "area",
+                        "space_domain": {
+                            "datatype": "float64",
+                            "rank": 2,
+                            "space_box": [
+                                0, 0, 5, 5
+                            ]
+                        },
+                        "properties": [
+                            {
+                                "name": "space_grid_shape",
+                                "shape_per_object": "same_shape",
+                                "value_variability": "constant",
+                                "datatype": "uint64",
+                                "shape": [
+                                    2
+                                ],
+                                "value": [
+                                    5, 5
+                                ]
+                            },
+                            {
+                                "name": "5x5-float32",
+                                "shape_per_object": "different_shape",
+                                "value_variability": "constant",
+                                "datatype": "float32",
+                                "rank": 2,
+                                "value": [
+                                    {
+                                        "id": 5,
+                                        "shape": [5, 5],
+                                        "no-data": -999.0,
+                                        "value": [
+                                            1.0,  1.0,  1.0,  -4.0,  -4.0,
+                                            2.0, -999.0,  2.0,  -4.0,  -4.0,
+                                            3.0,  6.0,  3.0,   3.0,   3.0,
+                                            4.0,  2.0,  3.0,   3.0,   3.0,
+                                            0.0, 14.0,  3.0,  -1.0,   0.0
+                                        ]
+                                    }
+                                ],
+                                "space_discretization": {
+                                    "type": "regular_grid",
+                                    "property": "/phenomenon/area/space_grid_shape"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

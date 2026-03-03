@@ -49,12 +49,13 @@ namespace lue::data_model::different_shape {
         @param      ids For each object, the object ID
         @param      shapes For each object, the shape of the object array
     */
-    void Value::expand(Count const nr_objects, ID const* ids, hdf5::Shape const* shapes)
+    void Value::expand(
+        Count const nr_objects, ID const* ids, hdf5::Shape const* shapes, void const* no_data_value)
     {
         for (Index object_idx = 0; object_idx < nr_objects; ++object_idx)
         {
             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            expand_core(ids[object_idx], shapes[object_idx]);
+            expand_core(ids[object_idx], shapes[object_idx], no_data_value);
         }
 
         _nr_objects += nr_objects;
@@ -70,14 +71,22 @@ namespace lue::data_model::different_shape {
         @param      shapes For each object, the shape of the object array. For each object, @a shapes must
                     contain rank sizes.
     */
-    void Value::expand(Count const nr_objects, ID const* ids, hdf5::Shape::value_type const* shapes)
+    void Value::expand(
+        Count const nr_objects,
+        ID const* ids,
+        hdf5::Shape::value_type const* shapes,
+        void const* no_data_value)
     {
         Rank const rank{this->rank()};
 
         for (Index object_idx = 0, shape_idx = 0; object_idx < nr_objects; ++object_idx, shape_idx += rank)
         {
-            // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-            expand_core(ids[object_idx], hdf5::Shape{shapes[shape_idx], shapes[shape_idx + 1]});
+            expand_core(
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                ids[object_idx],
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                hdf5::Shape{shapes[shape_idx], shapes[shape_idx + 1]},
+                no_data_value);
         }
 
         _nr_objects += nr_objects;

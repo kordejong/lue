@@ -35,9 +35,17 @@ namespace lue::data_model::different_shape {
 
             auto nr_objects() const -> Count;
 
-            void expand(Count nr_objects, ID const* ids, hdf5::Shape const* shapes);
+            void expand(
+                Count nr_objects,
+                ID const* ids,
+                hdf5::Shape const* shapes,
+                void const* no_data_value = nullptr);
 
-            void expand(Count nr_objects, ID const* ids, hdf5::Shape::value_type const* shapes);
+            void expand(
+                Count nr_objects,
+                ID const* ids,
+                hdf5::Shape::value_type const* shapes,
+                void const* no_data_value = nullptr);
 
             void expand(ID id, hdf5::Shape const& shape, void const* no_data_value = nullptr);
 

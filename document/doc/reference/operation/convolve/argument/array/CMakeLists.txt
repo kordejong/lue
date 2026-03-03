@@ -3,27 +3,30 @@ set(nr_cols "5")
 set(element_type "float32")
 set(name "${nr_rows}x${nr_cols}-${element_type}")
 
-set(phenomenon "phenomenon")
-set(property_set "area")
-set(property_name "${name}")
-
-configure_file(
-    "meta.json.in"
-    "${name}-meta.json"
-)
-
-# TODO: Import no-data value from json to lue
 add_custom_command(
-    OUTPUT "${name}.lue"
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.json"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}-meta.json"
     DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/${name}.json"
-    COMMAND "$<TARGET_FILE:lue_translate>" import
-        "${CMAKE_CURRENT_BINARY_DIR}/${name}.lue"
-        "${CMAKE_CURRENT_SOURCE_DIR}/${name}.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/${name}.txt"
+    COMMAND
+        ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_import_example_data.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/${name}.txt"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.json"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}-meta.json"
     VERBATIM
 )
 
-# TODO: Export no-data value from lue to tif
+add_custom_command(
+    OUTPUT "${name}.lue"
+    DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.json"
+    COMMAND "$<TARGET_FILE:lue_translate>" import
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.lue"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.json"
+    VERBATIM
+)
+
 add_custom_command(
     OUTPUT "${name}.tif"
     DEPENDS
@@ -35,6 +38,23 @@ add_custom_command(
     VERBATIM
 )
 
+add_custom_command(
+    OUTPUT
+        "${name}.pdf"
+        "${name}.svg"
+    DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.tif"
+    COMMAND
+        ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.tif"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.pdf"
+    COMMAND
+        ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.tif"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}.svg"
+    VERBATIM
+)
+
 add_custom_target("lue.documentation.reference.operation.array.${name}"
-    DEPENDS "${name}.tif"
+    DEPENDS "${name}.svg"
 )

@@ -313,11 +313,15 @@ namespace lue::utility {
             {
                 data_model::ID const id = a_value_json.at("id");
 
+                std::optional<Datatype> no_data_value{};
+
                 if (contains(a_value_json, "dataset"))
                 {
                     // Value is stored in an external dataset
                     std::string const dataset_name = expand_environment_variables(a_value_json.at("dataset"));
                     shape = read_gdal_raster(dataset_name, values);
+
+                    // TODO: no_data_value
                 }
                 else
                 {
@@ -326,6 +330,11 @@ namespace lue::utility {
                     shape = a_value_json.at("shape");
                     // values = a_value_json.get<decltype(values)>();
                     values = a_value_json.at("value").get<decltype(values)>();
+
+                    if (contains(a_value_json, "no_data"))
+                    {
+                        no_data_value = a_value_json.at("no_data");
+                    }
                 }
 
                 // Each object has a uniquely shaped value. This value does not
@@ -333,7 +342,7 @@ namespace lue::utility {
                 // already exist.
                 // assert(!property.value().exists(id));
 
-                property.value().expand(1, &id, &shape);
+                property.value().expand(1, &id, &shape, no_data_value ? &no_data_value.value() : nullptr);
                 property.value()[id].write(values.data());
             }
 

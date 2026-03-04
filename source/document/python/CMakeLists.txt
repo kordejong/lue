@@ -9,6 +9,7 @@ foreach(module_name
     "cli/__init__.py"
     "cli/create_example_figure.py"
     "cli/import_example_data.py"
+    "cli/main.py"
     "data/__init__.py"
     "figure/__init__.py"
     "figure/map/__init__.py"

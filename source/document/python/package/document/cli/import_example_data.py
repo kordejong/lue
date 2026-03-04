@@ -6,8 +6,10 @@ import docopt
 from lue import __version__ as version
 
 from ..data import import_example_data
+from .main import main_function
 
 
+@main_function
 def main() -> None:
     """Command line interface for command."""
     command = Path(sys.argv[0]).name

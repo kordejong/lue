@@ -47,11 +47,8 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
         "${CMAKE_CURRENT_BINARY_DIR}/${name}.tif"
-        "${CMAKE_CURRENT_BINARY_DIR}/${name}.pdf"
-    COMMAND
-        ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
-        "${CMAKE_CURRENT_BINARY_DIR}/${name}.tif"
-        "${CMAKE_CURRENT_BINARY_DIR}/${name}.svg"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}"
+        pdf svg
     VERBATIM
 )
 

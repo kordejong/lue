@@ -654,7 +654,14 @@ namespace lue::utility {
                             // constant_value / same_shape
                             using Properties = data_model::same_shape::Properties;
 
-                            if (datatype_json == "uint32")
+                            if (datatype_json == "uint8")
+                            {
+                                using Datatype = std::uint8_t;
+
+                                add_same_shape_property<Datatype>(
+                                    property_json, properties.collection<Properties>());
+                            }
+                            else if (datatype_json == "uint32")
                             {
                                 using Datatype = std::uint32_t;
 
@@ -702,7 +709,14 @@ namespace lue::utility {
                             // constant_value / different_shape
                             using Properties = data_model::different_shape::Properties;
 
-                            if (datatype_json == "uint32")
+                            if (datatype_json == "uint8")
+                            {
+                                using Datatype = std::uint8_t;
+
+                                add_different_shape_property<Datatype>(
+                                    property_json, properties.collection<Properties>());
+                            }
+                            else if (datatype_json == "uint32")
                             {
                                 using Datatype = std::uint32_t;
 

@@ -1,0 +1,8 @@
+kind: kernel
+shape: 3, 3
+value_scale: boolean
+element_type: uint8
+
+1, 1, 1,
+1, 1, 1,
+1, 1, 1,

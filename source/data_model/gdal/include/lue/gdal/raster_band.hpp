@@ -132,4 +132,9 @@ namespace lue::gdal {
         return detail::set_no_data_value(band, value) == CE_None;
     }
 
+    void set_metadata(
+        GDALRasterBand& band, std::string const& key, std::string const& value, std::string const& domain);
+
+    auto metadata(GDALRasterBand& band, std::string const& key, std::string const& domain) -> std::string;
+
 }  // namespace lue::gdal

@@ -74,6 +74,10 @@ namespace lue::gdal {
 
                     auto write(Shape const& shape, GDALDataType data_type, void* buffer) -> void;
 
+                    void set_metadata(
+                        std::string const& key, std::string const& value, std::string const& domain);
+
+                    auto metadata(std::string const& key, std::string const& domain) -> std::string;
 
                 private:
 

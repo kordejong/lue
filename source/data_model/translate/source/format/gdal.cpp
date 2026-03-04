@@ -277,7 +277,10 @@ namespace lue::utility {
 
 
     template<typename T>
-    void lue_to_gdal(data_model::Array const& array, gdal::Raster::Band& raster_band)
+    void lue_to_gdal(
+        data_model::Array const& array,
+        gdal::Raster::Band& raster_band,
+        std::map<std::string, std::string> const& tags)
     {
         if (array.has_no_data_value())
         {
@@ -312,48 +315,56 @@ namespace lue::utility {
                 raster_band.write_block({block_y, block_x}, values.data());
             }
         }
+
+        for (auto const& [key, value] : tags)
+        {
+            raster_band.set_metadata(key, value, "lue");
+        }
     }
 
 
-    void lue_to_gdal(data_model::Array const& array, gdal::Raster::Band& raster_band)
+    void lue_to_gdal(
+        data_model::Array const& array,
+        gdal::Raster::Band& raster_band,
+        std::map<std::string, std::string> const& tags)
     {
         hdf5::Datatype const memory_datatype{gdal_data_type_to_memory_data_type(raster_band.data_type())};
 
         if (memory_datatype == hdf5::native_uint8)
         {
-            lue_to_gdal<std::uint8_t>(array, raster_band);
+            lue_to_gdal<std::uint8_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint16)
         {
-            lue_to_gdal<std::uint16_t>(array, raster_band);
+            lue_to_gdal<std::uint16_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int16)
         {
-            lue_to_gdal<std::int16_t>(array, raster_band);
+            lue_to_gdal<std::int16_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint32)
         {
-            lue_to_gdal<std::uint32_t>(array, raster_band);
+            lue_to_gdal<std::uint32_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int32)
         {
-            lue_to_gdal<std::int32_t>(array, raster_band);
+            lue_to_gdal<std::int32_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint64)
         {
-            lue_to_gdal<std::uint64_t>(array, raster_band);
+            lue_to_gdal<std::uint64_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int64)
         {
-            lue_to_gdal<std::int64_t>(array, raster_band);
+            lue_to_gdal<std::int64_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_float32)
         {
-            lue_to_gdal<float>(array, raster_band);
+            lue_to_gdal<float>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_float64)
         {
-            lue_to_gdal<double>(array, raster_band);
+            lue_to_gdal<double>(array, raster_band, tags);
         }
         else
         {
@@ -412,6 +423,13 @@ namespace lue::utility {
                         property_set_name));
             }
 
+            std::map<std::string, std::string> tags{};
+
+            if (json ::has_key(*it, "value_scale"))
+            {
+                tags["value_scale"] = json::string(*it, "value_scale");
+            }
+
             RasterLayer layer{raster_view.layer(property_name)};
             auto const& space_box{raster_view.space_box()};
             gdal::Shape const raster_shape{hdf5_shape_to_gdal_shape(raster_view.grid_shape())};
@@ -454,7 +472,7 @@ namespace lue::utility {
 
             gdal::Count band_nr{1};
             gdal::Raster::Band raster_band{raster.band(band_nr)};
-            lue_to_gdal(layer, raster_band);
+            lue_to_gdal(layer, raster_band, tags);
 
 
             // TODO

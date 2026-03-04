@@ -129,4 +129,31 @@ namespace lue::gdal {
         write(band, {0, 0}, raster_shape, data_type, buffer);
     }
 
+
+    void set_metadata(
+        GDALRasterBand& band,
+        std::string const& key,
+        std::string const& value,
+        [[maybe_unused]] std::string const& domain)
+    {
+        auto cpl_status = band.SetMetadataItem(key.c_str(), value.c_str(), domain.c_str());
+
+        if (cpl_status != CE_None)
+        {
+            throw std::runtime_error("Cannot set metadata item to GDAL raster band");
+        }
+    }
+
+    auto metadata(GDALRasterBand& band, std::string const& key, std::string const& domain) -> std::string
+    {
+        char const* item = band.GetMetadataItem(key.c_str(), domain.c_str());
+
+        if (item == nullptr)
+        {
+            throw std::runtime_error("Cannot get metadata item from GDAL raster band");
+        }
+
+        return item;
+    }
+
 }  // namespace lue::gdal

@@ -1,7 +1,7 @@
 kind: kernel
 shape: 3, 3
-value_scale: boolean
-element_type: uint8
+value_scale: scalar
+element_type: float32
 
 1, 1, 1,
 1, 1, 1,

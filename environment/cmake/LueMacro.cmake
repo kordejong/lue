@@ -524,3 +524,169 @@ function(lue_configure_static_library_for_tests)
             ${link_libraries}
     )
 endfunction()
+
+
+function(tif_to_figure)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAME
+        TARGET
+        SOURCE_PREFIX
+        DESTINATION_PREFIX
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(basename ${ARG_BASENAME})
+    set(source_prefix ${ARG_SOURCE_PREFIX})
+    set(destination_prefix ${ARG_DESTINATION_PREFIX})
+
+    add_custom_command(
+        OUTPUT
+            "${destination_prefix}/${basename}.pdf"
+            "${destination_prefix}/${basename}.svg"
+        DEPENDS
+            "${source_prefix}/${basename}.tif"
+        COMMAND
+            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+            "${source_prefix}/${basename}.tif"
+            "${destination_prefix}/${basename}"
+            pdf svg
+        VERBATIM
+    )
+
+    add_custom_target(${ARG_TARGET}
+        DEPENDS
+            "${destination_prefix}/${basename}.pdf"
+            "${destination_prefix}/${basename}.svg"
+    )
+endfunction()
+
+
+function(example_to_figure)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAME
+        TARGET
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(basename ${ARG_BASENAME})
+
+    add_custom_command(
+        OUTPUT
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        DEPENDS
+            "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
+        COMMAND
+            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_import_example_data.py"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        VERBATIM
+    )
+
+    add_custom_command(
+        OUTPUT "${basename}.lue"
+        DEPENDS
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+        COMMAND "$<TARGET_FILE:lue_translate>" import
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.lue"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+        VERBATIM
+    )
+
+    # TODO: Assuming we need to produce a tif, which may not be the case. Example data may end up in
+    #       something else. Generalize.
+    add_custom_command(
+        OUTPUT "${basename}.tif"
+        DEPENDS
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.lue"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        COMMAND "$<TARGET_FILE:lue_translate>" export
+            --meta "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+            "${basename}.lue" "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
+        VERBATIM
+    )
+
+    tif_to_figure(
+        BASENAME
+            ${ARG_BASENAME}
+        TARGET
+            ${ARG_TARGET}
+        SOURCE_PREFIX
+            ${CMAKE_CURRENT_BINARY_DIR}
+        DESTINATION_PREFIX
+            ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    # add_custom_command(
+    #     OUTPUT
+    #         "${basename}.pdf"
+    #         "${basename}.svg"
+    #     DEPENDS
+    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
+    #     COMMAND
+    #         ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
+    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}"
+    #         pdf svg
+    #     VERBATIM
+    # )
+    #
+    # add_custom_target(${ARG_TARGET}
+    #     DEPENDS
+    #         "${basename}.pdf"
+    #         "${basename}.svg"
+    # )
+endfunction()
+
+
+function(examples_to_figures)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAMES
+        TARGET
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    add_custom_target(${ARG_TARGET})
+
+    foreach(basename ${ARG_BASENAMES})
+        set(target "${ARG_TARGET}.${basename}")
+
+        example_to_figure(
+            BASENAME ${basename}
+            TARGET ${target}
+        )
+
+        add_dependencies(${ARG_TARGET} ${target})
+    endforeach()
+endfunction()

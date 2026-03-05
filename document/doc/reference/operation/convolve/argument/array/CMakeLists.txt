@@ -1,6 +1,6 @@
 examples_to_figures(
     BASENAMES
-        "5x5-float32"
+        5x5-float32
     TARGET
-        "lue.documentation.reference.operation.convolve.array"
+        ${argument_target_name}.array.figure
 )

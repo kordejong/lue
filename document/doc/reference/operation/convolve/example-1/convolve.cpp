@@ -16,11 +16,8 @@ class Example: public lue::document::Example
                     cxxopts::Options options{std::filesystem::path{argv[0]}.filename()};
 
                     options.positional_help("<array> <kernel> <result>");
-                    options.custom_help("");
                     options.add_options()
                         // clang-format off
-                        ("h,help", "Show usage")
-                        ("v,version", "Show version")
                         ("argument_array", "array to read", cxxopts::value<std::string>())
                         ("argument_kernel", "kernel to read", cxxopts::value<std::string>())
                         ("result_array", "array to write", cxxopts::value<std::string>())

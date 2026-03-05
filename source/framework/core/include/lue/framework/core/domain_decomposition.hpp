@@ -357,7 +357,11 @@ namespace lue {
             // is not possible.
             Count const min_array_dimension_extent{*std::min_element(array_shape.begin(), array_shape.end())};
 
-            dimension_size = std::max(Count{1}, min_array_dimension_extent / nr_worker_threads);
+            // Make partition extents at least 10 elements ...
+            dimension_size = std::max(Count{rank * 10}, min_array_dimension_extent / nr_worker_threads);
+
+            // ... but shrink them in case the array extent is smaller than that
+            dimension_size = std::min(dimension_size, min_array_dimension_extent);
         }
         else
         {

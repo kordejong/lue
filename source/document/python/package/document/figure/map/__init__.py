@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -39,15 +40,46 @@ def colour_map(raster: rasterio.io.DatasetReader) -> str:
     return colour_map_by_value_scale[value_scale]
 
 
+def skip(value, no_data_value) -> bool:
+    if math.isnan(no_data_value):
+        return math.isnan(value)
+    else:
+        return value == no_data_value
+
+
 def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None:
     # https://py.geocompx.org
     raster = rasterio.open(raster_path)
     nr_rows, nr_cols = raster.shape
     figure, axes = plt.subplots(figsize=(nr_rows, nr_cols))
 
-    # TODO: Style:
-    #       - Show cell values (or legend?)
     rasterio.plot.show(raster, ax=axes, cmap=colour_map(raster))
+    axes.set_axis_off()
+
+    nodata_value = raster.nodata
+    array = raster.read(1)
+    x_coordinates, y_coordinates, cell_values = [], [], []
+    coordinates = []
+
+    for row in range(nr_rows):
+        for col in range(nr_cols):
+            x_coordinate, y_coordinate = raster.xy(row, col)
+            coordinates.append(raster.xy(row, col))
+            cell_value = array[row, col]
+
+            x_coordinates.append(x_coordinate)
+            y_coordinates.append(y_coordinate)
+            cell_values.append(cell_value)
+
+    for idx, coordinate in enumerate(coordinates):
+        if not skip(cell_values[idx], nodata_value):
+            axes.annotate(
+                f"{cell_values[idx]}",
+                xy=coordinate,
+                textcoords="data",
+                ha="center",
+                va="center",
+            )
 
     for format in formats:
         plt.savefig(figure_path.with_suffix(f".{format}"), transparent=True)

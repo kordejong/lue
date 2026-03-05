@@ -25,27 +25,40 @@ array is likely to contain less no-data values than the input array.
 
 ## Example
 
+<!--
+```{code-block} c++
+auto const kernel = lue::box_kernel<float, rank>(1, 1);
+auto const result = lue::value_policies::convolve(array, kernel);
+```
+-->
+
 ````{tab-set-code}
 
 ```{code-block} c
 /* TODO */
 ```
 
-```{code-block} c++
-auto const kernel = lue::box_kernel<float, rank>(1, 1);
-auto const result = lue::value_policies::convolve(array, kernel);
+```{literalinclude} convolve/example-1/convolve.cpp
+:start-after: [example
+:end-before: example]
+:language: c++
 ```
 
 ```{code-block} java
 // TODO
 ```
 
-```{code-block} python
-kernel = np.full((3, 3), 1, dtype=np.float32)
-result = lfr.convolve(array, kernel)
+```{literalinclude} convolve/example-1/convolve.py
+:start-after: [example
+:end-before: example]
+:language: python
 ```
 
 ````
+
+| `array` | `kernel` | `result` |
+| --- | --- | --- |
+| ![array](convolve/argument/array/5x5-float32.svg) | ![kernel](convolve/argument/kernel/3x3-float32.svg) | ![result](convolve/example-1/result/cxx/convolve-1.svg) |
 
 ## See also
 

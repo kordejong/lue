@@ -157,6 +157,14 @@ if(LATEX_FOUND)
         endif()
     endforeach()
 
+    add_custom_command(
+        TARGET lue.figure.logo.colour
+        POST_BUILD
+        BYPRODUCTS "lue_logo-colour.svg"
+        COMMAND ${CMAKE_COMMAND} -E copy "logo-colour.svg" "../doc/lue_logo-colour.svg"
+        VERBATIM
+    )
+
     if(ImageMagick_FOUND)
         set(style colour)
         set(figure icon)

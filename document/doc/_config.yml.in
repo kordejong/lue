@@ -4,7 +4,7 @@
 title: @LUE_TITLE@
 copyright: 2016-now -- This work is licensed under Creative Commons Attribution 4.0 International (CC-BY-4.0)
 author: @LUE_AUTHOR@
-# TODO logo: logo.png
+logo: lue_logo-colour.svg
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html

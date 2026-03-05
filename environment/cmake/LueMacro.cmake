@@ -637,26 +637,6 @@ function(example_to_figure)
         DESTINATION_PREFIX
             ${CMAKE_CURRENT_BINARY_DIR}
     )
-
-    # add_custom_command(
-    #     OUTPUT
-    #         "${basename}.pdf"
-    #         "${basename}.svg"
-    #     DEPENDS
-    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
-    #     COMMAND
-    #         ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
-    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
-    #         "${CMAKE_CURRENT_BINARY_DIR}/${basename}"
-    #         pdf svg
-    #     VERBATIM
-    # )
-    #
-    # add_custom_target(${ARG_TARGET}
-    #     DEPENDS
-    #         "${basename}.pdf"
-    #         "${basename}.svg"
-    # )
 endfunction()
 
 

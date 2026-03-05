@@ -60,13 +60,14 @@ class Example: public lue::document::Example
             using Array = lue::PartitionedArray<Element, rank>;
 
             // I/O
-            Kernel const kernel = read_kernel<Weight, rank>(argument_kernel_pathname);
             Array const array = read_array<Element, rank>(argument_array_pathname);
+            Kernel const kernel = read_kernel<Weight, rank>(argument_kernel_pathname);
 
-            // Start example
+            // [example
             Array const result = lue::value_policies::convolve(array, kernel);
-            // End example
+            // example]
 
+            // I/O
             lue::to_gdal(result, result_array_pathname);
 
             return EXIT_SUCCESS;

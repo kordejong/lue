@@ -13,6 +13,7 @@ foreach(module_name
     "data/__init__.py"
     "figure/__init__.py"
     "figure/map/__init__.py"
+    "io/__init__.py"
 )
     file(GENERATE
         OUTPUT "${install_prefix}/${module_name}"

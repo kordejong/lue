@@ -27,10 +27,10 @@ target_sources(lue_document
 )
 
 target_link_libraries(lue_document
-    PRIVATE
-        lue::gdal
     PUBLIC
+        lue::framework_algorithm
         lue::framework_io
+        lue::gdal
         lue::utility
 )
 

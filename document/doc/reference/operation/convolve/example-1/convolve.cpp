@@ -2,11 +2,6 @@
 #include "lue/document.hpp"
 #include <hpx/hpx_main.hpp>
 
-// TODO: refactor
-#include "lue/framework/algorithm/kernel.hpp"
-#include "lue/framework/io/gdal.hpp"
-#include "lue/gdal.hpp"
-
 
 class Example: public lue::document::Example
 {
@@ -45,7 +40,7 @@ class Example: public lue::document::Example
 
         auto run_implementation() -> int override
         {
-            // Obtain command line arguments
+            // Command line arguments
             if (!argument_parsed("argument_array") || !argument_parsed("argument_kernel") ||
                 !argument_parsed("result_array"))
             {
@@ -56,25 +51,21 @@ class Example: public lue::document::Example
             auto const argument_kernel_pathname = argument<std::string>("argument_kernel");
             auto const result_array_pathname = argument<std::string>("result_array");
 
-            // Setup types
+            // Types
             lue::Rank const rank{2};
 
             using Weight = float;
             using Kernel = lue::Kernel<Weight, rank>;
             using Element = float;
             using Array = lue::PartitionedArray<Element, rank>;
-            using Shape = lue::ShapeT<Array>;
 
+            // I/O
+            Kernel const kernel = read_kernel<Weight, rank>(argument_kernel_pathname);
+            Array const array = read_array<Element, rank>(argument_array_pathname);
 
-            Kernel kernel{{3, 3}};
-
-            lue::gdal::register_gdal_drivers();
-            auto raster =
-                lue::gdal::Raster{lue::gdal::open_dataset(argument_kernel_pathname, GDALAccess::GA_ReadOnly)};
-            raster.band(1).read(kernel.data());
-
-            Array const array = lue::from_gdal<Element>(argument_array_pathname, Shape{5, 5});
+            // Start example
             Array const result = lue::value_policies::convolve(array, kernel);
+            // End example
 
             lue::to_gdal(result, result_array_pathname);
 

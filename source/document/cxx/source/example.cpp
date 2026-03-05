@@ -1,4 +1,5 @@
 #include "lue/document/example.hpp"
+#include "lue/gdal.hpp"
 
 
 namespace lue::document {
@@ -8,6 +9,7 @@ namespace lue::document {
         utility::Application{std::move(options), argc, argv}
 
     {
+        lue::gdal::register_gdal_drivers();
     }
 
 }  // namespace lue::document

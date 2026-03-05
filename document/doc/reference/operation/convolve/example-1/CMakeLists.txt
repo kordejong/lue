@@ -10,12 +10,9 @@ set(result1 "${result1_basename}.tif")
 set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/../argument")
 set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result")
 
-# Prepare argument data
-
 # /${operation}/${algorithm_group}/
 # /${operation}/${algorithm_group}/
 
-# set(target_name "lue.documentation.reference.operation.${operation}.example-${example_nr}")
 set(target_name "${operation}.example-${example_nr}")
 
 add_executable(${target_name}

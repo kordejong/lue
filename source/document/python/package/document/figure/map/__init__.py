@@ -41,10 +41,13 @@ def colour_map(raster: rasterio.io.DatasetReader) -> str:
 
 
 def skip(value, no_data_value) -> bool:
-    if math.isnan(no_data_value):
-        return math.isnan(value)
-    else:
-        return value == no_data_value
+    if no_data_value is not None:
+        if isinstance(no_data_value, float) and math.isnan(no_data_value):
+            return math.isnan(value)
+        else:
+            return value == no_data_value
+
+    return False
 
 
 def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None:
@@ -73,12 +76,19 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
 
     for idx, coordinate in enumerate(coordinates):
         if not skip(cell_values[idx], nodata_value):
-            axes.annotate(
+            annotation = axes.annotate(
                 f"{cell_values[idx]}",
                 xy=coordinate,
                 textcoords="data",
                 ha="center",
                 va="center",
+            )
+            annotation.set_bbox(
+                dict(
+                    facecolor="#d8dee9",
+                    alpha=0.3,
+                    linewidth=0,
+                )
             )
 
     for format in formats:

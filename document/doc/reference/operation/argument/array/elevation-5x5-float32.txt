@@ -1,0 +1,10 @@
+kind: array
+shape: 5, 5
+value_scale: scalar
+element_type: float32
+
+23, 29, 11,  7,  6,
+35, 24,  7,  5,  3,
+36, 21, 13, 12, 17,
+37, 10, 10, 15, 19,
+35, 31, 27, 24, 29,

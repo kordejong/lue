@@ -5,7 +5,7 @@ link_example_arguments(
     TARGET
         ${example_target_name}.argument
     PATHNAMES
-        ../argument/array/5x5-float32
+        ../../argument/array/elevation-5x5-float32
 )
 
 add_operation_example(
@@ -18,7 +18,7 @@ add_operation_example(
     LINK_LIBRARIES
         lue::framework_${algorithm_group}_operation
     ARGUMENT_NAMES
-        array/5x5-float32.tif
+        array/elevation-5x5-float32.tif
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
     DEPENDS

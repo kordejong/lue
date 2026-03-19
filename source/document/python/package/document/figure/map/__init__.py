@@ -55,7 +55,7 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
     raster = rasterio.open(raster_path)
     array = raster.read(1)
     nr_rows, nr_cols = raster.shape
-    scale = 5 / max(nr_rows, nr_cols)
+    scale = 4 / max(nr_rows, nr_cols)
     show_values = nr_rows <= 10 and nr_cols <= 10
     show_legend = not show_values
 
@@ -106,7 +106,6 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
         plt.colorbar(image, cax=cax)
 
     for format in formats:
-        print(figure_path)
         plt.savefig(
             figure_path.with_suffix(f".{format}"), transparent=True, bbox_inches="tight"
         )

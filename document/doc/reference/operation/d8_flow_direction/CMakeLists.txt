@@ -1,5 +1,5 @@
-set(algorithm_group miscellaneous)
-set(operation_name open_simplex_noise)
+set(algorithm_group routing)
+set(operation_name d8_flow_direction)
 set(nr_examples 1)
 
 set(this_operation_target_name ${operation_target_name}.${operation_name})

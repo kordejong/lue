@@ -1,4 +1,4 @@
-set(argument_target_name ${operation_target_name}.argument)
+set(argument_target_name ${this_operation_target_name}.argument)
 
 add_subdirectory(array)
 add_subdirectory(kernel)

@@ -1,5 +1,5 @@
 set(example_nr 1)
-set(example_target_name ${operation_target_name}.example-${example_nr})
+set(example_target_name ${this_operation_target_name}.example-${example_nr})
 
 add_operation_example(
     NAME

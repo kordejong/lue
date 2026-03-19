@@ -12,11 +12,13 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conan.yml"
+      - "!document/*"
       - "!environment/easybuild/*"
   push:
     branches:
       - "master"
     paths-ignore:
+      - "document/*"
       - "environment/easybuild/*"
   workflow_dispatch:
 

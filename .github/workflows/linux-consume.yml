@@ -5,11 +5,13 @@ on:
     branches-ignore:
       - "*"
     paths-ignore:
+      - "document/*"
       - "environment/easybuild/*"
   push:
     branches-ignore:
       - "*"
     paths-ignore:
+      - "document/*"
       - "environment/easybuild/*"
 
 concurrency:

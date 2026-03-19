@@ -1,32 +1,12 @@
 set(example_nr 1)
-set(example_target_name ${operation_target_name}.example-${example_nr})
+set(example_target_name ${this_operation_target_name}.example-${example_nr})
 
-add_custom_command(
-    OUTPUT
-        argument/array/5x5-float32.tif
-    DEPENDS
-        ${operation_target_name}.argument
-    COMMAND
-        ${CMAKE_COMMAND} -E make_directory argument/array
-    COMMAND
-        ${CMAKE_COMMAND} -E create_symlink
-            ../../../argument/array/5x5-float32.tif
-            argument/array/5x5-float32.tif
-    VERBATIM
-)
-
-add_custom_command(
-    OUTPUT
-        argument/kernel/3x3-float32.tif
-    DEPENDS
-        ${operation_target_name}.argument
-    COMMAND
-        ${CMAKE_COMMAND} -E make_directory argument/kernel
-    COMMAND
-        ${CMAKE_COMMAND} -E create_symlink
-            ../../../argument/kernel/3x3-float32.tif
-            argument/kernel/3x3-float32.tif
-    VERBATIM
+link_example_arguments(
+    TARGET
+        ${example_target_name}.argument
+    PATHNAMES
+        ../argument/array/5x5-float32
+        ../argument/kernel/3x3-float32
 )
 
 add_operation_example(
@@ -43,4 +23,6 @@ add_operation_example(
         kernel/3x3-float32.tif
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
+    DEPENDS
+        ${example_target_name}.argument
 )

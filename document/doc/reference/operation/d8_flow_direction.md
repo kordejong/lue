@@ -19,13 +19,13 @@ number. Each number represents one of eight flow directions and the sink "direct
 | code | direction |
 | --- | --- |
 | 7 | north-west |
-| 8 | north |
+| 8 | ↑ north |
 | 9 | north-east |
-| 4 | west |
-| 5 | sink |
-| 6 | east |
+| 4 | ← west |
+| 5 | ■ sink |
+| 6 | → east |
 | 1 | south-west |
-| 2 | south |
+| 2 | ↓ south |
 | 3 | south-east |
 
 ## No-data handling
@@ -37,20 +37,26 @@ array. No new no-data values are generated.
 
 ````{tab-set-code}
 
-```{code-block} c
-/* TODO */
+```{literalinclude} d8_flow_direction/example-1/d8_flow_direction.cpp
+:language: c++
+:start-after: [example
+:end-before: example]
+:dedent:
 ```
 
-```{code-block} c++
-auto const flow_direction = lue::value_policies::d8_flow_direction<FlowDirectionElement>(elevation);
-```
-
-```{code-block} java
-// TODO
-```
-
-```{code-block} python
-flow_direction = lfr.d8_flow_direction(elevation)
+```{literalinclude} d8_flow_direction/example-1/d8_flow_direction.py
+:language: python
+:start-after: [example
+:end-before: example]
+:dedent:
 ```
 
 ````
+
+| `elevation` | `flow_direction` |
+| --- | --- |
+| ![elevation](d8_flow_direction/example-1/argument/array/elevation-5x5-float32.svg) | ![flow_direction](d8_flow_direction/example-1/result/cxx/d8_flow_direction-1.svg) |
+
+Source code:
+[C++](./d8_flow_direction/example-1/d8_flow_direction.cpp),
+[Python](./d8_flow_direction/example-1/d8_flow_direction.py)

@@ -750,6 +750,7 @@ function(add_operation_example_cxx)
         ARGUMENT_NAMES
         RESULT_NAMES
         LINK_LIBRARIES
+        DEPENDS
     )
 
     cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
@@ -766,6 +767,7 @@ function(add_operation_example_cxx)
     set(argument_names ${${prefix}_ARGUMENT_NAMES})
     set(result_names ${${prefix}_RESULT_NAMES})
     set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
 
     set(language cxx)
 
@@ -779,6 +781,10 @@ function(add_operation_example_cxx)
 
     # Main target
     add_custom_target(${target_name})
+
+    add_dependencies(${target_name}
+        ${dependencies}
+    )
 
     # Target for building the executable -----
     set(executable_target_name ${operation_name}.example-${example_nr})
@@ -955,6 +961,7 @@ function(add_operation_example)
         ARGUMENT_NAMES
         RESULT_NAMES
         LINK_LIBRARIES
+        DEPENDS
     )
 
     cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
@@ -971,6 +978,7 @@ function(add_operation_example)
     set(argument_names ${${prefix}_ARGUMENT_NAMES})
     set(result_names ${${prefix}_RESULT_NAMES})
     set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
 
     add_custom_target(${target_name})
 
@@ -987,6 +995,8 @@ function(add_operation_example)
             ${argument_names}
         RESULT_NAMES
             ${result_names}
+        DEPENDS
+            ${dependencies}
     )
 
     add_operation_example_python(
@@ -1005,5 +1015,80 @@ function(add_operation_example)
     add_dependencies(${target_name}
         ${target_name}.cxx
         ${target_name}.python
+    )
+endfunction()
+
+
+function(link_example_arguments)
+    # PATHNAMES: Relative basenames (without extension) of pathnames of files to link to
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        TARGET
+    )
+    set(multi_values
+        PATHNAMES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(target_name ${${prefix}_TARGET})
+    set(pathnames ${${prefix}_PATHNAMES})
+
+    # Create links to arguments used by the example
+    foreach(pathname ${pathnames})
+        foreach(extension
+            pdf
+            svg
+            tif
+        )
+            # ../argument/array/5x5-float32 -> ../argument/array
+            cmake_path(GET pathname PARENT_PATH directory_pathname)
+
+            # ../argument/array/5x5-float32 -> argument/array/5x5-float32
+            string(REGEX REPLACE "^\.\./" "" link_base_pathname ${pathname})
+
+            # ../argument/array/5x5-float32 -> argument/array/5x5-float32.${extension}
+            set(target_link_pathname
+                ${link_base_pathname}.${extension}
+            )
+
+            # Path of file to link to, relative to ${CMAKE_CURRENT_BINARY_DIR}
+            # ../argument/array/5x5-float32 -> ../argument/array/5x5-float32.${extension}
+            set(source_file_pathname
+                ${pathname}.${extension}
+            )
+
+            # Path to file to link to, relative to
+            #     ${CMAKE_CURRENT_BINARY_DIR}/${directory_pathname}
+            set(relative_source_file_pathname ../../${source_file_pathname})
+
+            add_custom_command(
+                OUTPUT
+                    ${target_link_pathname}
+                DEPENDS
+                    ${source_file_pathname}
+                COMMAND
+                    ${CMAKE_COMMAND} -E make_directory argument/${directory_pathname}
+                COMMAND
+                    ${CMAKE_COMMAND} -E create_symlink
+                        ${relative_source_file_pathname}
+                        ${target_link_pathname}
+                VERBATIM
+            )
+            LIST(APPEND link_names ${target_link_pathname})
+        endforeach()
+    endforeach()
+
+    add_custom_target(${target_name}
+        DEPENDS
+            ${link_names}
     )
 endfunction()

@@ -45,10 +45,10 @@ class Example: public lue::document::Example
                 throw std::runtime_error("Wrong usage, pass '--help' for more information");
             }
 
+            auto const result_array_pathname = argument<std::string>("result_array");
+
             using namespace lue;
             using namespace lue::value_policies;
-
-            auto const result_array_pathname = argument<std::string>("result_array");
 
             // [example
             Rank const rank{2};

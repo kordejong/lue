@@ -45,7 +45,7 @@ field is likely to contain less no-data values than the input field.
 
 | `array` | `kernel` | `result` |
 | --- | --- | --- |
-| ![array](convolve/argument/array/5x5-float32.svg) | ![kernel](convolve/argument/kernel/3x3-float32.svg) | ![result](convolve/example-1/result/cxx/convolve-1.svg) |
+| ![array](convolve/example-1/argument/array/5x5-float32.svg) | ![kernel](convolve/example-1/argument/kernel/3x3-float32.svg) | ![result](convolve/example-1/result/cxx/convolve-1.svg) |
 
 Source code:
 [C++](./convolve/example-1/convolve.cpp),

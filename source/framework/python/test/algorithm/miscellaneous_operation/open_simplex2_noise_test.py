@@ -3,7 +3,7 @@ import lue_test
 from lue_test.operation_test import OperationTest, setUpModule, tearDownModule
 
 
-class OpenSimplex2NoiseTest(OperationTest):
+class OpenSimplexNoiseTest(OperationTest):
     @lue_test.framework_test_case
     def test_overloads(self):
         array_shape = (60, 40)

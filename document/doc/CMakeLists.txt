@@ -171,6 +171,7 @@ add_custom_target(documentation
                     ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS
             doxygen_doc
+            lue.documentation.reference.operation
             # python_api
 )
 

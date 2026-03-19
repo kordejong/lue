@@ -15,7 +15,7 @@
 
 ## Description
 
-Operation for creating noise fields that can be used, for example, to generate elevation models.
+Operation for creating noise fields that can be used, for example, to generate synthetic elevation models.
 
 The `cell_index` operation can be used to create the argument to pass into the operation.
 
@@ -28,23 +28,28 @@ cell in the output array. No new no-data values are generated.
 
 ````{tab-set-code}
 
-```{code-block} c
-/* TODO */
+```{literalinclude} open_simplex_noise/example-1/open_simplex_noise.cpp
+:language: c++
+:start-after: [example
+:end-before: example]
+:dedent:
 ```
 
-```{code-block} c++
-auto const noise = lue::value_policies::open_simplex_noise(x_coordinates, y_coordinates, seed);
+```{literalinclude} open_simplex_noise/example-1/open_simplex_noise.py
+:language: python
+:start-after: [example
+:end-before: example]
+:dedent:
 ```
-
-```{code-block} java
-// TODO
-```
-
-```{code-block} python
-noise = lfr.open_simplex_noise(x_coordinates, y_coordinates, seed)
-```
-
 ````
+
+| `result` |
+| --- |
+| ![result](open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.svg) |
+
+Source code:
+[C++](./open_simplex_noise/example-1/open_simplex_noise.cpp),
+[Python](./open_simplex_noise/example-1/open_simplex_noise.py)
 
 ## See also
 

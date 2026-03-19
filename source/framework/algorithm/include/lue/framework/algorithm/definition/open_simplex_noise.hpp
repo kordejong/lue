@@ -87,11 +87,11 @@ namespace lue {
 
 
         template<typename Policies, typename Partition>
-        struct OpenSimplex2PartitionAction:
+        struct OpenSimplexPartitionAction:
             hpx::actions::make_action<
                 decltype(&open_simplex_noise_partition<Policies, Partition>),
                 &open_simplex_noise_partition<Policies, Partition>,
-                OpenSimplex2PartitionAction<Policies, Partition>>::type
+                OpenSimplexPartitionAction<Policies, Partition>>::type
         {
         };
 
@@ -117,7 +117,7 @@ namespace lue {
         lue_hpx_assert(all_are_valid(x_coordinates.partitions()));
         lue_hpx_assert(all_are_valid(y_coordinates.partitions()));
 
-        detail::open_simplex_noise::OpenSimplex2PartitionAction<Policies, Partition> action;
+        detail::open_simplex_noise::OpenSimplexPartitionAction<Policies, Partition> action;
 
         Localities<rank> localities{x_coordinates.localities()};
         Partitions const& x_coordinate_partitions{x_coordinates.partitions()};

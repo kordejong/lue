@@ -10,8 +10,17 @@ add_dependencies(
     ${operation_target_name}.argument
 )
 
-add_subdirectory(convolve)
-add_dependencies(
-    ${operation_target_name}
-    ${operation_target_name}.convolve
+set(operation_names
+    convolve
+    # d8_flow_direction
+    some_operation
+    open_simplex_noise
 )
+
+foreach(operation_name ${operation_names})
+    add_subdirectory(${operation_name})
+    add_dependencies(
+        ${operation_target_name}
+        ${operation_target_name}.${operation_name}
+    )
+endforeach()

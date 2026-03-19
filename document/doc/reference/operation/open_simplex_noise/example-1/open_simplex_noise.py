@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 import docopt
+import numpy as np
 
 import lue.document as ld
 import lue.framework as lfr
@@ -13,28 +14,26 @@ def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
 Usage:
-    {command} <array> <kernel> <result>
+    {command} <result>
 
 Options:
     -h --help   Show this screen and exit
     --version   Show version and exit
-    <array>     Array to read
-    <kernel>    Kernel to read
     <result>    Array to write
 """
     arguments = docopt.docopt(usage, sys.argv[1:], version=version)
-    argument_array_path = Path(arguments["<array>"])
-    argument_kernel_path = Path(arguments["<kernel>"])
     result_array_path = Path(arguments["<result>"])
 
-    array = ld.read_array(argument_array_path)
-    kernel = ld.read_kernel(argument_kernel_path)
-
     # [example
-    result = lfr.convolve(array, kernel)
-    # example]
+    array_shape = (600, 400)
+    condition = lfr.create_array(array_shape, lfr.boolean_element_type, 1)
+    x_coordinates = lfr.cast(lfr.cell_index(condition, 1), np.float32)
+    y_coordinates = lfr.cast(lfr.cell_index(condition, 0), np.float32)
+    seed = 5
+    result = lfr.open_simplex_noise(x_coordinates, y_coordinates, seed)
 
     lfr.to_gdal(result, str(result_array_path))
+    # example]
 
 
 if __name__ == "__main__":

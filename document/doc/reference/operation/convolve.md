@@ -27,24 +27,18 @@ field is likely to contain less no-data values than the input field.
 
 ````{tab-set-code}
 
-```{code-block} c
-/* TODO */
-```
-
 ```{literalinclude} convolve/example-1/convolve.cpp
+:language: c++
 :start-after: [example
 :end-before: example]
-:language: c++
-```
-
-```{code-block} java
-// TODO
+:dedent:
 ```
 
 ```{literalinclude} convolve/example-1/convolve.py
+:language: python
 :start-after: [example
 :end-before: example]
-:language: python
+:dedent:
 ```
 
 ````
@@ -52,6 +46,10 @@ field is likely to contain less no-data values than the input field.
 | `array` | `kernel` | `result` |
 | --- | --- | --- |
 | ![array](convolve/argument/array/5x5-float32.svg) | ![kernel](convolve/argument/kernel/3x3-float32.svg) | ![result](convolve/example-1/result/cxx/convolve-1.svg) |
+
+Source code:
+[C++](./convolve/example-1/convolve.cpp),
+[Python](./convolve/example-1/convolve.py)
 
 ## See also
 

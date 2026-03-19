@@ -15,20 +15,6 @@ add_custom_command(
     VERBATIM
 )
 
-add_custom_command(
-    OUTPUT
-        argument/kernel/3x3-float32.tif
-    DEPENDS
-        ${operation_target_name}.argument
-    COMMAND
-        ${CMAKE_COMMAND} -E make_directory argument/kernel
-    COMMAND
-        ${CMAKE_COMMAND} -E create_symlink
-            ../../../argument/kernel/3x3-float32.tif
-            argument/kernel/3x3-float32.tif
-    VERBATIM
-)
-
 add_operation_example(
     NAME
         ${operation_name}
@@ -40,7 +26,6 @@ add_operation_example(
         lue::framework_${algorithm_group}_operation
     ARGUMENT_NAMES
         array/5x5-float32.tif
-        kernel/3x3-float32.tif
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
 )

@@ -12,6 +12,7 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conda.yml"
+      - "!document/*"
       - "!environment/conda/*"
       - "!environment/easybuild/*"
   push:
@@ -21,6 +22,7 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conda.yml"
+      - "!document/*"
       - "!environment/conda/*"
       - "!environment/easybuild/*"
   workflow_dispatch:

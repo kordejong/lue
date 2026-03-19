@@ -670,3 +670,290 @@ function(examples_to_figures)
         add_dependencies(${ARG_TARGET} ${target})
     endforeach()
 endfunction()
+
+
+function(add_operation_example_cxx)
+    # Add a C++ example:
+    # - Create target for building executable for the example
+    # - Create target for generating results, by executing the example executable
+    # - Create targets for generating figures for all results
+    #
+    # All targets created are added as a dependency to the main target whose name is passed in
+    #
+    # NAME: Name of operation
+    # TARGET: Name of target to create for this example
+    # NR: Number of the example ([1, <nr_examples>])
+    # ARGUMENT_NAMES: Relative pathnames to arguments to read. These are assumed to be present in
+    #     ${CMAKE_CURRENT_BINARY_DIR}/argument
+    # RESULT_NAMES: Relative pathnames to results to write. These will be written to
+    #     ${CMAKE_CURRENT_BINARY_DIR}/result/cxx
+    # LINK_LIBRARIES: Libraries to link with the executable to resolve all undefined symbols
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        LINK_LIBRARIES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+
+    set(language cxx)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.cpp
+        INPUT ${operation_name}.cpp
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    # Target for building the executable -----
+    set(executable_target_name ${operation_name}.example-${example_nr})
+
+    add_executable(${executable_target_name}
+        ${operation_name}.cpp
+    )
+
+    target_link_libraries(${executable_target_name}
+        PRIVATE
+            lue::document
+            ${link_libraries}
+            HPX::wrap_main
+    )
+
+    # Target for creating results by executing the executable -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+        COMMAND
+            ${executable_target_name} ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
+function(add_operation_example_python)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+
+    set(language python)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.py
+        INPUT ${operation_name}.py
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    # Target for creating results by executing the script -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py
+        COMMAND
+            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. --
+                ${Python_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py"
+                ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
+function(add_operation_example)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        LINK_LIBRARIES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+
+    add_custom_target(${target_name})
+
+    add_operation_example_cxx(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.cxx
+        NR
+            ${example_nr}
+        LINK_LIBRARIES
+            ${link_libraries}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+    )
+
+    add_operation_example_python(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.python
+        NR
+            ${example_nr}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.cxx
+        ${target_name}.python
+    )
+endfunction()

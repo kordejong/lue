@@ -53,43 +53,60 @@ def skip(value, no_data_value) -> bool:
 def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None:
     # https://py.geocompx.org
     raster = rasterio.open(raster_path)
+    array = raster.read(1)
     nr_rows, nr_cols = raster.shape
-    figure, axes = plt.subplots(figsize=(nr_rows, nr_cols))
+    scale = 5 / max(nr_rows, nr_cols)
+    show_values = nr_rows <= 10 and nr_cols <= 10
+    show_legend = not show_values
 
-    rasterio.plot.show(raster, ax=axes, cmap=colour_map(raster))
+    figure, axes = plt.subplots(figsize=(nr_cols * scale, nr_rows * scale))
+
+    colour_map_ = colour_map(raster)
+
+    rasterio.plot.show(raster, ax=axes, cmap=colour_map_)
     axes.set_axis_off()
 
-    nodata_value = raster.nodata
-    array = raster.read(1)
-    x_coordinates, y_coordinates, cell_values = [], [], []
-    coordinates = []
+    if show_values:
+        nodata_value = raster.nodata
+        coordinates = []
+        cell_values = []
 
-    for row in range(nr_rows):
-        for col in range(nr_cols):
-            x_coordinate, y_coordinate = raster.xy(row, col)
-            coordinates.append(raster.xy(row, col))
-            cell_value = array[row, col]
+        for row in range(nr_rows):
+            for col in range(nr_cols):
+                coordinates.append(raster.xy(row, col))
+                cell_values.append(array[row, col])
 
-            x_coordinates.append(x_coordinate)
-            y_coordinates.append(y_coordinate)
-            cell_values.append(cell_value)
-
-    for idx, coordinate in enumerate(coordinates):
-        if not skip(cell_values[idx], nodata_value):
-            annotation = axes.annotate(
-                f"{cell_values[idx]}",
-                xy=coordinate,
-                textcoords="data",
-                ha="center",
-                va="center",
-            )
-            annotation.set_bbox(
-                dict(
-                    facecolor="#d8dee9",
-                    alpha=0.3,
-                    linewidth=0,
+        for idx, coordinate in enumerate(coordinates):
+            if not skip(cell_values[idx], nodata_value):
+                annotation = axes.annotate(
+                    f"{cell_values[idx]}",
+                    xy=coordinate,
+                    textcoords="data",
+                    ha="center",
+                    va="center",
                 )
-            )
+                annotation.set_bbox(
+                    dict(
+                        facecolor="#d8dee9",
+                        alpha=0.3,
+                        linewidth=0,
+                    )
+                )
+
+    if show_legend:
+        image = plt.imshow(array, cmap=colour_map_)
+        cax = figure.add_axes(
+            [
+                axes.get_position().x1 + 0.01,
+                axes.get_position().y0,
+                0.02,
+                axes.get_position().height,
+            ]
+        )
+        plt.colorbar(image, cax=cax)
 
     for format in formats:
-        plt.savefig(figure_path.with_suffix(f".{format}"), transparent=True)
+        print(figure_path)
+        plt.savefig(
+            figure_path.with_suffix(f".{format}"), transparent=True, bbox_inches="tight"
+        )

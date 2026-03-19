@@ -1,5 +1,5 @@
-set(algorithm_group focal)
-set(operation_name convolve)
+set(algorithm_group local)  # TODO
+set(operation_name some_operation)  # TODO
 set(nr_examples 1)
 
 set(operation_target_name ${operation_target_name}.${operation_name})

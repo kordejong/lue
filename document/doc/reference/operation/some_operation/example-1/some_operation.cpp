@@ -1,6 +1,5 @@
-#include "lue/framework/algorithm/value_policies/convolve.hpp"
+#include "lue/framework/algorithm/value_policies/add.hpp"
 #include "lue/document.hpp"
-#include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
 
 
@@ -20,11 +19,10 @@ class Example: public lue::document::Example
                     options.add_options()
                         // clang-format off
                         ("argument_array", "array to read", cxxopts::value<std::string>())
-                        ("argument_kernel", "kernel to read", cxxopts::value<std::string>())
                         ("result_array", "array to write", cxxopts::value<std::string>())
                         // clang-format on
                         ;
-                    options.parse_positional({"argument_array", "argument_kernel", "result_array"});
+                    options.parse_positional({"argument_array", "result_array"});
 
                     return options;
                 }(),
@@ -39,33 +37,30 @@ class Example: public lue::document::Example
         auto run_implementation() -> int override
         {
             // Command line arguments
-            if (!argument_parsed("argument_array") || !argument_parsed("argument_kernel") ||
-                !argument_parsed("result_array"))
+            if (!argument_parsed("argument_array") || !argument_parsed("result_array"))
             {
                 throw std::runtime_error("Wrong usage, pass '--help' for more information");
             }
 
-            using namespace lue;
-            using namespace value_policies;
-
             auto const argument_array_pathname = argument<std::string>("argument_array");
-            auto const argument_kernel_pathname = argument<std::string>("argument_kernel");
             auto const result_array_pathname = argument<std::string>("result_array");
 
-            Rank const rank{2};
-            using Weight = float;
-            using Kernel = Kernel<Weight, rank>;
-            using FloatElement = FloatingPointElement<0>;
-            using FloatArray = PartitionedArray<FloatElement, rank>;
+            // Types
+            lue::Rank const rank{2};
 
-            FloatArray const array = read_array<FloatElement, rank>(argument_array_pathname);
-            Kernel const kernel = read_kernel<Weight, rank>(argument_kernel_pathname);
+            using Element = float;
+            using Array = lue::PartitionedArray<Element, rank>;
+
+            // I/O
+            Array const array = read_array<Element, rank>(argument_array_pathname);
 
             // [example
-            FloatArray const result = convolve(array, kernel);
+            // TODO
+            Array result = lue::value_policies::add(array, Element{1});
             // example]
 
-            to_gdal(result, result_array_pathname);
+            // I/O
+            lue::to_gdal(result, result_array_pathname);
 
             return EXIT_SUCCESS;
         }

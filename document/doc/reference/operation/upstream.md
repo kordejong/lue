@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: upstream(flow_direction, material) -> Field
+.. py:function:: lue.framework.upstream(flow_direction, material) -> Field
 
    Assign the sum of the values from each cell's upstream neighbours to the cell itself
 

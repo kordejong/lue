@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: focal_majority(array, kernel) -> Field
+.. py:function:: lue.framework.focal_majority(array, kernel) -> Field
 
    Determine the most occurring value in a neighbourhood
 

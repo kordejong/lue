@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: focal_diversity(array, kernel) -> Field
+.. py:function:: lue.framework.focal_diversity(array, kernel) -> Field
 
    Count the number of different values in a neighbourhood
 

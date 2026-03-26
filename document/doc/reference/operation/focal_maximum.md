@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: focal_maximum(array, kernel) -> Field
+.. py:function:: lue.framework.focal_maximum(array, kernel) -> Field
 
    Determine the maximum value in a neighbourhood
 

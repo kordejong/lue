@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: downstream(flow_direction, material) -> Field
+.. py:function:: lue.framework.downstream(flow_direction, material) -> Field
 
    Assign the value from each cell's downstream neighbour to the cell itself
 

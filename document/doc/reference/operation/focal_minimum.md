@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: focal_minimum(array, kernel) -> Field
+.. py:function:: lue.framework.focal_minimum(array, kernel) -> Field
 
    Determine the minimum value in a neighbourhood
 

@@ -1,4 +1,13 @@
+# Top-level target for generating files the JupyterBook documentation depends on
+set(doc_preprocess_target_name lue.doc_preprocess)
+
+add_custom_target(${doc_preprocess_target_name})
+
 add_subdirectory(reference)
+
+add_dependencies(${doc_preprocess_target_name}
+    ${doc_preprocess_target_name}.reference
+)
 
 set(LUE_TITLE "LUE documentation")
 set(LUE_AUTHOR "Computational Geography R&D Team")
@@ -42,6 +51,7 @@ foreach(name IN ITEMS
     contribute/release.md
     example/index.md
     faq.md
+    genindex.md
     index.md
     manual/data_model/concept.md
     manual/data_model/format.md
@@ -65,6 +75,7 @@ foreach(name IN ITEMS
     manual/quality_assurance/scalability/strong_scalability.svg
     manual/quality_assurance/scalability/weak_scalability.svg
     manual/view/index.md
+    modindex.md  # TODO: move to Python section of reference
     pcraster/index.md
     pcraster/port.md
     pcraster/status.md
@@ -171,7 +182,7 @@ add_custom_target(documentation
                     ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS
             doxygen_doc
-            lue.documentation.reference.operation
+            ${doc_preprocess_target_name}
             # python_api
 )
 

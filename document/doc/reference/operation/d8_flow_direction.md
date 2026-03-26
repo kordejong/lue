@@ -1,5 +1,8 @@
 # `d8_flow_direction`
 
+```{index} single: routing operation; d8_flow_direction
+```
+
 ## Signature
 
 ```{eval-rst}
@@ -55,7 +58,7 @@ array. No new no-data values are generated.
 
 | `elevation` | `flow_direction` |
 | --- | --- |
-| ![elevation](d8_flow_direction/example-1/argument/array/elevation-5x5-float32.svg) | ![flow_direction](d8_flow_direction/example-1/result/cxx/d8_flow_direction-1.svg) |
+| ![elevation](d8_flow_direction/example-1/argument/array/elevation-5x5-float32.*) | ![flow_direction](d8_flow_direction/example-1/result/cxx/d8_flow_direction-1.*) |
 
 Source code:
 [C++](./d8_flow_direction/example-1/d8_flow_direction.cpp),

@@ -1,5 +1,8 @@
 # `convolve`
 
+```{index} single: focal operation; convolve
+```
+
 ## Signature
 
 ```{eval-rst}
@@ -16,6 +19,11 @@
 ## Description
 
 Focal operation summing all values in a neighbourhood, multiplied by their weights.
+
+```{math}
+:label: convolve
+\sum_{i=1}^{n} K[c] A[c]
+```
 
 ## No-data handling
 
@@ -45,7 +53,7 @@ field is likely to contain less no-data values than the input field.
 
 | `array` | `kernel` | `result` |
 | --- | --- | --- |
-| ![array](convolve/example-1/argument/array/5x5-float32.svg) | ![kernel](convolve/example-1/argument/kernel/3x3-float32.svg) | ![result](convolve/example-1/result/cxx/convolve-1.svg) |
+| ![array](convolve/example-1/argument/array/5x5-float32.*) | ![kernel](convolve/example-1/argument/kernel/3x3-float32.*) | ![result](convolve/example-1/result/cxx/convolve-1.*) |
 
 Source code:
 [C++](./convolve/example-1/convolve.cpp),

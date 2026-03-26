@@ -85,6 +85,8 @@ parts:
           - file: pcraster/status.md
 
       - file: faq.md
+      - file: genindex.md
+      - file: modindex.md
 
   - caption: Developer
     chapters:

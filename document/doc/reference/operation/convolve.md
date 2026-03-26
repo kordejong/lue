@@ -6,7 +6,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: convolve(field, kernel) -> Field
+.. py:function:: lue.framework.convolve(field, kernel) -> Field
 
    Sum all values in a neighbourhood, multiplied by their weights
 
@@ -61,4 +61,4 @@ Source code:
 
 ## See also
 
-- See {py:func}`focal_sum` for an operation which sums values without multiplying them by weights
+- See {py:func}`lue.framework.focal_sum` for an operation which sums values without multiplying them by weights

@@ -11,7 +11,6 @@ add_operation_example(
     LINK_LIBRARIES
         lue::framework_${algorithm_group}_operation
         lue::framework_local_operation
-    ARGUMENT_NAMES
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
 )

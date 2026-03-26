@@ -6,7 +6,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: d8_flow_direction(elevation) -> Field
+.. py:function:: lue.framework.d8_flow_direction(elevation) -> Field
 
    Determine direction each cell drains towards
 

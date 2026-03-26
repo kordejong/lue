@@ -683,11 +683,12 @@ function(add_operation_example_cxx)
     # NAME: Name of operation
     # TARGET: Name of target to create for this example
     # NR: Number of the example ([1, <nr_examples>])
-    # ARGUMENT_NAMES: Relative pathnames to arguments to read. These are assumed to be present in
-    #     ${CMAKE_CURRENT_BINARY_DIR}/argument
+    # ARGUMENT_NAMES: Zero or more relative pathnames to arguments to read. These are assumed to be present
+    #     in ${CMAKE_CURRENT_BINARY_DIR}/argument
     # RESULT_NAMES: Relative pathnames to results to write. These will be written to
     #     ${CMAKE_CURRENT_BINARY_DIR}/result/cxx
     # LINK_LIBRARIES: Libraries to link with the executable to resolve all undefined symbols
+    # DEPENDS: Zero or more target-level dependencies
 
     set(prefix ARG)
     set(no_values "")
@@ -732,9 +733,11 @@ function(add_operation_example_cxx)
     # Main target
     add_custom_target(${target_name})
 
-    add_dependencies(${target_name}
-        ${dependencies}
-    )
+    if(dependencies)
+        add_dependencies(${target_name}
+            ${dependencies}
+        )
+    endif()
 
     # Target for building the executable -----
     set(executable_target_name ${operation_name}.example-${example_nr})

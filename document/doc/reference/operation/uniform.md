@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: uniform(array_shape, partition_shape, min_value, max_value) -> Field
+.. py:function:: lue.framework.uniform(array_shape, partition_shape, min_value, max_value) -> Field
 
    Return an array with values drawn from the uniform distribution.
 

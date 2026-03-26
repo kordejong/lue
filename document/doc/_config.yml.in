@@ -27,10 +27,17 @@ repository:
   branch: master  # Which branch of the repository should be used when creating links (optional)
 
 # Add GitHub buttons to your book
-# See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
+# See https://jupyterbook.org/customize/config.html
 html:
   use_issues_button: true
   use_repository_button: true
+  baseurl: https://lue.computationalgeography.org/doc
+  extra_footer: |
+    <p>
+    <a href="https://lue.computationalgeography.org">
+        <img src="https://lue.computationalgeography.org/logo-colour.svg" width="50" alt="LUE home"/>
+    </a>
+    </p>
 sphinx:
   config:
 

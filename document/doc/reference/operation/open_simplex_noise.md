@@ -1,5 +1,8 @@
 # `open_simplex_noise`
 
+```{index} single: miscellaneous operation; convolve
+```
+
 ## Signature
 
 ```{eval-rst}
@@ -45,7 +48,7 @@ cell in the output array. No new no-data values are generated.
 
 | `result` |
 | --- |
-| ![result](open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.svg) |
+| ![result](open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.*) |
 
 Source code:
 [C++](./open_simplex_noise/example-1/open_simplex_noise.cpp),

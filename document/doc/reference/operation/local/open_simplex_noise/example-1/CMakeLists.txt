@@ -9,8 +9,9 @@ add_operation_example(
     NR
         ${example_nr}
     LINK_LIBRARIES
-        lue::framework_${algorithm_group}_operation
-        lue::framework_local_operation
+        lue::framework_${operation_kind}_operation
+        # TODO: Move open_simplex_noise into local operation and remove this lib
+        lue::framework_miscellaneous_operation
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
 )

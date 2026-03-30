@@ -1,44 +1,26 @@
-# Operations
+# Miscellaneous operations
 
-```{note}
-- Not all operations available are listed here already.
-- The signatures of the operations are written in a language-agnostic manner. How to use each operation from a
-  specific language might slightly differ. Check the usage examples for inspiration. Also, in Python the
-  `help` function can be used to obtain more information (e.g.: `help(lfr.uniform)`).
-```
-
-## Local operations
-
-Local operations compute values for each cell in the result array, given one or more corresponding
-corresponding cells in one or more argument arrays. Local operations differ with respect to how they compute a
-result value for a cell, given one or more argument values
-
-## Focal operations
-
-Focal operations (AKA filter operations, neighbourhood operations, window operations) compute values for each
-cell in the result array, given values within a kernel centered on each corresponding cell in the argument
-array. Kernels have a shape and contain weights with which to multiply each corresponding cell in the argument
-array. Focal operations differ with respect to how they compute a result value given argument values.
-
-## Zonal operations
-
-Zonal operations compute values for each cell in the result array, given corresponding cells in an argument
-array. Each cell in the argument array belongs to a class, each of which defines a zone. Result values are
-computed per zone, so cells in the result array located within the same zone receive the same value. Zonal
-operations differ with respect to how they compute a result given the argument values per zone.
-
-## Global operations
-
-Global operations compute a single result value, given all cell values in the input argument array. Global
-operations differ with respect to how they compute a result given all values.
-
-## Routing operations
-
-TODO: description
-
-## Miscellaneous operations
-
-TODO: description
+| Name | Description | Example |
+| --- | --- | --- |
+| {py:func}`lue.framework.resample` | | |
+| array_like | | |
+| array_partition_id | | |
+| cast | | |
+| cell_index | | |
+| clump | | |
+| copy | | |
+| create_partitioned_array | | |
+| fill | | |
+| locality_id | | |
+| mesh_grid | | |
+| normal | | |
+| partition_count_unique | | |
+| range | | |
+| reclassify | | |
+| scalar | | |
+| timestamp | | |
+| unique | | |
+| unique_id | | |
 
 <!--
 Connectivity

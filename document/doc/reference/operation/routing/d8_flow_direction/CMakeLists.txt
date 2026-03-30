@@ -1,12 +1,9 @@
-set(algorithm_group focal)
-set(operation_name convolve)
+set(operation_name d8_flow_direction)
 set(nr_examples 1)
 
-set(this_operation_target_name ${operation_target_name}.${operation_name})
+set(this_operation_target_name ${routing_operation_target_name}.${operation_name})
 
 add_custom_target(${this_operation_target_name})
-
-add_subdirectory(argument)
 
 foreach(example_nr RANGE 1 ${nr_examples})
     add_subdirectory(example-${example_nr})

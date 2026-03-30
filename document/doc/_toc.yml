@@ -37,20 +37,36 @@ parts:
         sections:
           - file: reference/operation/index.md
             sections:
-              - file: reference/operation/convolve.md
-              - file: reference/operation/d8_flow_direction.md
-              - file: reference/operation/downstream.md
-              - file: reference/operation/focal_diversity.md
-              - file: reference/operation/focal_high_pass.md
-              - file: reference/operation/focal_majority.md
-              - file: reference/operation/focal_maximum.md
-              - file: reference/operation/focal_mean.md
-              - file: reference/operation/focal_minimum.md
-              - file: reference/operation/focal_sum.md
-              - file: reference/operation/open_simplex_noise.md
-              - file: reference/operation/resample.md
-              - file: reference/operation/uniform.md
-              - file: reference/operation/upstream.md
+              - file: reference/operation/local/index.md
+                sections:
+                  - file: reference/operation/local/open_simplex_noise.md
+                  - file: reference/operation/local/uniform.md
+
+              - file: reference/operation/focal/index.md
+                sections:
+                  - file: reference/operation/focal/convolve.md
+                  - file: reference/operation/focal/focal_diversity.md
+                  - file: reference/operation/focal/focal_high_pass.md
+                  - file: reference/operation/focal/focal_majority.md
+                  - file: reference/operation/focal/focal_maximum.md
+                  - file: reference/operation/focal/focal_mean.md
+                  - file: reference/operation/focal/focal_minimum.md
+                  - file: reference/operation/focal/focal_sum.md
+
+              - file: reference/operation/zonal/index.md
+
+              - file: reference/operation/global/index.md
+
+              - file: reference/operation/routing/index.md
+                sections:
+                  - file: reference/operation/routing/d8_flow_direction.md
+                  - file: reference/operation/routing/downstream.md
+                  - file: reference/operation/routing/upstream.md
+
+              - file: reference/operation/miscellaneous/index.md
+                sections:
+                  - file: reference/operation/resample.md
+
           - file: source/framework/api/doc/index.md
             sections:
               - file: reference/c/index.md

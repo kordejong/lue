@@ -93,21 +93,34 @@ foreach(name IN ITEMS
     # reference/fortran/index.md
     # reference/java/index.md
     # reference/julia/index.md
-    reference/operation/convolve.md
-    reference/operation/d8_flow_direction.md
-    reference/operation/downstream.md
-    reference/operation/focal_diversity.md
-    reference/operation/focal_high_pass.md
-    reference/operation/focal_majority.md
-    reference/operation/focal_maximum.md
-    reference/operation/focal_mean.md
-    reference/operation/focal_minimum.md
-    reference/operation/focal_sum.md
+
+    reference/operation/focal/convolve.md
+    reference/operation/focal/focal_diversity.md
+    reference/operation/focal/focal_high_pass.md
+    reference/operation/focal/index.md
+    reference/operation/focal/focal_majority.md
+    reference/operation/focal/focal_maximum.md
+    reference/operation/focal/focal_mean.md
+    reference/operation/focal/focal_minimum.md
+    reference/operation/focal/focal_sum.md
+
+    reference/operation/global/index.md
+
     reference/operation/index.md
-    reference/operation/open_simplex_noise.md
-    reference/operation/resample.md
-    reference/operation/uniform.md
-    reference/operation/upstream.md
+
+    reference/operation/local/index.md
+    reference/operation/local/open_simplex_noise.md
+    reference/operation/local/uniform.md
+
+    reference/operation/miscellaneous/index.md
+    reference/operation/miscellaneous/resample.md
+
+    reference/operation/routing/index.md
+    reference/operation/routing/d8_flow_direction.md
+    reference/operation/routing/downstream.md
+    reference/operation/routing/upstream.md
+
+    reference/operation/zonal/index.md
     # reference/python/data_model/index.rst
     # reference/python/data_model/hdf5/index.rst
     # reference/python/data_model/index.rst

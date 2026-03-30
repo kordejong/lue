@@ -1,8 +1,7 @@
-set(algorithm_group miscellaneous)
 set(operation_name open_simplex_noise)
 set(nr_examples 1)
 
-set(this_operation_target_name ${operation_target_name}.${operation_name})
+set(this_operation_target_name ${${operation_kind}_operation_target_name}.${operation_name})
 
 add_custom_target(${this_operation_target_name})
 

@@ -4,17 +4,19 @@ add_custom_target(${operation_target_name})
 
 add_subdirectory(argument)
 
-set(operation_names
-    convolve
-    d8_flow_direction
-    some_operation
-    open_simplex_noise
+set(operaration_kind_names
+    focal
+    local
+    global
+    miscellaneous
+    routing
+    zonal
 )
 
-foreach(operation_name ${operation_names})
-    add_subdirectory(${operation_name})
+foreach(operation_kind_name ${operaration_kind_names})
+    add_subdirectory(${operation_kind_name})
 
     add_dependencies(${operation_target_name}
-        ${operation_target_name}.${operation_name}
+        ${operation_target_name}.${operation_kind_name}
     )
 endforeach()

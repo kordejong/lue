@@ -1,42 +1,69 @@
 # Local operations
 
+## Logical
+
 | Name | Description | Example |
 | --- | --- | --- |
-| abs | | |
+| logical_and (`&&` / `and`) | | |
+| logical_exclusive_or (`^`)| | |
+| logical_inclusive_or (`\|\|` / `or`) | | |
+| logical_not (`!` / `not`) | | |
+
+## Comparison and classification
+
+| Name | Description | Example |
+| --- | --- | --- |
+| close_to | | |
+| equal_to (`==`) | | |
+| greater_than (`>`) | | |
+| greater_than_equal_to (`>=`) | | |
+| less_than (`<`) | | |
+| less_than_equal_to (`<=`) | | |
+| not_equal_to (`!=`) | | |
+| valid | | |
+
+## Conditional
+
+| Name | Description | Example |
+| --- | --- | --- |
+| where | | |
+
+## Trigonometric
+
+| Name | Description | Example |
+| --- | --- | --- |
 | acos | | |
-| add | | |
 | asin | | |
 | atan | | |
 | atan2 | | |
-| ceil | | |
-| close_to | | |
 | cos | | |
-| divide | | |
-| equal_to | | |
-| exp | | |
+| sin | | |
+| tan | | |
+
+## Nearest integer floating point
+
+| Name | Description | Example |
+| --- | --- | --- |
+| ceil | | |
 | floor | | |
-| greater_than | | |
-| greater_than_equal_to | | |
-| less_than | | |
-| less_than_equal_to | | |
+| round | | |
+| trunc | | |
+
+## Mathematical
+
+| Name | Description | Example |
+| --- | --- | --- |
+| abs | | |
+| add (`+`) | | |
+| divide (`/`) | | |
+| exp | | |
 | log | | |
 | log10 | | |
-| logical_and | | |
-| logical_exclusive_or | | |
-| logical_inclusive_or | | |
-| logical_not | | |
-| modulus | | |
-| multiply | | |
-| negate | | |
-| not_equal_to | | |
-| {py:func}`lue.framework.open_simplex_noise` | Create noise field | <img src="open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.*" width="50"/> |
-| pow | | |
-| round | | |
-| sin | | |
+| modulus (`%`) | | |
+| multiply (`*`) | | |
+| negate (`-`) | | |
+| {py:func}`lue.framework.open_simplex_noise` | Create noise field | <img src="open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.*" width="30"/> |
+| pow (`**`) | | |
 | sqrt | | |
-| subtract | | |
-| tan | | |
-| trunc | | |
+| subtract (`-`) | | |
 | {py:func}`lue.framework.uniform` | | |
-| valid | | |
-| where | | |

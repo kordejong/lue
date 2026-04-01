@@ -1,26 +1,31 @@
+(reference-operation-miscellaneous)=
+
 # Miscellaneous operations
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`lue.framework.resample` | | |
-| array_like | | |
-| array_partition_id | | |
-| cast | | |
-| cell_index | | |
-| clump | | |
-| copy | | |
-| create_partitioned_array | | |
-| fill | | |
-| locality_id | | |
-| mesh_grid | | |
-| normal | | |
-| partition_count_unique | | |
-| range | | |
-| reclassify | | |
-| scalar | | |
-| timestamp | | |
-| unique | | |
-| unique_id | | |
+| {py:func}`array_like` | | |
+| {py:func}`array_partition_id` | | |
+| {py:func}`cast` | | |
+| {py:func}`cell_index` | | |
+| {py:func}`clump` | | |
+| {py:func}`copy` | | |
+| {py:func}`create_array` | | |
+| {py:func}`create_partitioned_array` | | |
+| {py:func}`create_scalar` | | |
+| {py:func}`downscale` | | |
+| {py:func}`fill` | | |
+| {py:func}`locality_id` | | |
+| {py:func}`mesh_grid` | | |
+| {py:func}`normal` | | |
+| {py:func}`partition_count_unique` | | |
+| {py:func}`range` | | |
+| {py:func}`reclassify` | | |
+| {py:func}`resample` | | |
+| {py:func}`scalar` | | |
+| {py:func}`timestamp` | | |
+| {py:func}`unique` | | |
+| {py:func}`unique_id` | | |
 
 <!--
 Connectivity

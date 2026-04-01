@@ -94,6 +94,8 @@ foreach(name IN ITEMS
     # reference/java/index.md
     # reference/julia/index.md
 
+    reference/operation/conversion/index.md
+
     reference/operation/focal/convolve.md
     reference/operation/focal/focal_diversity.md
     reference/operation/focal/focal_high_pass.md
@@ -107,6 +109,8 @@ foreach(name IN ITEMS
     reference/operation/global/index.md
 
     reference/operation/index.md
+
+    reference/operation/io/index.md
 
     reference/operation/local/index.md
     reference/operation/local/open_simplex_noise.md

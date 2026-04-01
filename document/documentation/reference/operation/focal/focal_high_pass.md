@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.focal_high_pass(array, kernel) -> Field
+.. py:function:: focal_high_pass(array, kernel) -> Field
 
    TODO
 

@@ -6,7 +6,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.open_simplex_noise(x_coordinates, y_coordinates, seed) -> Field
+.. py:function:: open_simplex_noise(x_coordinates, y_coordinates, seed) -> Field
 
    Return a noise field based on the OpenSimplex noise function
 

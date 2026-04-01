@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.downscale(array, cell_size, count, strategy) -> Field
+.. py:function:: downscale(array, cell_size, count, strategy) -> Field
 
    Downscale the array by splitting cells into `count` by `count` new cells
 

@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.focal_sum(array, kernel) -> Field
+.. py:function:: focal_sum(array, kernel) -> Field
 
    Sum all values in a neighbourhood
 

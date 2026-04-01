@@ -1,10 +1,12 @@
+(reference-operation-global)=
+
 # Global operations
 
 | Name | Description | Example |
 | --- | --- | --- |
-| all | | |
-| any | | |
-| maximum | | |
-| minimum | | |
-| none | | |
-| sum | | |
+| {py:func}`all` | | |
+| {py:func}`any` | | |
+| {py:func}`maximum` | | |
+| {py:func}`minimum` | | |
+| {py:func}`none` | | |
+| {py:func}`sum` | | |

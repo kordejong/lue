@@ -3,7 +3,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.focal_mean(array, kernel) -> Field
+.. py:function:: focal_mean(array, kernel) -> Field
 
    Determine the mean value in a neighbourhood
 

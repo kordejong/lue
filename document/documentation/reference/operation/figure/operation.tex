@@ -1,0 +1,53 @@
+% Stuff common to operations
+\def\mysheetspacing{2.6cm}
+\def\myxslant{1.5}  % 1
+\def\myyslant{-0.3}  % -0.5
+
+\def\myscale{0.25}
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+
+% Fix the seed so random values are reproducable
+\pgfmathsetseed{1}
+
+% Styles used in *_operation.tex code
+\tikzset{
+    input sheet/.style={
+        nord blue,
+        opacity=0.4
+    },
+    output sheet/.style={
+        nord fg!50!nord bg,
+        opacity=0.7
+    },
+    grid/.style={
+        very thin,
+        nord fg,
+        opacity=0.4
+    },
+    input cell/.style={
+        nord fg,
+        fill=nord blue,
+        opacity=0.8
+    },
+    output cell/.style={
+        nord fg,
+        fill=nord fg!50!nord bg,
+        opacity=0.9
+    },
+    arrow/.style={
+        ->,
+        nord fg,
+        opacity=0.8,
+        very thin,
+    },
+    direction/.style={
+        ->,
+        nord fg,
+        opacity=0.8,
+        shorten >= 0.1cm,
+        thick,
+    },
+}

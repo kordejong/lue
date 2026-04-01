@@ -1,0 +1,90 @@
+\documentclass[background=light]{nord_figure}
+
+\begin{document}
+    \input{operation.tex}
+
+
+    \begin{tikzpicture}[
+            >=stealth,
+            scale=\myscale,
+        ]
+
+        % Output grid --------------------------------------------------------------
+        \begin{pgfonlayer}{background}
+            \begin{scope}[
+                    yshift=(0 * \mysheetspacing),
+                    yslant=\myyslant,
+                    xslant=\myxslant,
+                ]
+
+                \fill[output sheet] (-0.5, -0.5) rectangle (5.5, 5.5);
+                \draw[grid] (-0.25, -0.25) grid (5.25, 5.25);
+
+                \draw[output cell] (2, 2) rectangle +(1, 1);
+
+                \coordinate (output cell) at (2.5, 2.5);
+
+            \end{scope}
+        \end{pgfonlayer}
+
+        % Input values grid --------------------------------------------------------
+        \begin{pgfonlayer}{main}
+            \begin{scope}[
+                    yshift=(2 * \mysheetspacing),
+                    yslant=\myyslant,
+                    xslant=\myxslant,
+                ]
+
+                \fill[input sheet] (-0.5, -0.5) rectangle (5.5, 5.5);
+                \draw[grid] (-0.25, -0.25) grid (5.25, 5.25);
+
+
+                \foreach \x in {1, 2, 3} {
+                    \foreach \y in {1, 2, 3} {
+                        \draw[input cell,
+                            fill opacity={min(rnd + 0.2, 1.0)}]
+                            (\x, \y) rectangle +(1, 1);
+                        \coordinate ({input cell \x \y}) at (\x + 0.5, \y + 0.5);
+                    }
+                }
+
+            \end{scope}
+        \end{pgfonlayer}
+
+        % Input kernel -------------------------------------------------------------
+        \begin{pgfonlayer}{foreground}
+            \begin{scope}[
+                    yshift=(3 * \mysheetspacing),
+                    yslant=\myyslant,
+                    xslant=\myxslant,
+                ]
+
+                \foreach \x in {1, 2, 3} {
+                    \foreach \y in {1, 2, 3} {
+                        \draw[input cell,
+                                fill=nord green,
+                                fill opacity={min(rnd + 0.2, 1.0)}
+                            ]
+                            (\x, \y) rectangle +(1, 1);
+                        \coordinate ({kernel cell \x \y}) at (\x + 0.5, \y + 0.5);
+                    }
+                }
+            \end{scope}
+        \end{pgfonlayer}
+
+        \begin{pgfonlayer}{main}
+            \foreach \x in {1, 2, 3}
+                \foreach \y in {1, 2, 3}
+                    \draw[arrow]
+                        (kernel cell \x \y) -- (input cell \x \y);
+        \end{pgfonlayer}
+
+        \begin{pgfonlayer}{background}
+            \foreach \x in {1, 2, 3}
+                \foreach \y in {1, 2, 3}
+                    \draw[arrow, shorten >= \myscale * 1.0cm]
+                        (input cell \x \y) -- (output cell);
+        \end{pgfonlayer}
+
+    \end{tikzpicture}
+\end{document}

@@ -6,7 +6,7 @@
 ## Signature
 
 ```{eval-rst}
-.. py:function:: lue.framework.d8_flow_direction(elevation) -> Field
+.. py:function:: d8_flow_direction(elevation) -> Field
 
    Determine direction each cell drains towards
 
@@ -63,3 +63,7 @@ array. No new no-data values are generated.
 Source code:
 [C++](./d8_flow_direction/example-1/d8_flow_direction.cpp),
 [Python](./d8_flow_direction/example-1/d8_flow_direction.py)
+
+## See also
+
+- ...

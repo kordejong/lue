@@ -63,9 +63,12 @@ parts:
                   - file: reference/operation/routing/downstream.md
                   - file: reference/operation/routing/upstream.md
 
+              - file: reference/operation/io/index.md
+              - file: reference/operation/conversion/index.md
+
               - file: reference/operation/miscellaneous/index.md
                 sections:
-                  - file: reference/operation/resample.md
+                  - file: reference/operation/miscellaneous/resample.md
 
           - file: source/framework/api/doc/index.md
             sections:
@@ -90,6 +93,7 @@ parts:
             sections:
               - file: reference/algorithm/clump.md
               - file: reference/algorithm/flow_accumulation.md
+
           - file: source/quality_assurance/doc/index.md
             sections:
               - file: source/quality_assurance/cxx/doc/index.md

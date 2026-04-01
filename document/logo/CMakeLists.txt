@@ -161,7 +161,7 @@ if(LATEX_FOUND)
         TARGET lue.figure.logo.colour
         POST_BUILD
         BYPRODUCTS "lue_logo-colour.svg"
-        COMMAND ${CMAKE_COMMAND} -E copy "logo-colour.svg" "../doc/lue_logo-colour.svg"
+        COMMAND ${CMAKE_COMMAND} -E copy "logo-colour.svg" "../documentation/lue_logo-colour.svg"
         VERBATIM
     )
 

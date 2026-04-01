@@ -35,7 +35,8 @@ html:
   extra_footer: |
     <p>
     <a href="https://lue.computationalgeography.org">
-        <img src="https://lue.computationalgeography.org/logo-colour.svg" width="50" alt="LUE home"/>
+        <!-- TODO: where the logo?! -->
+        <img src="/_static/lue_logo-colour.svg" width="50" alt="LUE home"/>
     </a>
     </p>
 sphinx:
@@ -43,10 +44,17 @@ sphinx:
 
     bibtex_reference_style: author_year
 
-    # html_theme_options:
-    #   logo:
-    #     image_light: YOUR_LIGHT_LOGO.png
-    #     image_dark: YOUR_DARK_LOGO.png
+    html_theme_options:
+      # repository_url: https://example.com/thing
+      use_issues_button: false
+      use_download_button: false
+      use_repository_button: false
+      use_edit_page_button: false
+      home_page_in_toc: false
+      logo:
+        image_light: lue_logo-colour.svg
+        image_dark: lue_logo-colour.svg
+
     html_context:
       default_mode: light
 

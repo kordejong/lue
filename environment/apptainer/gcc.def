@@ -1,0 +1,25 @@
+Bootstrap: docker
+From: gcc:{{COMPILER_VERSION}}
+
+%files
+    {{LUE}}/environment/apptainer/prepare_debian.sh /opt
+    {{LUE}}/environment/apptainer/run_script.py /opt
+    {{LUE}}/environment/configuration/requirements-dev.txt /opt
+
+%post -c /bin/bash
+    /opt/prepare_debian.sh
+
+%environment
+    export VIRTUAL_ENV=/usr/local/venv
+    export PATH=/opt/cmake/bin:$VIRTUAL_ENV/bin:$PATH
+    export CC=gcc
+    export CXX=g++
+
+%help
+    Container for building HPX and LUE using a version of the GCC compiler.
+    What version to use is determined at build-time, by passing in the
+    COMPILER_VERSION build argument.
+
+    apptainer build --force --fakeroot \
+        --build-arg COMPILER_VERSION=15 --build-arg LUE=$LUE \
+        gcc-15.sif $LUE/environment/apptainer/gcc-15.def

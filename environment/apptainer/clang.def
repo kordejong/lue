@@ -1,0 +1,33 @@
+Bootstrap: docker
+From: silkeh/clang:{{COMPILER_VERSION}}
+
+%files
+    {{LUE}}/environment/apptainer/prepare_debian.sh /opt
+    {{LUE}}/environment/apptainer/run_script.py /opt
+    {{LUE}}/environment/configuration/requirements-dev.txt /opt
+
+%post -c /bin/bash
+    /opt/prepare_debian.sh
+
+    # gcc is only needed for HDF5 detection by CMake
+    apt-get install -y \
+        gcc
+
+    # ImageMagick security policy 'PDF' blocking conversion
+    sed -i '/disable ghostscript format types/,+6d' /etc/ImageMagick-6/policy.xml
+
+%environment
+    export VIRTUAL_ENV=/usr/local/venv
+    export PATH=/opt/cmake/bin:$VIRTUAL_ENV/bin:$PATH
+    export CC=clang-{{COMPILER_VERSION}}
+    export CXX=clang++-{{COMPILER_VERSION}}
+    export CXXFLAGS="-stdlib=libc++ -DBOOST_NO_CXX98_FUNCTION_BASE"
+
+%help
+    Container for building HPX and LUE using a version of the Clang compiler.
+    What version to use is determined at build-time, by passing in the
+    COMPILER_VERSION build argument.
+
+    apptainer build --force --fakeroot \
+        --build-arg COMPILER_VERSION=21 --build-arg LUE=$LUE \
+        clang-21.sif $LUE/environment/apptainer/clang.def

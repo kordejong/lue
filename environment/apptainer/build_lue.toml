@@ -1,0 +1,23 @@
+[hpx]
+version = "1.11.0"
+
+[hpx.prefix]
+source = "source/hpx"
+build = "build/Debug/hpx"
+install = "install/Debug"
+
+[mdspan]
+commit = "9ceface91483775a6c74d06ebf717bbb2768452f" # 0.6.0
+
+[mdspan.prefix]
+source = "source/mdspan"
+build = "build/Debug/mdspan"
+install = "install/Debug"
+
+[lue]
+branch = "master"
+
+[lue.prefix]
+source = "source/lue"
+build = "build/Debug/lue"
+install = "install/Debug"

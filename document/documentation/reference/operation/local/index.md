@@ -6,66 +6,66 @@
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`logical_and` (`&&` / `and`) | | |
-| {py:func}`logical_exclusive_or` (`^`)| | |
-| {py:func}`logical_inclusive_or` (`\|\|` / `or`) | | |
-| {py:func}`logical_not` (`!` / `not`) | | |
+| {py:func}`logical_and`<br/>`&&` (C++), `and` (Python) | ... | |
+| {py:func}`logical_exclusive_or`<br/>`^` (Python) | ... | |
+| {py:func}`logical_inclusive_or`<br/>`\|\|` (C++), `or` (Python) | ... | |
+| {py:func}`logical_not`<br/>`!` (C++), `not` (Python) | ... | |
 
 ## Comparison and classification
 
 | Name | Description | Example |
 | --- | --- | --- |
 | {py:func}`close_to` | | |
-| {py:func}`equal_to` (`==`) | | |
-| {py:func}`greater_than` (`>`) | | |
-| {py:func}`greater_than_equal_to` (`>=`) | | |
-| {py:func}`less_than` (`<`) | | |
-| {py:func}`less_than_equal_to` (`<=`) | | |
-| {py:func}`not_equal_to` (`!=`) | | |
-| {py:func}`valid` | | |
+| {py:func}`equal_to`<br/>`==` (C++, Python) | ... | |
+| {py:func}`greater_than`<br/>`>` (C++, Python) | ... | |
+| {py:func}`greater_than_equal_to`<br/>`>=` (C++, Python) | ... | |
+| {py:func}`less_than`<br/>`<` (C++, Python) | ... | |
+| {py:func}`less_than_equal_to`<br/>`<=` (C++, Python) | ... | |
+| {py:func}`not_equal_to`<br/>`!=` (C++, Python) | ... | |
+| {py:func}`valid` | ... | |
 
 ## Conditional
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`where` | | |
+| {py:func}`where` | ... | |
 
 ## Trigonometric
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`acos` | | |
-| {py:func}`asin` | | |
-| {py:func}`atan` | | |
-| {py:func}`atan2` | | |
-| {py:func}`cos` | | |
-| {py:func}`sin` | | |
-| {py:func}`tan` | | |
+| {py:func}`acos` | ... | |
+| {py:func}`asin` | ... | |
+| {py:func}`atan` | ... | |
+| {py:func}`atan2` | ... | |
+| {py:func}`cos` | ... | |
+| {py:func}`sin` | ... | |
+| {py:func}`tan` | ... | |
 
 ## Nearest integer floating point
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`ceil` | | |
-| {py:func}`floor` | | |
-| {py:func}`round` | | |
-| {py:func}`trunc` | | |
+| {py:func}`ceil` | ... | |
+| {py:func}`floor` | ... | |
+| {py:func}`round` | ... | |
+| {py:func}`trunc` | ... | |
 
 ## Mathematical
 
 | Name | Description | Example |
 | --- | --- | --- |
 | {py:func}`abs` | | |
-| {py:func}`add` (`+`) | | |
-| {py:func}`divide` (`/`) | | |
-| {py:func}`exp` | | |
-| {py:func}`log` | | |
-| {py:func}`log10` | | |
-| {py:func}`modulus` (`%`) | | |
-| {py:func}`multipl`y (`*`) | | |
-| {py:func}`negate` (`-`) | | |
+| {py:func}`add`<br/>`+` (C++, Python) | ... | |
+| {py:func}`divide`<br/>`/` (C++, Python) | ... | |
+| {py:func}`exp` | ... | |
+| {py:func}`log` | ... | |
+| {py:func}`log10` | ... | |
+| {py:func}`modulus`<br/>`%` (C++, Python) | ... | |
+| {py:func}`multiply`<br/>`*` (C++, Python) | ... | |
+| {py:func}`negate`<br/>`-` (C++, Python) | ... | |
 | {py:func}`open_simplex_noise` | Create noise field | <img src="open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.*" width="30"/> |
-| {py:func}`pow` (`**`) | | |
-| {py:func}`sqrt` | | |
-| {py:func}`subtract` (`-`) | | |
-| {py:func}`uniform` | | |
+| {py:func}`pow`<br/>`**` (Python) | ... | |
+| {py:func}`sqrt` | ... | |
+| {py:func}`subtract`<br/>`-` (C++, Python) | ... | |
+| {py:func}`uniform` | ... | |

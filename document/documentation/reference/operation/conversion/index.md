@@ -4,5 +4,5 @@
 
 | Name | Description | Example |
 | --- | --- | --- |
-| {py:func}`from_numpy` | | |
-| {py:func}`to_numpy` | | |
+| {py:func}`from_numpy` | ... | |
+| {py:func}`to_numpy` | ... | |

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import glob
-import os.path
 import sys
 from pathlib import Path
 
@@ -15,8 +14,10 @@ def serve_documentation(
     source_directory_path: Path, build_directory_path: Path
 ) -> None:
     source_prefix = f"{source_directory_path}/source"
-    documentation_source_prefix = f"{source_directory_path}/document/doc"
-    documentation_build_prefix = f"{build_directory_path}/document/doc/_build/html"
+    documentation_source_prefix = f"{source_directory_path}/document/documentation"
+    documentation_build_prefix = (
+        f"{build_directory_path}/document/documentation/_build/html"
+    )
 
     server = Server()
 
@@ -40,7 +41,7 @@ def serve_documentation(
 
 
 def main() -> None:
-    command = os.path.basename(sys.argv[0])
+    command = Path(sys.argv[0]).name
     usage = f"""\
 Serve documentation and refresh when source files change
 

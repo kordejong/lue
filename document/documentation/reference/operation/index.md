@@ -1,3 +1,5 @@
+(doc-reference-operation)=
+
 # Operations
 
 Operations are the generic building blocks for larger applications. Most operations use some computation to

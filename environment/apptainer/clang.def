@@ -4,7 +4,6 @@ From: silkeh/clang:{{COMPILER_VERSION}}
 %files
     {{LUE}}/environment/apptainer/prepare_debian.sh /opt
     {{LUE}}/environment/apptainer/build_lue.py /opt
-    {{LUE}}/environment/configuration/requirements-dev.txt /opt
 
 %post -c /bin/bash
     /opt/prepare_debian.sh

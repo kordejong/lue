@@ -782,7 +782,7 @@ namespace lue {
 
                 lue_hpx_assert(to_lue_finished_f.valid());
 
-                return std::move(to_lue_finished_f);
+                return to_lue_finished_f;
             });
 
         root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));

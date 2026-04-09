@@ -455,7 +455,8 @@ these differences as much as possible.
     -
 *   - uniqueid
     - ✅
-    - unique_id
+    - unique_id \
+      IDs start with zero, not one as in PCRaster.
 *   - upstream
     - ✅
     -

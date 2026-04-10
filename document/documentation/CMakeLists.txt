@@ -3,6 +3,7 @@ set(doc_preprocess_target_name lue.doc_preprocess)
 
 add_custom_target(${doc_preprocess_target_name})
 
+add_subdirectory(quick_start)
 add_subdirectory(reference)
 
 add_dependencies(${doc_preprocess_target_name}
@@ -80,6 +81,7 @@ foreach(name IN ITEMS
     pcraster/port.md
     pcraster/status.md
     quick_start/cpp.md
+    quick_start/game_of_life.cpp
     quick_start/game_of_life.py
     quick_start/index.md
     quick_start/python.md

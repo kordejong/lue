@@ -1,7 +1,5 @@
 #define BOOST_TEST_MODULE lue framework model simulate
-#include "lue/framework/model/model.hpp"
-#include "lue/framework/model/progressor.hpp"
-#include "lue/framework/model/simulate.hpp"
+#include "lue/framework/model.hpp"
 #include "lue/framework/test/hpx_unit_test.hpp"
 
 

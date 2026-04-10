@@ -103,7 +103,7 @@ IncludeCategories:
       Priority: 80
     - Regex: '^"lue/'
       Priority: 90
-    - Regex: "^<hpx/"
+    - Regex: "^(<hpx/|<cxxopts.hpp>)"
       Priority: 100
     - Regex: "^<vulkan/"
       Priority: 105

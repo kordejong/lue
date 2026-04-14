@@ -2,6 +2,7 @@
 #include "lue/framework/api/cxx/create_scalar.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
 #include <format>
 
 
@@ -127,6 +128,7 @@ namespace lue::api {
         }
 
     }  // Anonymous namespace
+
 
     void bind_scalar(pybind11::module& module)
     {

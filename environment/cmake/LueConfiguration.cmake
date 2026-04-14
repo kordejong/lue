@@ -446,7 +446,6 @@ if(LUE_MDSPAN_REQUIRED)
         GIT_REPOSITORY https://github.com/kokkos/mdspan.git
         GIT_TAG 9ceface91483775a6c74d06ebf717bbb2768452f  # 0.6.0
         SYSTEM
-        FIND_PACKAGE_ARGS
     )
     FetchContent_MakeAvailable(mdspan)
 endif()
@@ -671,7 +670,6 @@ if(LUE_NLOHMANN_JSON_REQUIRED)
         GIT_REPOSITORY https://github.com/nlohmann/json.git
         GIT_TAG 9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03  # v3.11.3
         SYSTEM
-        FIND_PACKAGE_ARGS
     )
     FetchContent_MakeAvailable(nlohmann_json)
 endif()

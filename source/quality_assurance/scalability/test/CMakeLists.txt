@@ -12,8 +12,12 @@ set_property(
         lue_qa_command_test
     APPEND
     PROPERTY
-        # Add the path to our Python modules to PYTHONPATH.
         ENVIRONMENT_MODIFICATION
+            # Preload the custom allocator shared library, if necessary
+            LD_PRELOAD=path_list_append:$<$<AND:$<PLATFORM_ID:Linux>,$<BOOL:${Jemalloc_LIBRARY}>>:${Jemalloc_LIBRARY}>
+            LD_PRELOAD=path_list_append:$<$<AND:$<PLATFORM_ID:Linux>,$<BOOL:${Tcmalloc_LIBRARY}>>:${Tcmalloc_LIBRARY}>
+
+            # Add the path to our Python modules to PYTHONPATH.
             PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
             # No need to append the PATH here with locations to our DDLs. Python won't pick them up.
 )

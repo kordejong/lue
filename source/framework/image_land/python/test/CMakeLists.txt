@@ -19,23 +19,19 @@
 #         lue_py_image_land_python_test
 #     APPEND
 #     PROPERTY
-#         # Preload the tcmalloc shared library, if necessary.
 #         ENVIRONMENT_MODIFICATION
-#             LD_PRELOAD=path_list_append:$<$<PLATFORM_ID:Linux>:${Tcmalloc_LIBRARY}>
-# )
-# set_property(
-#     TEST
-#         lue_py_image_land_python_test
-#     APPEND
-#     PROPERTY
-#         # Add the path to our Python modules to PYTHONPATH.
-#         ENVIRONMENT_MODIFICATION
+#             # Preload the tcmalloc shared library, if necessary
+#             LD_PRELOAD=path_list_append:$<$<AND:$<PLATFORM_ID:Linux>,$<BOOL:${Jemalloc_LIBRARY}>>:${Jemalloc_LIBRARY}>
+#             LD_PRELOAD=path_list_append:$<$<AND:$<PLATFORM_ID:Linux>,$<BOOL:${Tcmalloc_LIBRARY}>>:${Tcmalloc_LIBRARY}>
+#
+#             # Add the path to our Python modules to PYTHONPATH.
 #             PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
 #             PYTHONPATH=path_list_prepend:$<TARGET_PROPERTY:lue::py_framework,SOURCE_DIR>/test  # lue_unit_test.py
 #             PYTHONPATH=path_list_prepend:${CMAKE_CURRENT_SOURCE_DIR}
 #             PATH=path_list_prepend:$<$<PLATFORM_ID:Windows>:$<TARGET_FILE_DIR:hdf5::hdf5>/../bin>
 #             PATH=path_list_prepend:$<$<PLATFORM_ID:Windows>:${HWLOC_ROOT}/bin>
 # )
+#
 # set_property(
 #     TEST
 #         lue_py_image_land_python_test

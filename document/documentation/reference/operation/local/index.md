@@ -11,7 +11,7 @@
 | {py:func}`logical_inclusive_or`<br/>`\|\|` (C++), `or` (Python) | ... | |
 | {py:func}`logical_not`<br/>`!` (C++), `not` (Python) | ... | |
 
-## Comparison and classification
+## Comparison
 
 | Name | Description | Example |
 | --- | --- | --- |
@@ -22,7 +22,6 @@
 | {py:func}`less_than`<br/>`<` (C++, Python) | ... | |
 | {py:func}`less_than_equal_to`<br/>`<=` (C++, Python) | ... | |
 | {py:func}`not_equal_to`<br/>`!=` (C++, Python) | ... | |
-| {py:func}`valid` | ... | |
 
 ## Conditional
 
@@ -69,3 +68,9 @@
 | {py:func}`sqrt` | ... | |
 | {py:func}`subtract`<br/>`-` (C++, Python) | ... | |
 | {py:func}`uniform` | ... | |
+
+## Miscellaneous
+
+| Name | Description | Example |
+| --- | --- | --- |
+| {py:func}`valid` | ... | |

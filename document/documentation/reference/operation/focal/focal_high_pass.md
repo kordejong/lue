@@ -1,5 +1,8 @@
 # `focal_high_pass`
 
+```{index} single: focal operation; focal_high_pass
+```
+
 ## Signature
 
 ```{eval-rst}

@@ -1,5 +1,8 @@
 # `upstream`
 
+```{index} single: routing operation; downstream
+```
+
 ## Signature
 
 ```{eval-rst}

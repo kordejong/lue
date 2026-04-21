@@ -1,5 +1,8 @@
 # `focal_mean`
 
+```{index} single: focal operation; focal_mean
+```
+
 ## Signature
 
 ```{eval-rst}

@@ -27,8 +27,12 @@ Options:
     # [example
     array_shape = (600, 400)
     condition = lfr.create_array(array_shape, lfr.boolean_element_type, 1)
-    x_coordinates = lfr.cast(lfr.cell_index(condition, 1), np.float32)
-    y_coordinates = lfr.cast(lfr.cell_index(condition, 0), np.float32)
+    x_coordinates = lfr.cast(
+        lfr.cell_index(condition, 1), lfr.floating_point_element_types[0]
+    )
+    y_coordinates = lfr.cast(
+        lfr.cell_index(condition, 0), lfr.floating_point_element_types[0]
+    )
     seed = 5
     result = lfr.open_simplex_noise(x_coordinates, y_coordinates, seed)
 

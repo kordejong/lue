@@ -1,48 +1,39 @@
 # `uniform`
 
+```{index} single: local operation; uniform
+```
+
 ## Signature
 
 ```{eval-rst}
-.. py:function:: uniform(array_shape, partition_shape, min_value, max_value) -> Field
+.. py:function::
+    uniform(array_shape, partition_shape, min_value, max_value) -> Field
+    uniform(array_shape, min_value, max_value) -> Field
+    uniform(array, min_value, max_value) -> Field
+    uniform(min_value, max_value) -> Field
 
-   Return a field with values drawn from the uniform distribution
+    Return a field with value(s) drawn from the uniform distribution
 
-   :param Shape array_shape: Shape of the array
-   :param Shape partition_shape: Shape of the partitions
-   :param Field min_value: Minimum value of the distribution (value, scalar / arithmetic)
-   :param Field max_value: Maximum value of the distribution (value, scalar / arithmetic)
-   :return: New field with values in the range [min_value, max_value] (integral values) or [min_value,
-        max_value) (floating point values) (array / arithmetic)
+    :param Shape array_shape: Shape of the array
+    :param Array array: Array whose shape and partition shape will be used
+    :param Shape partition_shape: Shape of the partitions. If not passed in a default partition shape will
+        be used.
+    :param Field min_value: Minimum value of the distribution (value, scalar / arithmetic)
+    :param Field max_value: Maximum value of the distribution (value, scalar / arithmetic)
+    :return: New field with value(s) in the range [min_value, max_value] (integral values) or
+        [min_value, max_value) (floating point values) (array, scalar / arithmetic)
 
-.. py:function:: uniform(array_shape, min_value, max_value) -> Field
-   :no-index:
-
-   Overload. A default partition shape will be used.
-
-.. py:function:: uniform(array, min_value, max_value) -> Field
-   :no-index:
-
-   Overload. The passed in array's shape and partition shape will be used.
-
-.. py:function:: uniform(min_value, max_value) -> Field
-
-   Return a scalar with a value drawn from the uniform distribution.
-
-   :param Scalar min_value: Minimum value of the distribution (value, scalar / arithmetic)
-   :param Scalar max_value: Maximum value of the distribution (value, scalar / arithmetic)
-   :return: New field with value in the range [min_value, max_value] (integral values) or [min_value,
-        max_value) (floating point values) (array / arithmetic)
+    .. note::
+        Generating random values for `uint8` and `int8` element types is not supported.
 ```
 
 ## Description
 
-TODO
-
-- max_value included / excluded vs integral / floating point values
+Operation for creating random fields for various element types, with values in a custom range.
 
 ## No-data handling
 
-TODO
+If `min_value` or `max_value` is no-data, no-data is written to the result.
 
 ## Example
 
@@ -74,10 +65,13 @@ Source code:
 ## See also
 
 - Algorithms used:
-  - [Integral values](https://en.cppreference.com/cpp/numeric/random/uniform_int_distribution)
-  - [Floating point values](https://en.cppreference.com/cpp/numeric/random/uniform_real_distribution)
+  - [`std::uniform_int_distribution`](https://en.cppreference.com/cpp/numeric/random/uniform_int_distribution)
+  for integral values
+  - [`std::uniform_real_distribution`](https://en.cppreference.com/cpp/numeric/random/uniform_real_distribution)
+    for floating point values
 
 | Software | Operation name |
 | --- | --- |
-| ArcGIS | TODO |
+| ArcGIS | `UNIFORM` |
+| NumPy | `random.uniform` |
 | PCRaster | `mapuniform` |

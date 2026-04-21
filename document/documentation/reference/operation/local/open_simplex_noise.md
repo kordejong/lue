@@ -10,10 +10,10 @@
 
    Return a noise field based on the OpenSimplex noise function
 
-   :param Field x_coordinates: Floating point array
-   :param Field y_coordinates: Floating point array
+   :param Field x_coordinates: X-coordinates (array / floating point)
+   :param Field y_coordinates: Y-coordinates (array / floating point)
    :param seed int: Seed
-   :return: New floating point array with values in the range [-1, 1]
+   :return: New field with values in the range [-1, 1] (array / floating point)
 ```
 
 ## Description

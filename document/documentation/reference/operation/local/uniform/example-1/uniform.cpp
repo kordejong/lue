@@ -47,7 +47,6 @@ class Example: public lue::document::Example
             using namespace lue;
             using namespace lue::value_policies;
 
-            // [example
             Rank const rank{2};
             using Shape = Shape<Count, rank>;
             using Element = LargestUnsignedIntegralElement;
@@ -56,10 +55,11 @@ class Example: public lue::document::Example
             Shape const array_shape{6, 4};
             Element const min_value{1};
             Element const max_value{10};
+            // [example
             Array const result = uniform(array_shape, min_value, max_value);
+            // example]
 
             to_gdal(result, result_array_pathname);
-            // example]
 
             return EXIT_SUCCESS;
         }

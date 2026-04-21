@@ -1,6 +1,6 @@
 # `open_simplex_noise`
 
-```{index} single: miscellaneous operation; convolve
+```{index} single: local operation; open_simplex_noise
 ```
 
 ## Signature
@@ -8,12 +8,12 @@
 ```{eval-rst}
 .. py:function:: open_simplex_noise(x_coordinates, y_coordinates, seed) -> Field
 
-   Return a noise field based on the OpenSimplex noise function
+    Return a noise field based on the OpenSimplex noise function
 
-   :param Field x_coordinates: X-coordinates (array / floating point)
-   :param Field y_coordinates: Y-coordinates (array / floating point)
-   :param seed int: Seed
-   :return: New field with values in the range [-1, 1] (array / floating point)
+    :param Field x_coordinates: X-coordinates (array / floating point)
+    :param Field y_coordinates: Y-coordinates (array / floating point)
+    :param int seed: Seed
+    :return: New field with values in the range [-1, 1] (array / floating point)
 ```
 
 ## Description

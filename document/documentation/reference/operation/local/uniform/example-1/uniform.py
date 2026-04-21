@@ -24,14 +24,15 @@ Options:
     arguments = docopt.docopt(usage, sys.argv[1:], version=version)
     result_array_path = Path(arguments["<result>"])
 
-    # [example
     array_shape = (6, 4)
     min_value = 1
     max_value = 10
-    result = lfr.uniform(array_shape, np.uint32, min_value, max_value)
+    dtype = lfr.unsigned_integral_element_types[-1]
+    # [example
+    result = lfr.uniform(array_shape, dtype, min_value, max_value)
+    # example]
 
     lfr.to_gdal(result, str(result_array_path))
-    # example]
 
 
 if __name__ == "__main__":

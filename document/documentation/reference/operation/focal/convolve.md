@@ -8,21 +8,24 @@
 ```{eval-rst}
 .. py:function:: convolve(field, kernel) -> Field
 
-   Sum all values in a neighbourhood, multiplied by their weights
+    Sum all values in a neighbourhood, multiplied by their weights
 
-   :param Field field: Floating point field to analyse
-   :param Kernel kernel: Neighbourhood to search. The weights must be floating point and will be used to
+    :param Field field: Field to analyse (array / floating point)
+    :param Kernel kernel: Neighbourhood to search. The weights must be floating point and will be used to
         multiply each cell's value with.
-   :return: New floating point field
+    :return: New field (array / floating point)
 ```
 
 ## Description
 
 Focal operation summing all values in a neighbourhood, multiplied by their weights.
 
+Formula for computing a result for a single cell {math}`(row, col)`, given an array {math}`A` and a 3x3
+kernel {math}`K`:
+
 ```{math}
 :label: convolve
-\sum_{i=1}^{n} K[c] A[c]
+\sum_{i=-1}^{1} \sum_{j=-1}^{1} K[i][j] \times A[row+i][col+j]
 ```
 
 ## No-data handling

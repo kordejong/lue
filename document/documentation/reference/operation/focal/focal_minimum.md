@@ -1,5 +1,8 @@
 # `focal_minimum`
 
+```{index} single: focal operation; focal_minimum
+```
+
 ## Signature
 
 ```{eval-rst}

@@ -128,19 +128,19 @@ See [](reference-operation-routing) for an overview of all routing operations.
 
 ## I/O operations
 
-TODO: description
+Operations related to reading and writing data.
 
 See [](reference-operation-io) for an overview of all I/O operations.
 
 ## Conversion operations
 
-TODO: description
+Operations related to interacting with other software packages.
 
 See [](reference-operation-conversion) for an overview of all conversion operations.
 
 ## Miscellaneous operations
 
-TODO: description
+Operations that do not fall in the above categories.
 
 See [](reference-operation-miscellaneous) for an overview of all miscellaneous operations.
 

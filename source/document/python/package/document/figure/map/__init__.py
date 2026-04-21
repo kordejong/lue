@@ -1,4 +1,5 @@
 import math
+from collections.abc import Callable
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -12,6 +13,13 @@ colour_map_by_value_scale = {
     "nominal": "Dark2",
     "ordinal": "viridis",
     "scalar": "viridis",
+}
+
+value_formatter_by_value_scale = {
+    "boolean": lambda value: f"{value != 0}",
+    "nominal": lambda value: f"{value}",
+    "ordinal": lambda value: f"{value}",
+    "scalar": lambda value: f"{value:.2f}",
 }
 
 
@@ -40,6 +48,14 @@ def colour_map(raster: rasterio.io.DatasetReader) -> str:
     return colour_map_by_value_scale[value_scale]
 
 
+def value_formatter(raster: rasterio.io.DatasetReader) -> Callable[[str], str]:
+    value_scale = raster.tags(1, ns="lue").get(
+        "value_scale", default_value_scale(raster)
+    )
+
+    return value_formatter_by_value_scale[value_scale]
+
+
 def skip(value, no_data_value) -> bool:
     if no_data_value is not None:
         if isinstance(no_data_value, float) and math.isnan(no_data_value):
@@ -62,6 +78,7 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
     figure, axes = plt.subplots(figsize=(nr_cols * scale, nr_rows * scale))
 
     colour_map_ = colour_map(raster)
+    format_value = value_formatter(raster)
 
     rasterio.plot.show(raster, ax=axes, cmap=colour_map_)
     axes.set_axis_off()
@@ -79,7 +96,8 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
         for idx, coordinate in enumerate(coordinates):
             if not skip(cell_values[idx], nodata_value):
                 annotation = axes.annotate(
-                    f"{cell_values[idx]}",
+                    # f"{cell_values[idx]}",
+                    format_value(cell_values[idx]),
                     xy=coordinate,
                     textcoords="data",
                     ha="center",

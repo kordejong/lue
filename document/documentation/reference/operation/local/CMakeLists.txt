@@ -7,6 +7,7 @@ add_subdirectory(argument)
 
 set(operation_names
     open_simplex_noise
+    uniform
 )
 
 foreach(operation_name ${operation_names})

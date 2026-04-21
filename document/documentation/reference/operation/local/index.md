@@ -67,7 +67,7 @@
 | {py:func}`pow`<br/>`**` (Python) | ... | |
 | {py:func}`sqrt` | ... | |
 | {py:func}`subtract`<br/>`-` (C++, Python) | ... | |
-| {py:func}`uniform` | ... | |
+| {py:func}`uniform` | Create random field | <img src="uniform/example-1/result/cxx/uniform-1.*" width="30"/> |
 
 ## Miscellaneous
 

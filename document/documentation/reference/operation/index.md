@@ -41,6 +41,10 @@ doing useful work.
   exist that help with such conversion, like {py:func}`resample`, for example.
 - The signatures of the operations are written in a language-agnostic manner. How to use each operation from
   a specific language might slightly differ. Check the usage examples for inspiration.
+- The most relevant part of each usage example is the call of the operation. Some of the code surrounding
+  such calls is atypical code developed specifically to make it easy to write usage examples. This code, from
+  the `lue_document` C++ library and the `lue.document` Python subpackage, should not be used in real-world
+  LUE code.
 ```
 
 ## Local operations

@@ -1,5 +1,8 @@
 # `focal_diversity`
 
+```{index} single: focal operation; focal_diversity
+```
+
 ## Signature
 
 ```{eval-rst}

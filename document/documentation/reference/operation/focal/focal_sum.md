@@ -1,5 +1,8 @@
 # `focal_sum`
 
+```{index} single: focal operation; focal_sum
+```
+
 ## Signature
 
 ```{eval-rst}

@@ -1,5 +1,8 @@
 # `focal_majority`
 
+```{index} single: focal operation; focal_majority
+```
+
 ## Signature
 
 ```{eval-rst}

@@ -1,5 +1,8 @@
 # `focal_maximum`
 
+```{index} single: focal operation; focal_maximum
+```
+
 ## Signature
 
 ```{eval-rst}

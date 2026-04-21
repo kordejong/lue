@@ -58,22 +58,28 @@ The [reference section](#doc-reference) is an important part of the LUE document
 An operation page describes, possible multiple overloads of, a single LUE operation. Each page contains the
 same set of sections:
 
-- [Signature](#signature)
-- [Description](#description)
-- [No-data handling](#no-data-handling)
-- [Example](#example)
-- [See also](#see-also)
+- [Signature](#operation-reference-page-signature)
+- [Description](#operation-reference-page-description)
+- [No-data handling](#operation-reference-page-no-data-handling)
+- [Example](#operation-reference-page-example)
+- [See also](#operation-reference-page-see-also)
 
 #### Sections
+
+(operation-reference-page-signature)=
 
 ##### Signature
 
 A signature for each overload of the operation, in a language agnostic way.
 
+(operation-reference-page-description)=
+
 ##### Description
 
 The description of the operation, in a language agnostic way. If needed the description should highlight
 differences between overloads.
+
+(operation-reference-page-no-data-handling)=
 
 ##### No-data handling
 
@@ -81,10 +87,14 @@ A description of how no-data values are handled by the operation. After reading 
 operation must understand how the operation deals with no-data values in the arguments, and under what
 circumstances no-data is generated and written to the result.
 
+(operation-reference-page-example)=
+
 ##### Example
 
 One or more language-specific examples of calling and operation. Per example, an implementation must be
 provided for all supported programming languages.
+
+(operation-reference-page-see-also)=
 
 ##### See also
 

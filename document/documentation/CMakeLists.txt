@@ -63,7 +63,9 @@ foreach(name IN ITEMS
     manual/framework/python/index.md
     manual/glossary.md
     manual/index.md
+    manual/install/apptainer.md
     manual/install/conda.md
+    manual/install/easybuild.md
     manual/install/index.md
     manual/install/source.md
     manual/quality_assurance/index.md

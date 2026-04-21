@@ -98,8 +98,19 @@ provided for all supported programming languages.
 
 ##### See also
 
-Zero or more internal or external links to pages with more information related to the operation.
+Zero or more internal or external links to pages with more information related to the operation. Examples are
+links to a related: algorithm, blog post, or book. Also, a table can be added with names of similar operations
+in other software packages.
 
-#### Add new page
+### Add a new page
 
-TODO
+- Use a similar operation for inspiration:
+  - Copy and rename its Markdown file, replace its contents. Add new file to `documentation/CMakeLists.txt`
+  and `documentation/_toc.yml`.
+  - Copy and rename its example directory. Update its `CMakeLists.txt` and the source code.
+- Rebuild the documentation and inspect the message printed and the resulting HTML. Running a local web server
+can by handy for this:
+
+  ```bash
+  python -m http.server $lue_build_directory/document/documentation/_build/html
+  ```

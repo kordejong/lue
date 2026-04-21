@@ -16,6 +16,8 @@ parts:
             sections:
               - file: manual/install/conda.md
               - file: manual/install/source.md
+              - file: manual/install/easybuild.md
+              - file: manual/install/apptainer.md
           - file: manual/data_model/index.md
             sections:
               - file: manual/data_model/concept.md

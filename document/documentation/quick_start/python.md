@@ -2,14 +2,7 @@
 
 ## Install
 
-Installing the LUE Conda package is the easiest way to get started:
-
-```bash
-conda install -c conda-forge lue
-```
-
-See also [](#install-conda).
-
+See the [installation section](#installation) for all options for installing LUE.
 
 ## Implement
 
@@ -35,7 +28,6 @@ For the model developer this asynchrony has a few practical implications, relate
 - Managing the runtime
 - Dealing with asynchronously computed values
 - Slowing down the interpreter
-
 
 ### Managing the runtime
 
@@ -73,9 +65,7 @@ only executed by one of the processes[^decorator]. Unless special measures are t
 the call to the decorated function is executed by all processes.
 ```
 
-[^decorator]: The `runtime_scope` decorator itself is executed by all processes. This is needed because the
 runtime needs to be started by all processes, allowing them to collaboratively solve all the work.
-
 
 ### Dealing with asynchronously computed values
 
@@ -89,17 +79,17 @@ tasks by LUE operations in subsequent expressions.
 ```python
 lowest_elevation = lfr.minimum(elevation)
 
-# Using the value means explicitly get-ting it. This blocks the interpreter.
-print(lowest_elevation.get())
+# Using the value means explicitly get-ting it from its future. This blocks
+# the interpreter.
+print(lowest_elevation.future.get())
 
 # We only get here once the computation of lowest_elevation has finished
 ```
 
 ```{note}
 Use LUE operations whenever possible. Mixing LUE operations with other library's operations requires blocking
-the interpreter, which limits the options of the LUE runtime for efficiently performing all the work.
+the interpreter, which limits the options the LUE runtime has for efficiently performing all the work.
 ```
-
 
 ### Slowing down the interpreter
 
@@ -112,7 +102,6 @@ more work. LUE has a facility to limit the number of iterations for which work i
 the work for an iteration is finished, work for another iteration is added to the mix. This way, LUE ensures
 that there is always work for `rate_limit` iterations is available for execution. The next example illustrates
 the use of `rate_limit`.
-
 
 ```python
 class MyModel(lfr.Model):
@@ -129,10 +118,8 @@ class MyModel(lfr.Model):
         # ...
 
 
-        # Inform LUE about when the time step is finished. A partitioned array
-        # can be asked for a future which becomes ready once all partitions have
-        # become ready.
-        return state.future()
+        # Inform LUE about when the time step is finished
+        return lfr.as_state(state)
 
 
 my_model = MyModel();
@@ -140,7 +127,6 @@ my_model = MyModel();
 # Supply the runtime with work for 3 time steps
 lfr.run_deterministic(my_model, lfr.DefaultProgressor(), nr_time_steps=365 * 24, rate_limit=3);
 ```
-
 
 ### Game of Life
 
@@ -154,7 +140,6 @@ supported:
 - Save generations to files
 
 We will implement these aspects in turn. See [](#quick-start-model) for the complete script.
-
 
 #### Parse the command line arguments
 
@@ -198,7 +183,6 @@ final pathname. Optionally, a partition shape can be passed in as well, which wi
 array. By default LUE will use a heuristic to determine a suitable partition shape, based on the array size
 and the number of CPU cores used.
 
-
 #### Initialize a generation
 
 A generation in Game of Life is an array with boolean values representing whether or not a cell is alive or
@@ -220,7 +204,6 @@ def initialize_generation(array_shape: Shape, partition_shape: Shape | None) -> 
 
     return generation
 ```
-
 
 #### Simulate the next generation
 
@@ -262,9 +245,9 @@ In this function different kinds of LUE operations are used:
 
 - A focal operation: `focal_sum`
 - Local operations:
-    - Conditional: `where`
-    - Comparison: `less_then` / `<`, `greater_then` / `>`, and `equal_to` / `==`
-    - Logical: `not` / `~`, `or` / `|`[^logical_not]
+  - Conditional: `where`
+  - Comparison: `less_then` / `<`, `greater_then` / `>`, and `equal_to` / `==`
+  - Logical: `not` / `~`, `or` / `|`[^logical_not]
 
 [^logical_not]: LUE forbids arrays to be used in [truth value
 testing](https://docs.python.org/3/library/stdtypes.html#truth-value-testing) because this is ambiguous: how
@@ -272,7 +255,6 @@ to convert an array of values to a single True or False? To allow for Boolean op
 basis, LUE uses the [Python bitwise
 operators](https://docs.python.org/3/library/stdtypes.html#bitwise-operations-on-integer-types): `&` for
 Boolean `and`, `|` for Boolean `or`, `^` for Boolean exclusive or, and `~` for Boolean `not`.
-
 
 #### Save a generation
 
@@ -287,7 +269,6 @@ lfr.to_gdal(generation, f"{self.generation_path}-{generation_id}.tif")
 This function also works asynchronously, so Python will continue interpreting subsequent statements while the
 I/O is being scheduled for execution, at some future moment in time.
 
-
 #### Putting it all together
 
 We now have the building blocks for finishing the script that implements a version of the Game of Life
@@ -301,7 +282,6 @@ A LUE model simulating a system's state through time must implement a `simulate`
 the change of the state for a single time step, and optionally an `initialize` member function to initialize
 the systems's state. In our case, this is where we can call our `initialize_generation` and `next_generation`
 functions. At the end of the `simulate` we save the new distribution of alive and dead cells.
-
 
 ```python
 class GameOfLife(lfr.Model):
@@ -325,7 +305,7 @@ class GameOfLife(lfr.Model):
         self.generation = next_generation(self.generation)
         self.save_generation(self.generation, iteration)
 
-        return self.generation.future()
+        return lfr.as_state(self.generation)
 ```
 
 To actually run the model we call `run_deterministic`. This function takes a `Model` specialization, a
@@ -361,7 +341,6 @@ if __name__ == "__main__":
     main()
 ```
 
-
 ## Execute
 
 We can execute our model as we would execute any Python script:
@@ -386,7 +365,6 @@ python game_of_life.py --hpx:threads=2 [2000,2000] 20 generation
 ```
 
 More information about executing LUE models can be found on the [](execute-lue-framework-programs) page.
-
 
 (quick-start-model)=
 

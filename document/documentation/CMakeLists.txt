@@ -98,6 +98,13 @@ foreach(name IN ITEMS
     # reference/java/index.md
     # reference/julia/index.md
 
+    reference/concept/array.md
+    reference/concept/field.md
+    reference/concept/index.md
+    reference/concept/raster.md
+    reference/concept/scalar.md
+    reference/concept/shape.md
+
     reference/operation/conversion/index.md
 
     reference/operation/focal/convolve.md
@@ -204,6 +211,7 @@ add_custom_target(documentation
         DEPENDS
             doxygen_doc
             ${doc_preprocess_target_name}
+            lue.figure.logo.colour
             # python_api
 )
 

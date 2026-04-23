@@ -80,7 +80,7 @@ class GameOfLife(lfr.Model):
         self.generation = next_generation(self.generation)
         self.save_generation(self.generation, iteration)
 
-        return self.generation.future()
+        return lfr.as_state(self.generation)
 
 
 @lfr.runtime_scope

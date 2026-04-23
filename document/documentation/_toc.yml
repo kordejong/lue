@@ -37,6 +37,13 @@ parts:
 
       - file: reference/index.md
         sections:
+          - file: reference/concept/index.md
+            sections:
+              - file: reference/concept/field.md
+              - file: reference/concept/raster.md
+              - file: reference/concept/array.md
+              - file: reference/concept/shape.md
+              - file: reference/concept/scalar.md
           - file: reference/operation/index.md
             sections:
               - file: reference/operation/local/index.md

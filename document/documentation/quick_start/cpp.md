@@ -2,7 +2,7 @@
 
 ## Install
 
-TODO
+See the [installation section](#installation) for all options for installing LUE.
 
 ## Implement
 

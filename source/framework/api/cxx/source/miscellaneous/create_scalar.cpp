@@ -1,4 +1,4 @@
-#include "lue/framework/api/cxx/create_scalar.hpp"
+#include "lue/framework/api/cxx/miscellaneous/create_scalar.hpp"
 #include "detail/unsupported_overload.hpp"
 #include "overload.hpp"
 #include "lue/concept.hpp"

@@ -84,8 +84,6 @@ target_sources(lue_framework_api_cxx
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/cxx/scalar.hpp
     PRIVATE
         ${generated_source_files}
-        source/create_array.cpp
-        source/create_scalar.cpp
         source/focal/mean.cpp
         source/io.cpp
         source/local/abs.cpp
@@ -127,6 +125,8 @@ target_sources(lue_framework_api_cxx
         source/local/valid.cpp
         source/local/where2.cpp
         source/local/where3.cpp
+        source/miscellaneous/create_array.cpp
+        source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
 )
 

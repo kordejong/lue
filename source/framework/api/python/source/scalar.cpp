@@ -1,5 +1,5 @@
 #include "lue/framework/api/cxx/scalar.hpp"
-#include "lue/framework/api/cxx/create_scalar.hpp"
+#include "lue/framework/api/cxx/miscellaneous/create_scalar.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 #include <format>

@@ -26,8 +26,16 @@ target_sources(lue_framework_api_c
         source/field.cpp
         source/future.cpp
         source/io.cpp
+        source/literal.cpp
         source/local_operation.cpp
+        source/miscellaneous_operation.cpp
+        source/runtime.cpp
+        source/scalar.cpp
 )
+
+# set_property(TARGET lue_framework_api_c
+#     PROPERTY C_STANDARD 11
+# )
 
 target_link_libraries(lue_framework_api_c
     PRIVATE

@@ -16,8 +16,9 @@
 
 int hpx_main(int argc, char* argv[])
 {
+    // init_unit_test is undefined here, but once BOOST_TEST_MODULE is set (in a unit test module), it will
+    // be defined
     int test_status = boost::unit_test::unit_test_main(init_unit_test, argc, argv);
-
     int hpx_status = hpx::finalize();
 
     return test_status != boost::exit_success ? test_status : hpx_status;

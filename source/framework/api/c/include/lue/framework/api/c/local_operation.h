@@ -70,7 +70,7 @@ LUE_FCAPI_EXPORT Field* tan_(Field const* field);
 
 LUE_FCAPI_EXPORT Field* trunc_(Field const* field);
 
-LUE_FCAPI_EXPORT Field* where(Field const* field1, Field const* field2, Field const* field3 = nullptr);
+LUE_FCAPI_EXPORT Field* where(Field const* field1, Field const* field2, Field const* field3 /* = nullptr */);
 
 
 #ifdef __cplusplus

@@ -401,6 +401,7 @@ if(LUE_BUILD_QUALITY_ASSURANCE)
         set(LUE_BOOST_REQUIRED TRUE)
 
         if(LUE_BUILD_FRAMEWORK)
+            set(LUE_CUNIT_REQUIRED TRUE)  # Used by api/c/test
             set(LUE_HPXRUN_REQUIRED TRUE)
 
             # Needed to be able to run hpxrun.py
@@ -518,6 +519,21 @@ if(LUE_BOOST_REQUIRED)
         message(FATAL_ERROR
             "Boost-1.75's safe_numerics library is known to contain a bug:\n"
             "https://github.com/boostorg/safe_numerics/issues/94")
+    endif()
+endif()
+
+
+if(LUE_CUNIT_REQUIRED)
+    CPMAddPackage(
+        URI "gl:cunity/cunit#3.5.4"
+        SYSTEM  # NOTE: Has no effect ATM... Build still fails because warnings are treated as errors.
+    )
+
+    # TODO: Hack until SYSTEM works well. May have to be ported to other platforms.
+    if(
+        CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
+        CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(cunit PRIVATE -w)
     endif()
 endif()
 

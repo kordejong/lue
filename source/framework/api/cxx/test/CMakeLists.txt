@@ -45,16 +45,20 @@ set(local_operation_names
     local/where
 )
 
+set(miscellaneous_operation_names
+    miscellaneous/create_array
+    miscellaneous/create_scalar
+)
+
 set(routing_operation_names
     routing/accu
 )
 
 set(names
-    create_array
-    create_scalar
     ${focal_operation_names}
     # io
     ${local_operation_names}
+    ${miscellaneous_operation_names}
     ${routing_operation_names}
 )
 
@@ -63,6 +67,11 @@ foreach(name ${names})
     string(REPLACE "/" "_" test_name ${scope}_${module_name})
 
     add_executable(${test_name} ${module_name}.cpp)
+
+    target_include_directories(${test_name}
+        PRIVATE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    )
 
     target_link_libraries(${test_name}
         PRIVATE

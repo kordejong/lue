@@ -60,6 +60,14 @@ get_property(LUE_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CO
 #     set(CMAKE_MODULE_LINKER_FLAGS_PROFILE "${CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO} -pg")
 # endif()
 
+file(
+    DOWNLOAD
+        https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.42.3/CPM.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake
+    EXPECTED_HASH
+        SHA256=a609e875fd532b067174250f6abbc3dac22fe2d64869783fb1e80bda1625c844
+)
+include(${CMAKE_CURRENT_BINARY_DIR}/cmake/CPM.cmake)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/environment/cmake")
 

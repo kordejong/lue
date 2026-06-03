@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE lue framework api cxx create_array
-#include "lue/framework/api/cxx/create_array.hpp"
+#include "lue/framework/api/cxx/miscellaneous/create_array.hpp"
 #include "lue/framework/test/hpx_unit_test.hpp"
 #include "lue/framework.hpp"
 

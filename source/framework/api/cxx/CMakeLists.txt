@@ -95,6 +95,7 @@ target_sources(lue_framework_api_cxx
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/cxx/scalar.hpp
     PRIVATE
         ${generated_source_files}
+        source/as_field.cpp
         source/focal/mean.cpp
         source/io.cpp
         source/local/abs.cpp

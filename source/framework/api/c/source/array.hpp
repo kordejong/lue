@@ -28,6 +28,12 @@ inline auto lue_as_cxx_array(LUE_Array const* array) -> lue::api::Array const&
 }
 
 
+inline auto lue_as_cxx_array(LUE_Array* array) -> lue::api::Array&
+{
+    return *lue_as_cxx_array_ptr(array);
+}
+
+
 inline auto as_cxx_array(LUE_Array* array) -> lue::api::Array&
 {
     return *lue_as_cxx_array_ptr(array);

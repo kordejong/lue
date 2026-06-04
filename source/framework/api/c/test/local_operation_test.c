@@ -1,15 +1,44 @@
-#define BOOST_TEST_MODULE lue framework api c local_operation
+#include "hpx_unit_test.h"
+#include "lue/framework/api/c/as_field.h"
+#include "lue/framework/api/c/destruct.h"
 #include "lue/framework/api/c/local_operation.h"
-#include "lue/framework/test/hpx_unit_test.hpp"
+#include "lue/framework/api/c/miscellaneous_operation.h"
+#include "lue/framework/api/c/type_info.h"
 
 
-BOOST_AUTO_TEST_CASE(add_raster_raster)
+// TODO: All this assumes the used element types are supported. We need a C header with information about the
+//       supported types. Picking the wrong type here results in link errors.
+
+
+static void abs_test()
 {
-    BOOST_CHECK(true);
+    typedef int32_t Element;
+
+    LUE_Rank const rank = 2;
+    LUE_Count const array_shape[] = {60, 40};
+
+    Element const value = -5;
+    LUE_Literal* literal = lue_create_literal(value);
+    LUE_Scalar* scalar = lue_create_scalar(literal);
+    LUE_Field* field = lue_as_field(lue_create_array(rank, array_shape, scalar));
+
+    LUE_Field* result = lue_abs(field);
+
+    CU_ASSERT_NOT_EQUAL(result, NULL);
+    CU_ASSERT_EQUAL(lue_data_model(result), LUE_DataModel_Array);
+    CU_ASSERT_EQUAL(lue_element_type(result), LUE_ElementType_Int32);
+
+    lue_destruct(result);
+    lue_destruct(field);
+    lue_destruct(scalar);
+    lue_destruct(literal);
 }
 
 
-// TODO
+HPX_UNIT_TEST_SUITE("local_operation", CUNIT_CI_TEST(abs_test));
+
+
+// TODO:
 // abs
 // acos
 // add
@@ -49,29 +78,3 @@ BOOST_AUTO_TEST_CASE(add_raster_raster)
 // valid
 // where2
 // where3
-
-
-// #include "lue/framework/api/c/local_operation.h"
-//
-//
-// int main()
-// {
-//     // TODO Start HPX runtime
-//
-//     // TODO
-//     Field* field1 = 0;  //  = uniform(...);
-//     Field* field2 = 0;  //  = uniform(...);
-//
-//     {
-//         Field* result = add(field1, field2);
-//
-//         // TODO Test result
-//
-//         destruct(result);
-//     }
-//
-//     destruct(field1);
-//     destruct(field2);
-//
-//     // TODO Stop HPX runtime
-// }

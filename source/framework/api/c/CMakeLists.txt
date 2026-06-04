@@ -24,6 +24,7 @@ target_sources(lue_framework_api_c
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/export.h
     PRIVATE
         source/array.cpp
+        source/as_field.cpp
         source/field.cpp
         source/future.cpp
         source/io.cpp

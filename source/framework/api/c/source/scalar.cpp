@@ -1,7 +1,7 @@
 #include "scalar.hpp"
 
 
-void destruct_scalar(Scalar* scalar)
+void lue_destruct_scalar(Scalar* scalar)
 {
     if (scalar != nullptr)
     {

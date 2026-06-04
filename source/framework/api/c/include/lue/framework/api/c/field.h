@@ -20,7 +20,7 @@ struct Field
 typedef struct Field Field;
 
 
-LUE_FCAPI_EXPORT void destruct_field(Field* field);
+LUE_FCAPI_EXPORT void lue_destruct_field(Field* field);
 
 
 #ifdef __cplusplus

@@ -60,6 +60,14 @@ namespace lue {
         }
 
 
+        auto element_type(Array const& array) -> ElementType
+        {
+            return std::visit(
+                overload{[](auto const& array) -> ElementType { return lue::element_type(array); }},
+                array.variant());
+        }
+
+
         auto element_type(Field const& field) -> ElementType
         {
             return std::visit(

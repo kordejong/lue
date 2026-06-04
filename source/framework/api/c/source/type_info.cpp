@@ -1,4 +1,5 @@
 #include "lue/framework/api/c/type_info.h"
+#include "array.hpp"
 #include "field.hpp"
 #include "literal.hpp"
 #include "scalar.hpp"
@@ -92,6 +93,14 @@ static auto element_type(lue::ElementType const scoped_enum)
     }
 
     return result;
+}
+
+
+auto lue_element_type_array(Array const* array) -> LUE_ElementType
+{
+    auto scoped_enum = lue::api::element_type(as_cxx_array(array));
+
+    return element_type(scoped_enum);
 }
 
 

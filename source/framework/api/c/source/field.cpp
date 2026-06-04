@@ -1,7 +1,7 @@
 #include "field.hpp"
 
 
-void destruct_field(Field* field)
+void lue_destruct_field(Field* field)
 {
     if (field != nullptr)
     {

@@ -1,0 +1,34 @@
+#pragma once
+#include "lue/framework/api/c/array.h"
+#include "lue/framework/api/cxx/array.hpp"
+#include <cassert>
+
+
+inline auto as_cxx_array_ptr(Array const* array) -> lue::api::Array const*
+{
+    assert(array);
+    assert(array->instance);
+
+    return static_cast<lue::api::Array const*>(array->instance);
+}
+
+
+inline auto as_cxx_array_ptr(Array* array) -> lue::api::Array*
+{
+    assert(array);
+    assert(array->instance);
+
+    return static_cast<lue::api::Array*>(array->instance);
+}
+
+
+inline auto as_cxx_array(Array const* array) -> lue::api::Array const&
+{
+    return *as_cxx_array_ptr(array);
+}
+
+
+inline auto as_cxx_array(Array* array) -> lue::api::Array&
+{
+    return *as_cxx_array_ptr(array);
+}

@@ -526,6 +526,9 @@ endif()
 if(LUE_CUNIT_REQUIRED)
     CPMAddPackage(
         URI "gl:cunity/cunit#3.5.4"
+        OPTIONS
+            "CUNIT_DISABLE_EXAMPLES TRUE"
+            "CUNIT_DISABLE_TESTS TRUE"
         SYSTEM  # NOTE: Has no effect ATM... Build still fails because warnings are treated as errors.
     )
 

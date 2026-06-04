@@ -34,7 +34,7 @@ namespace lue {
         auto create_array(
             Shape<Count, 2> const& array_shape,
             Shape<Count, 2> const& partition_shape,
-            Field const& fill_value) -> Field
+            Scalar const& fill_value) -> Field
         {
             return std::visit(
                 overload{
@@ -47,7 +47,7 @@ namespace lue {
         /*!
             @overload
         */
-        auto create_array(Shape<Count, 2> const& array_shape, Field const& fill_value) -> Field
+        auto create_array(Shape<Count, 2> const& array_shape, Scalar const& fill_value) -> Field
         {
             return std::visit(
                 overload{

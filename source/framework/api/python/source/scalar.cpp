@@ -1,5 +1,6 @@
 #include "lue/framework/api/cxx/scalar.hpp"
 #include "lue/framework/api/cxx/miscellaneous/create_scalar.hpp"
+#include "lue/framework/api/cxx/operator.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 #include <format>
@@ -13,9 +14,9 @@ namespace lue::api {
     namespace {
 
         template<typename Element>
-        auto create_scalar(double const value) -> std::optional<Field>
+        auto create_scalar(double const value) -> std::optional<Scalar>
         {
-            std::optional<Field> result{};
+            std::optional<Scalar> result{};
 
             if constexpr (lue::arithmetic_element_supported<Element>)
             {
@@ -26,7 +27,7 @@ namespace lue::api {
         }
 
 
-        auto create_scalar(double const value, pybind11::dtype const& dtype) -> Field
+        auto create_scalar(double const value, pybind11::dtype const& dtype) -> Scalar
         {
             // TODO Out of range values must result in no-data values. This logic must be in the API layer or
             // higher. All bindings need it.
@@ -35,7 +36,7 @@ namespace lue::api {
 
             auto const kind = dtype.kind();
             auto const size = dtype.itemsize();  // bytes
-            std::optional<Field> field{};
+            std::optional<Scalar> scalar{};
 
             // NOLINTBEGIN(bugprone-switch-missing-default-case)
             switch (kind)
@@ -47,22 +48,22 @@ namespace lue::api {
                     {
                         case 1:
                         {
-                            field = create_scalar<std::int8_t>(value);
+                            scalar = create_scalar<std::int8_t>(value);
                             break;
                         }
                         case 2:
                         {
-                            field = create_scalar<std::int16_t>(value);
+                            scalar = create_scalar<std::int16_t>(value);
                             break;
                         }
                         case 4:
                         {
-                            field = create_scalar<std::int32_t>(value);
+                            scalar = create_scalar<std::int32_t>(value);
                             break;
                         }
                         case 8:
                         {
-                            field = create_scalar<std::int64_t>(value);
+                            scalar = create_scalar<std::int64_t>(value);
                             break;
                         }
                     }
@@ -76,22 +77,22 @@ namespace lue::api {
                     {
                         case 1:
                         {
-                            field = create_scalar<std::uint8_t>(value);
+                            scalar = create_scalar<std::uint8_t>(value);
                             break;
                         }
                         case 2:
                         {
-                            field = create_scalar<std::uint16_t>(value);
+                            scalar = create_scalar<std::uint16_t>(value);
                             break;
                         }
                         case 4:
                         {
-                            field = create_scalar<std::uint32_t>(value);
+                            scalar = create_scalar<std::uint32_t>(value);
                             break;
                         }
                         case 8:
                         {
-                            field = create_scalar<std::uint64_t>(value);
+                            scalar = create_scalar<std::uint64_t>(value);
                             break;
                         }
                     }
@@ -105,12 +106,12 @@ namespace lue::api {
                     {
                         case 4:
                         {
-                            field = create_scalar<float>(value);
+                            scalar = create_scalar<float>(value);
                             break;
                         }
                         case 8:
                         {
-                            field = create_scalar<double>(value);
+                            scalar = create_scalar<double>(value);
                             break;
                         }
                     }
@@ -120,21 +121,43 @@ namespace lue::api {
             }
             // NOLINTEND(bugprone-switch-missing-default-case)
 
-            if (!field)
+            if (!scalar)
             {
                 throw std::runtime_error(std::format("Unsupported dtype (kind={}, itemsize={})", kind, size));
             }
 
-            return std::move(*field);
+            return std::move(*scalar);
         }
 
     }  // Anonymous namespace
 
     void bind_scalar(pybind11::module& module)
     {
+        pybind11::class_<Scalar>(module, "Scalar")
+
+            // // bool(a), not a, if a, while a, ...
+            // .def(
+            //     "__bool__",
+            //     []([[maybe_unused]] Scalar const& scalar) -> void
+            //     {
+            //         // ValueError
+            //         throw std::invalid_argument("The truth value of a scalar is ambiguous");
+            //     })
+
+            // a + b, a += b
+            // .def(pybind11::self + pybind11::self)
+            .def("__add__", add, pybind11::is_operator())
+            .def("__radd__", add, pybind11::is_operator())
+
+
+            // TODO
+            // https://pybind11.readthedocs.io/en/stable/advanced/classes.html#operator-overloading
+
+            ;
+
         module.def(
             "create_scalar",
-            [](double const value, pybind11::object const& dtype_args) -> Field
+            [](double const value, pybind11::object const& dtype_args) -> Scalar
             {
                 pybind11::dtype const dtype{pybind11::dtype::from_args(dtype_args)};
 

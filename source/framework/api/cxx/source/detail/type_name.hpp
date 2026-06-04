@@ -26,6 +26,10 @@ namespace lue::api::detail {
         {
             return "uint16";
         }
+        else if (std::is_same_v<Element, std::int8_t>)
+        {
+            return "int8";
+        }
         else if (std::is_same_v<Element, std::int32_t>)
         {
             return "int32";

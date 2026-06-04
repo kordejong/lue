@@ -128,6 +128,7 @@ target_sources(lue_framework_api_cxx
         source/miscellaneous/create_array.cpp
         source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
+        source/type_info.cpp
 )
 
 # TODO Integrate with target_sources call?

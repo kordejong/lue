@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(create_scalar)
     using Scalar = lue::Scalar<Element>;
 
     lue::api::Literal const value = Element{};
-    lue::api::Field const result = lue::api::create_scalar(value);
+    lue::api::Scalar const result = lue::api::create_scalar(value);
 
     BOOST_CHECK(std::holds_alternative<Scalar>(result.variant()));
 }

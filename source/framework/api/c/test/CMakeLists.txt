@@ -2,7 +2,6 @@ set(scope lue_framework_api_c)
 
 set(names
     io
-    local_operation
 )
 
 foreach(name ${names})
@@ -71,6 +70,7 @@ endforeach()
 # )
 
 set(names
+    local_operation
     miscellaneous_operation
 )
 

@@ -13,7 +13,7 @@ namespace lue::api {
         module.def(
             "create_array",
             [](Shape<Count, 2> const& array_shape,
-               Field const& fill_value,
+               Scalar const& fill_value,
                std::optional<Shape<Count, 2>> const& partition_shape) -> Field
             {
                 return partition_shape ? create_array(array_shape, *partition_shape, fill_value)

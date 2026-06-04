@@ -31,6 +31,7 @@ target_sources(lue_framework_api_c
         source/miscellaneous_operation.cpp
         source/runtime.cpp
         source/scalar.cpp
+        source/type_info.cpp
 )
 
 # set_property(TARGET lue_framework_api_c

@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE lue framework api cxx local abs
 #include "unit_test.hpp"
 #include "lue/framework/api/cxx/local/abs.hpp"
+#include "lue/framework/api/cxx/scalar.hpp"
 #include "lue/framework.hpp"
 
 

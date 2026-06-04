@@ -210,7 +210,21 @@ namespace lue {
 
 
     template<typename Array>
-    Count nr_partitions(Array const& array);
+    auto nr_partitions(Array const& array) -> Count;
+
+
+    enum class ElementType : std::uint8_t {
+        Int8,
+        Int16,
+        Int32,
+        Int64,
+        UInt8,
+        UInt16,
+        UInt32,
+        UInt64,
+        Float32,
+        Float64,
+    };
 
 
     template<typename T>
@@ -223,6 +237,7 @@ namespace lue {
     struct TypeTraits<std::uint8_t>
     {
             static constexpr auto name{"uint8"};
+            static constexpr auto element_type = ElementType::UInt8;
     };
 
 
@@ -230,6 +245,7 @@ namespace lue {
     struct TypeTraits<std::int8_t>
     {
             static constexpr auto name{"int8"};
+            static constexpr auto element_type = ElementType::Int8;
     };
 
 
@@ -237,6 +253,7 @@ namespace lue {
     struct TypeTraits<std::uint16_t>
     {
             static constexpr auto name{"uint16"};
+            static constexpr auto element_type = ElementType::UInt16;
     };
 
 
@@ -244,6 +261,7 @@ namespace lue {
     struct TypeTraits<std::int16_t>
     {
             static constexpr auto name{"int16"};
+            static constexpr auto element_type = ElementType::Int16;
     };
 
 
@@ -251,6 +269,7 @@ namespace lue {
     struct TypeTraits<std::uint32_t>
     {
             static constexpr auto name{"uint32"};
+            static constexpr auto element_type = ElementType::UInt32;
     };
 
 
@@ -258,6 +277,7 @@ namespace lue {
     struct TypeTraits<std::int32_t>
     {
             static constexpr auto name{"int32"};
+            static constexpr auto element_type = ElementType::Int32;
     };
 
 
@@ -265,6 +285,7 @@ namespace lue {
     struct TypeTraits<std::uint64_t>
     {
             static constexpr auto name{"uint64"};
+            static constexpr auto element_type = ElementType::UInt64;
     };
 
 
@@ -272,6 +293,7 @@ namespace lue {
     struct TypeTraits<std::int64_t>
     {
             static constexpr auto name{"int64"};
+            static constexpr auto element_type = ElementType::Int64;
     };
 
 
@@ -279,6 +301,7 @@ namespace lue {
     struct TypeTraits<float>
     {
             static constexpr auto name{"float32"};
+            static constexpr auto element_type = ElementType::Float32;
     };
 
 
@@ -286,6 +309,7 @@ namespace lue {
     struct TypeTraits<double>
     {
             static constexpr auto name{"float64"};
+            static constexpr auto element_type = ElementType::Float64;
     };
 
 
@@ -295,5 +319,13 @@ namespace lue {
     */
     template<typename Element>
     constexpr auto as_string = TypeTraits<Element>::name;
+
+
+    // /*!
+    //     @brief      Element type as an enum value of @Element
+    //     @tparam     Element Element type
+    // */
+    // template<typename Element>
+    // constexpr auto element_type = TypeTraits<Element>::element_type;
 
 }  // namespace lue

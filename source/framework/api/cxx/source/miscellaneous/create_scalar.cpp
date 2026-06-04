@@ -18,10 +18,10 @@ namespace lue {
         /*!
             @brief      Create a scalar given a literal value
         */
-        auto create_scalar(Literal const& value) -> Field
+        auto create_scalar(Literal const& value) -> Scalar
         {
             return std::visit(
-                overload{[](auto const& value) -> Field { return lue::create_scalar(value); }},
+                overload{[](auto const& value) -> Scalar { return lue::create_scalar(value); }},
                 value.variant());
         }
 

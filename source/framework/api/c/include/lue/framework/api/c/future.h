@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-struct Future
+struct LUE_Future
 {
 
         /*!
@@ -17,10 +17,10 @@ struct Future
 };
 
 
-typedef struct Future Future;
+typedef struct LUE_Future LUE_Future;
 
 
-LUE_FCAPI_EXPORT void destruct_future(Future* future);
+LUE_FCAPI_EXPORT void lue_destruct_future(LUE_Future* future);
 
 
 #ifdef __cplusplus

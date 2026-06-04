@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-struct Array
+struct LUE_Array
 {
 
         /*!
@@ -17,10 +17,10 @@ struct Array
 };
 
 
-typedef struct Array Array;
+typedef struct LUE_Array LUE_Array;
 
 
-LUE_FCAPI_EXPORT void lue_destruct_array(Array* array);
+LUE_FCAPI_EXPORT void lue_destruct_array(LUE_Array* array);
 
 
 #ifdef __cplusplus

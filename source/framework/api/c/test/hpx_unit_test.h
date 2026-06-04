@@ -5,7 +5,7 @@
 
 CU_SUITE_TEARDOWN()
 {
-    int hpx_status = finalize_runtime();
+    int hpx_status = lue_finalize_runtime();
 
     return hpx_status == 0 ? CUE_SUCCESS : CUE_SCLEAN_FAILED;
 }
@@ -27,5 +27,5 @@ CU_SUITE_TEARDOWN()
     int main(int argc, char** argv)                                                                          \
     {                                                                                                        \
         /* init function that runs the whole test suite. Once it finishes, finalize can be called */         \
-        return initialize_runtime(&test_suite, argc, argv);                                                  \
+        return lue_initialize_runtime(&test_suite, argc, argv);                                                  \
     }

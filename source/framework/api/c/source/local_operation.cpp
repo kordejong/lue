@@ -3,300 +3,301 @@
 #include "lue/framework/api/cxx/local_operation.hpp"
 
 
-auto abs_(Field const* field) -> Field*
+auto abs_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::abs(as_cxx_field(field));
+    lue::api::Field result = lue::api::abs(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto acos_(Field const* field) -> Field*
+auto acos_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::acos(as_cxx_field(field));
+    lue::api::Field result = lue::api::acos(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto add(Field const* field1, Field const* field2) -> Field*
+auto add(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::add(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::add(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto asin_(Field const* field) -> Field*
+auto asin_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::asin(as_cxx_field(field));
+    lue::api::Field result = lue::api::asin(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto atan_(Field const* field) -> Field*
+auto atan_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::atan(as_cxx_field(field));
+    lue::api::Field result = lue::api::atan(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto atan2_(Field const* field1, Field const* field2) -> Field*
+auto atan2_(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::atan2(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::atan2(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto ceil_(Field const* field) -> Field*
+auto ceil_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::ceil(as_cxx_field(field));
+    lue::api::Field result = lue::api::ceil(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto close_to(Field const* field1, Field const* field2) -> Field*
+auto close_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::close_to(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::close_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto cos_(Field const* field) -> Field*
+auto cos_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::cos(as_cxx_field(field));
+    lue::api::Field result = lue::api::cos(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto divide(Field const* field1, Field const* field2) -> Field*
+auto divide(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::divide(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::divide(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto equal_to(Field const* field1, Field const* field2) -> Field*
+auto equal_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::equal_to(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto exp_(Field const* field) -> Field*
+auto exp_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::exp(as_cxx_field(field));
+    lue::api::Field result = lue::api::exp(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto floor_(Field const* field) -> Field*
+auto floor_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::floor(as_cxx_field(field));
+    lue::api::Field result = lue::api::floor(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto greater_than(Field const* field1, Field const* field2) -> Field*
+auto greater_than(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::greater_than(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::greater_than(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto greater_than_equal_to(Field const* field1, Field const* field2) -> Field*
+auto greater_than_equal_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::greater_than_equal_to(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::greater_than_equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto less_than(Field const* field1, Field const* field2) -> Field*
+auto less_than(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::less_than(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::less_than(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto less_than_equal_to(Field const* field1, Field const* field2) -> Field*
+auto less_than_equal_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::less_than_equal_to(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::less_than_equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto log_(Field const* field) -> Field*
+auto log_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::log(as_cxx_field(field));
+    lue::api::Field result = lue::api::log(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto log10_(Field const* field) -> Field*
+auto log10_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::log10(as_cxx_field(field));
+    lue::api::Field result = lue::api::log10(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto logical_and(Field const* field1, Field const* field2) -> Field*
+auto logical_and(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_and(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::logical_and(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto logical_exclusive_or(Field const* field1, Field const* field2) -> Field*
+auto logical_exclusive_or(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_exclusive_or(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::logical_exclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto logical_inclusive_or(Field const* field1, Field const* field2) -> Field*
+auto logical_inclusive_or(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_inclusive_or(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::logical_inclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto logical_not(Field const* field) -> Field*
+auto logical_not(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_not(as_cxx_field(field));
+    lue::api::Field result = lue::api::logical_not(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto modulus(Field const* field1, Field const* field2) -> Field*
+auto modulus(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::modulus(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::modulus(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto multiply(Field const* field1, Field const* field2) -> Field*
+auto multiply(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::multiply(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::multiply(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto negate(Field const* field) -> Field*
+auto negate(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::negate(as_cxx_field(field));
+    lue::api::Field result = lue::api::negate(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto not_equal_to(Field const* field1, Field const* field2) -> Field*
+auto not_equal_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::not_equal_to(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::not_equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto open_simplex_noise(Field const* x_coordinates, Field const* y_coordinates, int const seed) -> Field*
+auto open_simplex_noise(LUE_Field const* x_coordinates, LUE_Field const* y_coordinates, int const seed)
+    -> LUE_Field*
 {
     lue::api::Field result =
-        lue::api::open_simplex_noise(as_cxx_field(x_coordinates), as_cxx_field(y_coordinates), seed);
+        lue::api::open_simplex_noise(lue_as_cxx_field(x_coordinates), lue_as_cxx_field(y_coordinates), seed);
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto pow(Field const* field1, Field const* field2) -> Field*
+auto pow(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::pow(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::pow(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto round_(Field const* field) -> Field*
+auto round_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::round(as_cxx_field(field));
+    lue::api::Field result = lue::api::round(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto sin_(Field const* field) -> Field*
+auto sin_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::sin(as_cxx_field(field));
+    lue::api::Field result = lue::api::sin(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto sqrt_(Field const* field) -> Field*
+auto sqrt_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::sqrt(as_cxx_field(field));
+    lue::api::Field result = lue::api::sqrt(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto subtract(Field const* field1, Field const* field2) -> Field*
+auto subtract(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::subtract(as_cxx_field(field1), as_cxx_field(field2));
+    lue::api::Field result = lue::api::subtract(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto tan_(Field const* field) -> Field*
+auto tan_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::tan(as_cxx_field(field));
+    lue::api::Field result = lue::api::tan(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto trunc_(Field const* field) -> Field*
+auto trunc_(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::trunc(as_cxx_field(field));
+    lue::api::Field result = lue::api::trunc(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto valid(Field const* field) -> Field*
+auto valid(LUE_Field const* field) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::valid(as_cxx_field(field));
+    lue::api::Field result = lue::api::valid(lue_as_cxx_field(field));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
 
 
-auto where(Field const* field1, Field const* field2, Field const* field3) -> Field*
+auto where(LUE_Field const* field1, LUE_Field const* field2, LUE_Field const* field3) -> LUE_Field*
 {
     lue::api::Field result =
-        field3 ? lue::api::where(as_cxx_field(field1), as_cxx_field(field2), as_cxx_field(field3))
-               : lue::api::where(as_cxx_field(field1), as_cxx_field(field2));
+        field3 ? lue::api::where(lue_as_cxx_field(field1), lue_as_cxx_field(field2), lue_as_cxx_field(field3))
+               : lue::api::where(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }

@@ -12,13 +12,13 @@ static void create_array_test()
 {
     typedef float Element;
 
-    Rank const rank = 2;
-    Count const array_shape[] = {60, 40};
+    LUE_Rank const rank = 2;
+    LUE_Count const array_shape[] = {60, 40};
 
     Element const value = 5.5F;
-    Literal* literal = create_literal(value);
-    Scalar* scalar = create_scalar(literal);
-    Array* array = create_array(rank, array_shape, scalar);
+    LUE_Literal* literal = lue_create_literal(value);
+    LUE_Scalar* scalar = lue_create_scalar(literal);
+    LUE_Array* array = lue_create_array(rank, array_shape, scalar);
 
     CU_ASSERT_NOT_EQUAL(array, NULL);
     CU_ASSERT_EQUAL(lue_element_type(array), LUE_ElementType_Float32);
@@ -34,7 +34,7 @@ static void create_literal_test()
     typedef uint8_t Element;
 
     Element const value = 5;
-    Literal* literal = create_literal(value);
+    LUE_Literal* literal = lue_create_literal(value);
 
     CU_ASSERT_NOT_EQUAL(literal, NULL);
     CU_ASSERT_EQUAL(lue_element_type(literal), LUE_ElementType_UInt8);
@@ -48,8 +48,8 @@ static void create_scalar_test()
     typedef int32_t Element;
 
     Element const value = -5;
-    Literal* literal = create_literal(value);
-    Scalar* scalar = create_scalar(literal);
+    LUE_Literal* literal = lue_create_literal(value);
+    LUE_Scalar* scalar = lue_create_scalar(literal);
 
     CU_ASSERT_NOT_EQUAL(scalar, NULL);
     CU_ASSERT_EQUAL(lue_element_type(scalar), LUE_ElementType_Int32);

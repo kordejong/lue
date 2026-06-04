@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-struct Scalar
+struct LUE_Scalar
 {
 
         /*!
@@ -17,10 +17,10 @@ struct Scalar
 };
 
 
-typedef struct Scalar Scalar;
+typedef struct LUE_Scalar LUE_Scalar;
 
 
-LUE_FCAPI_EXPORT void lue_destruct_scalar(Scalar* scalar);
+LUE_FCAPI_EXPORT void lue_destruct_scalar(LUE_Scalar* scalar);
 
 
 #ifdef __cplusplus

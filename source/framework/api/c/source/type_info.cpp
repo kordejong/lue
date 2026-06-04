@@ -6,9 +6,9 @@
 #include "lue/framework/api/cxx/type_info.hpp"
 
 
-auto lue_data_model(Field const* field) -> LUE_DataModel
+auto lue_data_model(LUE_Field const* field) -> LUE_DataModel
 {
-    auto scoped_enum = lue::api::data_model(as_cxx_field(field));
+    auto scoped_enum = lue::api::data_model(lue_as_cxx_field(field));
     LUE_DataModel result{};
 
     switch (scoped_enum)
@@ -96,33 +96,33 @@ static auto element_type(lue::ElementType const scoped_enum)
 }
 
 
-auto lue_element_type_array(Array const* array) -> LUE_ElementType
+auto lue_element_type_array(LUE_Array const* array) -> LUE_ElementType
 {
-    auto scoped_enum = lue::api::element_type(as_cxx_array(array));
+    auto scoped_enum = lue::api::element_type(lue_as_cxx_array(array));
 
     return element_type(scoped_enum);
 }
 
 
-auto lue_element_type_field(Field const* field) -> LUE_ElementType
+auto lue_element_type_field(LUE_Field const* field) -> LUE_ElementType
 {
-    auto scoped_enum = lue::api::element_type(as_cxx_field(field));
+    auto scoped_enum = lue::api::element_type(lue_as_cxx_field(field));
 
     return element_type(scoped_enum);
 }
 
 
-auto lue_element_type_literal(Literal const* literal) -> LUE_ElementType
+auto lue_element_type_literal(LUE_Literal const* literal) -> LUE_ElementType
 {
-    auto scoped_enum = lue::api::element_type(as_cxx_literal(literal));
+    auto scoped_enum = lue::api::element_type(lue_as_cxx_literal(literal));
 
     return element_type(scoped_enum);
 }
 
 
-auto lue_element_type_scalar(Scalar const* scalar) -> LUE_ElementType
+auto lue_element_type_scalar(LUE_Scalar const* scalar) -> LUE_ElementType
 {
-    auto scoped_enum = lue::api::element_type(as_cxx_scalar(scalar));
+    auto scoped_enum = lue::api::element_type(lue_as_cxx_scalar(scalar));
 
     return element_type(scoped_enum);
 }

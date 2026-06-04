@@ -4,25 +4,25 @@
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
 
 
-auto create_array(Rank const rank, Count const* array_shape_p, Scalar const* fill_value) -> Array*
+auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_Scalar const* fill_value) -> LUE_Array*
 {
     assert(rank == 2);
 
     lue::Shape<lue::Count, 2> array_shape{};
     std::copy(array_shape_p, array_shape_p + rank, array_shape.data());
 
-    lue::api::Array result = lue::api::create_array(array_shape, as_cxx_scalar(fill_value));
+    lue::api::Array result = lue::api::create_array(array_shape, lue_as_cxx_scalar(fill_value));
 
-    return new Array{.instance = new lue::api::Array{std::move(result)}};
+    return new LUE_Array{.instance = new lue::api::Array{std::move(result)}};
 }
 
 
 #define CreateLiteral(type, type_name)                                                                       \
-    auto create_literal_##type_name(type const value) -> Literal*                                                  \
+    auto lue_create_literal_##type_name(type const value) -> LUE_Literal*                                                  \
     {                                                                                                        \
         lue::api::Literal result{value};                                                                     \
                                                                                                              \
-        return new Literal{.instance = new lue::api::Literal{std::move(result)}};                            \
+        return new LUE_Literal{.instance = new lue::api::Literal{std::move(result)}};                            \
     }
 
 CreateLiteral(uint8_t, uint8)
@@ -39,9 +39,9 @@ CreateLiteral(double, float64)
 #undef CreateLiteral
 
 
-    auto create_scalar(Literal* fill_value) -> Scalar*
+    auto lue_create_scalar(LUE_Literal* fill_value) -> LUE_Scalar*
 {
-    lue::api::Scalar result = lue::api::create_scalar(as_cxx_literal(fill_value));
+    lue::api::Scalar result = lue::api::create_scalar(lue_as_cxx_literal(fill_value));
 
-    return new Scalar{.instance = new lue::api::Scalar{std::move(result)}};
+    return new LUE_Scalar{.instance = new lue::api::Scalar{std::move(result)}};
 }

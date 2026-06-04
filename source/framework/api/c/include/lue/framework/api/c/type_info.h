@@ -32,23 +32,23 @@ typedef enum {
 } LUE_ElementType;
 
 
-LUE_FCAPI_EXPORT LUE_DataModel lue_data_model(Field const* field);
+LUE_FCAPI_EXPORT LUE_DataModel lue_data_model(LUE_Field const* field);
 
-LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_array(Array const* array);
+LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_array(LUE_Array const* array);
 
-LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_field(Field const* field);
+LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_field(LUE_Field const* field);
 
-LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_literal(Literal const* literal);
+LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_literal(LUE_Literal const* literal);
 
-LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_scalar(Scalar const* scalar);
+LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_scalar(LUE_Scalar const* scalar);
 
 #define lue_element_type(X)                                                                                  \
     _Generic(                                                                                                \
         (X),                                                                                                 \
-        Array*: lue_element_type_array,                                                                      \
-        Field*: lue_element_type_field,                                                                      \
-        Literal*: lue_element_type_literal,                                                                  \
-        Scalar*: lue_element_type_scalar)(X)
+        LUE_Array*: lue_element_type_array,                                                                      \
+        LUE_Field*: lue_element_type_field,                                                                      \
+        LUE_Literal*: lue_element_type_literal,                                                                  \
+        LUE_Scalar*: lue_element_type_scalar)(X)
 
 
 #ifdef __cplusplus

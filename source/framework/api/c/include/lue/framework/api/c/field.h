@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-struct Field
+struct LUE_Field
 {
 
         /*!
@@ -17,10 +17,10 @@ struct Field
 };
 
 
-typedef struct Field Field;
+typedef struct LUE_Field LUE_Field;
 
 
-LUE_FCAPI_EXPORT void lue_destruct_field(Field* field);
+LUE_FCAPI_EXPORT void lue_destruct_field(LUE_Field* field);
 
 
 #ifdef __cplusplus

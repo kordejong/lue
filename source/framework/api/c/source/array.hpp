@@ -4,7 +4,7 @@
 #include <cassert>
 
 
-inline auto as_cxx_array_ptr(Array const* array) -> lue::api::Array const*
+inline auto lue_as_cxx_array_ptr(LUE_Array const* array) -> lue::api::Array const*
 {
     assert(array);
     assert(array->instance);
@@ -13,7 +13,7 @@ inline auto as_cxx_array_ptr(Array const* array) -> lue::api::Array const*
 }
 
 
-inline auto as_cxx_array_ptr(Array* array) -> lue::api::Array*
+inline auto lue_as_cxx_array_ptr(LUE_Array* array) -> lue::api::Array*
 {
     assert(array);
     assert(array->instance);
@@ -22,13 +22,13 @@ inline auto as_cxx_array_ptr(Array* array) -> lue::api::Array*
 }
 
 
-inline auto as_cxx_array(Array const* array) -> lue::api::Array const&
+inline auto lue_as_cxx_array(LUE_Array const* array) -> lue::api::Array const&
 {
-    return *as_cxx_array_ptr(array);
+    return *lue_as_cxx_array_ptr(array);
 }
 
 
-inline auto as_cxx_array(Array* array) -> lue::api::Array&
+inline auto as_cxx_array(LUE_Array* array) -> lue::api::Array&
 {
-    return *as_cxx_array_ptr(array);
+    return *lue_as_cxx_array_ptr(array);
 }

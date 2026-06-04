@@ -4,7 +4,7 @@
 #include <cassert>
 
 
-inline auto as_cxx_scalar_ptr(Scalar const* scalar) -> lue::api::Scalar const*
+inline auto lue_as_cxx_scalar_ptr(LUE_Scalar const* scalar) -> lue::api::Scalar const*
 {
     assert(scalar);
     assert(scalar->instance);
@@ -13,7 +13,7 @@ inline auto as_cxx_scalar_ptr(Scalar const* scalar) -> lue::api::Scalar const*
 }
 
 
-inline auto as_cxx_scalar_ptr(Scalar* scalar) -> lue::api::Scalar*
+inline auto lue_as_cxx_scalar_ptr(LUE_Scalar* scalar) -> lue::api::Scalar*
 {
     assert(scalar);
     assert(scalar->instance);
@@ -22,13 +22,13 @@ inline auto as_cxx_scalar_ptr(Scalar* scalar) -> lue::api::Scalar*
 }
 
 
-inline auto as_cxx_scalar(Scalar const* scalar) -> lue::api::Scalar const&
+inline auto lue_as_cxx_scalar(LUE_Scalar const* scalar) -> lue::api::Scalar const&
 {
-    return *as_cxx_scalar_ptr(scalar);
+    return *lue_as_cxx_scalar_ptr(scalar);
 }
 
 
-inline auto as_cxx_scalar(Scalar* scalar) -> lue::api::Scalar&
+inline auto lue_as_cxx_scalar(LUE_Scalar* scalar) -> lue::api::Scalar&
 {
-    return *as_cxx_scalar_ptr(scalar);
+    return *lue_as_cxx_scalar_ptr(scalar);
 }

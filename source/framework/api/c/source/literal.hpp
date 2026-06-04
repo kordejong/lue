@@ -4,7 +4,7 @@
 #include <cassert>
 
 
-inline auto as_cxx_literal_ptr(Literal const* literal) -> lue::api::Literal const*
+inline auto lue_as_cxx_literal_ptr(LUE_Literal const* literal) -> lue::api::Literal const*
 {
     assert(literal);
     assert(literal->instance);
@@ -13,7 +13,7 @@ inline auto as_cxx_literal_ptr(Literal const* literal) -> lue::api::Literal cons
 }
 
 
-inline auto as_cxx_literal_ptr(Literal* literal) -> lue::api::Literal*
+inline auto lue_as_cxx_literal_ptr(LUE_Literal* literal) -> lue::api::Literal*
 {
     assert(literal);
     assert(literal->instance);
@@ -22,13 +22,13 @@ inline auto as_cxx_literal_ptr(Literal* literal) -> lue::api::Literal*
 }
 
 
-inline auto as_cxx_literal(Literal const* literal) -> lue::api::Literal const&
+inline auto lue_as_cxx_literal(LUE_Literal const* literal) -> lue::api::Literal const&
 {
-    return *as_cxx_literal_ptr(literal);
+    return *lue_as_cxx_literal_ptr(literal);
 }
 
 
-inline auto as_cxx_literal(Literal* literal) -> lue::api::Literal&
+inline auto lue_as_cxx_literal(LUE_Literal* literal) -> lue::api::Literal&
 {
-    return *as_cxx_literal_ptr(literal);
+    return *lue_as_cxx_literal_ptr(literal);
 }

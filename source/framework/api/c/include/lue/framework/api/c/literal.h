@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 
-struct Literal
+struct LUE_Literal
 {
 
         /*!
@@ -17,10 +17,10 @@ struct Literal
 };
 
 
-typedef struct Literal Literal;
+typedef struct LUE_Literal LUE_Literal;
 
 
-LUE_FCAPI_EXPORT void lue_destruct_literal(Literal* literal);
+LUE_FCAPI_EXPORT void lue_destruct_literal(LUE_Literal* literal);
 
 
 #ifdef __cplusplus

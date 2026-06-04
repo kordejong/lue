@@ -8,6 +8,17 @@ block()
     list(TRANSFORM Elements APPEND "\"")
     list(JOIN Elements ", " Elements)
 
+    set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/array.hpp")
+    generate_template_instantiation(
+        INPUT_PATHNAME
+            "${CMAKE_CURRENT_SOURCE_DIR}/${offset}/array.hpp.in"
+        OUTPUT_PATHNAME
+            ${output_pathname}
+        DICTIONARY
+            '{"Elements":[${Elements}]}'
+    )
+    list(APPEND generated_source_files "${output_pathname}")
+
     set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/field.hpp")
     generate_template_instantiation(
         INPUT_PATHNAME

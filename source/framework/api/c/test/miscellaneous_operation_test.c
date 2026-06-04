@@ -1,4 +1,5 @@
 #include "hpx_unit_test.h"
+#include "lue/framework/api/c/destruct.h"
 #include "lue/framework/api/c/miscellaneous_operation.h"
 #include "lue/framework/api/c/type_info.h"
 
@@ -17,15 +18,14 @@ static void create_array_test()
     Element const value = 5.5F;
     Literal* literal = create_literal(value);
     Scalar* scalar = create_scalar(literal);
-    Field* array = create_array(rank, array_shape, scalar);
+    Array* array = create_array(rank, array_shape, scalar);
 
     CU_ASSERT_NOT_EQUAL(array, NULL);
-    CU_ASSERT_EQUAL(lue_data_model(array), LUE_DataModel_Array);
     CU_ASSERT_EQUAL(lue_element_type(array), LUE_ElementType_Float32);
 
-    destruct_field(array);
-    destruct_scalar(scalar);
-    destruct_literal(literal);
+    lue_destruct(array);
+    lue_destruct(scalar);
+    lue_destruct(literal);
 }
 
 
@@ -39,7 +39,7 @@ static void create_literal_test()
     CU_ASSERT_NOT_EQUAL(literal, NULL);
     CU_ASSERT_EQUAL(lue_element_type(literal), LUE_ElementType_UInt8);
 
-    destruct_literal(literal);
+    lue_destruct(literal);
 }
 
 
@@ -54,8 +54,8 @@ static void create_scalar_test()
     CU_ASSERT_NOT_EQUAL(scalar, NULL);
     CU_ASSERT_EQUAL(lue_element_type(scalar), LUE_ElementType_Int32);
 
-    destruct_scalar(scalar);
-    destruct_literal(literal);
+    lue_destruct(scalar);
+    lue_destruct(literal);
 }
 
 

@@ -20,7 +20,7 @@ struct Literal
 typedef struct Literal Literal;
 
 
-LUE_FCAPI_EXPORT void destruct_literal(Literal* literal);
+LUE_FCAPI_EXPORT void lue_destruct_literal(Literal* literal);
 
 
 #ifdef __cplusplus

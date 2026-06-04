@@ -1,6 +1,6 @@
 #pragma once
+#include "lue/framework/api/c/array.h"
 #include "lue/framework/api/c/export.h"
-#include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/literal.h"
 #include "lue/framework/api/c/scalar.h"
 #include <stddef.h>
@@ -15,7 +15,7 @@ extern "C" {
 typedef size_t Rank;
 typedef ptrdiff_t Count;
 
-LUE_FCAPI_EXPORT Field* create_array(Rank rank, Count const* array_shape, Scalar const* fill_value);
+LUE_FCAPI_EXPORT Array* create_array(Rank rank, Count const* array_shape, Scalar const* fill_value);
 
 LUE_FCAPI_EXPORT Literal* create_literal_uint8(uint8_t value);
 LUE_FCAPI_EXPORT Literal* create_literal_uint16(uint16_t value);

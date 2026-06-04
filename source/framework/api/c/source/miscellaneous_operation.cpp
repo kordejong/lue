@@ -4,16 +4,16 @@
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
 
 
-auto create_array(Rank const rank, Count const* array_shape_p, Scalar const* fill_value) -> Field*
+auto create_array(Rank const rank, Count const* array_shape_p, Scalar const* fill_value) -> Array*
 {
     assert(rank == 2);
 
     lue::Shape<lue::Count, 2> array_shape{};
     std::copy(array_shape_p, array_shape_p + rank, array_shape.data());
 
-    lue::api::Field result = lue::api::create_array(array_shape, as_cxx_scalar(fill_value));
+    lue::api::Array result = lue::api::create_array(array_shape, as_cxx_scalar(fill_value));
 
-    return new Field{.instance = new lue::api::Field{std::move(result)}};
+    return new Array{.instance = new lue::api::Array{std::move(result)}};
 }
 
 

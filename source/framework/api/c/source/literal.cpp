@@ -1,7 +1,7 @@
 #include "literal.hpp"
 
 
-void destruct_literal(Literal* literal)
+void lue_destruct_literal(Literal* literal)
 {
     if (literal != nullptr)
     {

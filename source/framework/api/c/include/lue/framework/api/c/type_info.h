@@ -1,4 +1,5 @@
 #pragma once
+#include "lue/framework/api/c/array.h"
 #include "lue/framework/api/c/export.h"
 #include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/literal.h"
@@ -33,6 +34,8 @@ typedef enum {
 
 LUE_FCAPI_EXPORT LUE_DataModel lue_data_model(Field const* field);
 
+LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_array(Array const* array);
+
 LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_field(Field const* field);
 
 LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_literal(Literal const* literal);
@@ -42,6 +45,7 @@ LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_scalar(Scalar const* scalar);
 #define lue_element_type(X)                                                                                  \
     _Generic(                                                                                                \
         (X),                                                                                                 \
+        Array*: lue_element_type_array,                                                                      \
         Field*: lue_element_type_field,                                                                      \
         Literal*: lue_element_type_literal,                                                                  \
         Scalar*: lue_element_type_scalar)(X)

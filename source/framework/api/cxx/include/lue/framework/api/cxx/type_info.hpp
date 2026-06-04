@@ -1,4 +1,5 @@
 #pragma once
+#include "lue/framework/api/cxx/array.hpp"
 #include "lue/framework/api/cxx/export.hpp"
 #include "lue/framework/api/cxx/field.hpp"
 #include "lue/framework/api/cxx/literal.hpp"
@@ -18,6 +19,8 @@ namespace lue {
     namespace api {
 
         LUE_FAPI_EXPORT auto data_model(Field const& field) -> DataModel;
+
+        LUE_FAPI_EXPORT auto element_type(Array const& array) -> ElementType;
 
         LUE_FAPI_EXPORT auto element_type(Field const& field) -> ElementType;
 

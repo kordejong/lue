@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(create_array)
     {
         lue::api::Scalar const fill_value = Element{};
 
-        lue::api::Field result = lue::api::create_array(array_shape, partition_shape, fill_value);
+        lue::api::Array result = lue::api::create_array(array_shape, partition_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
     }
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(create_array)
     {
         lue::api::Scalar const fill_value = Scalar{};
 
-        lue::api::Field result = lue::api::create_array(array_shape, partition_shape, fill_value);
+        lue::api::Array result = lue::api::create_array(array_shape, partition_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
     }
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(create_array_without_partition_shape)
     {
         lue::api::Scalar const fill_value = Element{};
 
-        lue::api::Field result = lue::api::create_array(array_shape, fill_value);
+        lue::api::Array result = lue::api::create_array(array_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
     }
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(create_array_without_partition_shape)
     {
         lue::api::Scalar const fill_value = Scalar{};
 
-        lue::api::Field result = lue::api::create_array(array_shape, fill_value);
+        lue::api::Array result = lue::api::create_array(array_shape, fill_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
     }

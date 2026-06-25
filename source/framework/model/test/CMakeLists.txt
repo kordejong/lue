@@ -63,3 +63,27 @@ foreach(name ${names})
                 PATH=path_list_prepend:$<$<PLATFORM_ID:Windows>:$<TARGET_FILE_DIR:HPX::component_storage_component>>
     )
 endforeach()
+
+
+set(names
+    memory
+)
+
+foreach(name ${names})
+    set(target_name lue_framework_model_test_${name})
+
+    add_executable(${target_name}
+        ${name}_test.cpp
+    )
+
+    target_link_libraries(${target_name}
+        PRIVATE
+            lue::framework_local_operation
+            lue::framework_miscellaneous_operation
+            lue::framework_routing_operation
+            lue::framework_model
+            lue::utility
+            HPX::iostreams_component
+            HPX::wrap_main
+    )
+endforeach()

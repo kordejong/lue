@@ -66,7 +66,7 @@ namespace lue::detail {
                     }
                 }
 
-                return hpx::when_all(futures).then([]([[maybe_unused]] auto&& futures) { return; });
+                return hpx::when_all(futures).then([]([[maybe_unused]] auto&& futures) -> void {});
             }
 
 

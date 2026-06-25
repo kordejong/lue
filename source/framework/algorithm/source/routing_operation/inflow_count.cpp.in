@@ -3,15 +3,16 @@
 
 using lue_CellsIdxs = std::vector<lue::Index>;
 
-HPX_REGISTER_CHANNEL_DECLARATION(lue_CellsIdxs);
+HPX_REGISTER_CHANNEL_DECLARATION(lue_CellsIdxs)
+
+// NOTE:: Channel is defined in channel.cpp
 
 
 namespace lue {
 
     LUE_INSTANTIATE_INFLOW_COUNT(
-            ESC(policy::inflow_count::{{ Policies }}<{{ Element }}, {{ FlowDirectionElement }}>),
-            {{ Element }},
-            {{ FlowDirectionElement }}
-        );
+        ESC(policy::inflow_count::{{Policies}} < {{Element}}, {{FlowDirectionElement}} >),
+        {{Element}},
+        {{FlowDirectionElement}});
 
 }  // namespace lue

@@ -1877,14 +1877,11 @@ endblock()
 
 
 block()
-    set(count "0")
-
     foreach(Element IN LISTS LUE_FRAMEWORK_MATERIAL_ELEMENTS)
-        math(EXPR count "${count} + 1")
-        string(REPLACE "::" "_" name ${Element})
+        string(REPLACE "::" "_" element ${Element})
 
         # Instantiate channel_material
-        set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/channel_material-${count}.cpp")
+        set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/channel_material-${element}.cpp")
 
         generate_template_instantiation(
             INPUT_PATHNAME
@@ -1892,7 +1889,7 @@ block()
             OUTPUT_PATHNAME
                 "${output_pathname}"
             DICTIONARY
-                '{"name":"${name}","Element":"${Element}"}'
+                '{"name":"${element}","Element":"${Element}"}'
         )
         list(APPEND generated_source_files "${output_pathname}")
     endforeach()
@@ -1949,14 +1946,10 @@ block()
 endblock()
 
 block()
-    set(count "0")
-
     foreach(Policies IN LISTS LUE_FRAMEWORK_ALGORITHM_POLICIES)
-        math(EXPR count "${count} + 1")
-
         if(LUE_FRAMEWORK_WITH_DEVELOPMENT_OPERATIONS)
             # Instantiate inflow_count
-            set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/inflow_count-${count}.cpp")
+            set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/inflow_count-${Policies}.cpp")
 
             # We're using the boolean element type for the counts, assuming the boolean element type is a small
             # integral capable of representing small numbers.
@@ -2007,9 +2000,15 @@ target_sources(lue_framework_routing_operation
         source/routing_operation/walk/cell_counter.cpp
 )
 
+target_include_directories(lue_framework_routing_operation
+    PUBLIC
+        $<TARGET_PROPERTY:lue::framework_io,INCLUDE_DIRECTORIES>
+)
+
 target_link_libraries(lue_framework_routing_operation
     PUBLIC
         lue::framework_algorithm
+        HPX::iostreams_component
 )
 
 lue_install_runtime_libraries(

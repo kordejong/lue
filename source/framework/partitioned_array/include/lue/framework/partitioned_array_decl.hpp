@@ -49,7 +49,6 @@ namespace lue {
 
             PartitionedArray(PartitionedArray&& other) = default;
 
-
             PartitionedArray(Shape const& shape, LocalitiesPtr<rank> localities_ptr, Partitions&& partitions);
 
             template<typename OtherElement>
@@ -60,7 +59,6 @@ namespace lue {
 
             {
             }
-
 
             ~PartitionedArray() = default;
 

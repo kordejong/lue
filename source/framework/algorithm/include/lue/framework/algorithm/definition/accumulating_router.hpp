@@ -674,8 +674,8 @@ namespace lue {
             CommunicatorArray<MaterialCommunicator<MaterialElement, 2>, 2>&& material_communicators)
         {
             // The communicators used by the tasks calculating the results must be kept alive until these
-            // results are ready. We do this by attaching a continuation, passing in the communicators. Once
-            // the results are ready, these communicators go out of scope. Once they do, free up AGAS
+            // results are ready. We do this by attaching a continuation, passing in the communicators.
+            // Once the results are ready, these communicators go out of scope. Once they do, free up AGAS
             // resources. Note that component clients are reference-counted.
             // TODO: Is this actually necessary?
             hpx::when_all(

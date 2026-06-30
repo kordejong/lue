@@ -645,6 +645,25 @@ namespace lue {
         }
 
 
+        template<typename Functor>
+        auto accumulating_router_communicators_use_count_by()
+            -> root::ResourceUseCountByKey<LocalitiesPtr<2>>&
+        {
+            static root::ResourceUseCountByKey<LocalitiesPtr<2>> use_count_by{};
+
+            return use_count_by;
+        }
+
+
+        template<typename Functor>
+        auto accumulating_router_communicators_use_finished() -> root::ResourceUseFinished<LocalitiesPtr<2>>&
+        {
+            static root::ResourceUseFinished<LocalitiesPtr<2>> use_finished{};
+
+            return use_finished;
+        }
+
+
         /*!
             @brief      Create communicators used to exchange information about inflow counts and accumulated
                         material between localities
@@ -654,16 +673,63 @@ namespace lue {
                         material, in that order
         */
         template<typename Functor>
-        auto create_communicators(Localities<2> const& localities) -> std::tuple<
-            CommunicatorArray<InflowCountCommunicator<2>, 2>,
-            CommunicatorArray<MaterialCommunicator<MaterialT<Functor>, 2>, 2>>
+        auto create_communicators(Localities<2> const& localities, LocalitiesPtr<2> localities_ptr)
+            -> std::tuple<
+                CommunicatorArray<InflowCountCommunicator<2>, 2>,
+                CommunicatorArray<MaterialCommunicator<MaterialT<Functor>, 2>, 2>>
         {
-            return {
-                CommunicatorArray<InflowCountCommunicator<2>, 2>{
-                    std::format("/lue/{}/inflow_count/", functor_name<Functor>), localities},
-                CommunicatorArray<MaterialCommunicator<MaterialT<Functor>, 2>, 2>{
-                    std::format("/lue/{}/{}/", functor_name<Functor>, as_string<MaterialT<Functor>>),
-                    localities}};
+            // If this is the first time we are called, for this specific distribution of partitions, then
+            // create a new set of channels to use. Otherwise, reuse the existing ones.
+
+            using InflowCountCommunicatorArray = detail::CommunicatorArray<InflowCountCommunicator<2>, 2>;
+            using MaterialCommunicatorArray =
+                detail::CommunicatorArray<MaterialCommunicator<MaterialT<Functor>, 2>, 2>;
+
+            // Maps for caching the communicator arrays by a certain distribution of partitions over
+            // localities. Per distribution, we can re-use the same communicators. This saves time and memory.
+            // NOTE: We could use an ordered map and a max size to prevent the map to increase in size (this
+            // only happens if many different partition distributions are passed in, which is likely unlikely
+            // in real-world cases).
+            static std::map<LocalitiesPtr<2>, std::unique_ptr<InflowCountCommunicatorArray>>
+                inflow_count_communicators_by_localities{};
+
+            if (!inflow_count_communicators_by_localities.contains(localities_ptr))
+            {
+                inflow_count_communicators_by_localities[localities_ptr] =
+                    std::make_unique<InflowCountCommunicatorArray>(
+                        std::format("/lue/inflow_count/{}", inflow_count_communicators_by_localities.size()),
+                        localities);
+            }
+
+            lue_hpx_assert(inflow_count_communicators_by_localities.contains(localities_ptr));
+
+            InflowCountCommunicatorArray const& inflow_count_communicators =
+                *(inflow_count_communicators_by_localities.find(localities_ptr)->second);
+
+            static std::map<LocalitiesPtr<2>, std::unique_ptr<MaterialCommunicatorArray>>
+                material_communicators_by_localities{};
+
+            if (!material_communicators_by_localities.contains(localities_ptr))
+            {
+                material_communicators_by_localities[localities_ptr] =
+                    std::make_unique<MaterialCommunicatorArray>(
+                        std::format("/lue/{}/{}/", functor_name<Functor>, as_string<MaterialT<Functor>>),
+                        localities);
+            }
+
+            lue_hpx_assert(material_communicators_by_localities.contains(localities_ptr));
+
+            MaterialCommunicatorArray const& material_communicators =
+                *(material_communicators_by_localities.find(localities_ptr)->second);
+
+            return {inflow_count_communicators, material_communicators};
+
+            // return {
+            //     CommunicatorArray<InflowCountCommunicator<2>, 2>{
+            //         std::format("/lue/{}/inflow_count/", functor_name<Functor>), localities},
+            //     CommunicatorArray<MaterialCommunicator<MaterialT<Functor>, 2>, 2>{
+            //         std::format("/lue/{}/{}/", functor_name<Functor>, as_string<MaterialT<Functor>>),
+            //         localities}};
         }
 
 
@@ -1373,16 +1439,82 @@ namespace lue {
     */
     template<typename Policies, typename Functor, typename... Arguments>
     auto accumulating_router(
-        Policies const& policies,
-        Functor const& functor,
-        PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& flow_direction,
-        Arguments const&... arguments) -> ResultsT<Functor>
+        [[maybe_unused]] Policies const& policies,
+        [[maybe_unused]] Functor const& functor,
+        [[maybe_unused]] PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& flow_direction,
+        [[maybe_unused]] Arguments const&... arguments) -> ResultsT<Functor>
     {
         Localities<2> const& localities{flow_direction.localities()};
+        LocalitiesPtr<2> localities_ptr{flow_direction.localities_ptr()};
 
         auto [inflow_count_communicators, material_communicators] =
-            detail::create_communicators<Functor>(localities);
+            detail::create_communicators<Functor>(localities, localities_ptr);
 
+        // A count representing this call. The first time this function is called, the count is 1, etc.
+        Count const communicators_use_count = root::resource_use_count_by(
+            detail::accumulating_router_communicators_use_count_by<Functor>(), localities_ptr);
+
+        // A future which becomes ready once the previous call to this function, with a count 1 less than the
+        // current one, is done using the channels
+        hpx::shared_future<void> precondition_f = root::resource_use_finished(
+            detail::accumulating_router_communicators_use_finished<Functor>(),
+            localities_ptr,
+            communicators_use_count - 1);
+
+        // Continue once the precondition is met. This serializes multiple calls to this function... This is
+        // unlikely a problem in real-world situations where there's always more to do.
+
+        hpx::future<std::tuple<std::vector<detail::PassedArgumentT<Arguments>>...>>
+            inflow_count_partitions_f = precondition_f.then(
+                [policies,
+                 flow_direction_partitions = flow_direction.partitions(),
+                 localities,
+                 inflow_count_communicators,
+                 material_communicators](
+                    [[maybe_unused]] hpx::shared_future<void> const& communicators_ready_for_us)
+                    -> std::tuple<std::vector<detail::PassedArgumentT<Arguments>>...>
+                {
+                    // This code only runs when the communicators are ready for us. Do whatever it takes to
+                    // compute a result and return the resulting partitions.
+
+                    [[maybe_unused]] Count const nr_partitions{localities.nr_elements()};
+
+                    // TODO: hier verder
+
+                    // // For each partition, spawn a task that will solve the calculation for the partition
+                    // std::vector<InflowCountPartition> inflow_count_partitions(nr_partitions);
+                    //
+                    // detail::AccumulateAction<Policies, Functor, detail::PassedArgumentT<Arguments>...>
+                    // action{};
+                    //
+                    // for (Index partition_idx = 0; partition_idx < nr_partitions; ++partition_idx)
+                    // {
+                    //     // inflow_count_partitions[partition_idx] = hpx::get<0>(hpx::split_future(
+                    //     //     hpx::async(
+                    //     //         hpx::annotated_function(action, "inflow_count"),
+                    //     //         localities[partition_idx],
+                    //     //         policies,
+                    //     //         flow_direction_partitions[partition_idx],
+                    //     //         std::move(inflow_count_communicators[partition_idx]))));
+                    //
+                    //     partition_references(results_partitions, partition_idx) = hpx::split_future(
+                    //         hpx::async(
+                    //             action,
+                    //             localities[partition_idx],
+                    //             policies,
+                    //             functor,
+                    //             flow_direction.partitions()[partition_idx],
+                    //             detail::pass_argument(arguments, partition_idx)...,
+                    //             inflow_count_communicators[partition_idx],
+                    //             material_communicators[partition_idx]));
+                    //         }
+
+                    return {};
+                });
+
+        return {};
+
+#if 0
         auto const& shape_in_partitions{flow_direction.partitions().shape()};
         Count const nr_partitions{nr_elements(shape_in_partitions)};
 
@@ -1408,14 +1540,15 @@ namespace lue {
                     material_communicators[partition_idx]));
         }
 
-        detail::keep_communicators_alive(
-            std::get<0>(results_partitions),
-            std::move(inflow_count_communicators),
-            std::move(material_communicators));
+        // detail::keep_communicators_alive(
+        //     std::get<0>(results_partitions),
+        //     std::move(inflow_count_communicators),
+        //     std::move(material_communicators));
 
         // Return partitioned arrays containing the collections of partitions just created
         return results_partitions_to_arrays(
             results_partitions, flow_direction.shape(), flow_direction.localities_ptr());
+#endif
     }
 
 

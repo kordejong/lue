@@ -62,7 +62,8 @@ namespace lue {
         auto connectivity_ready(
             Policies const& policies,
             ArrayPartition<FlowDirectionElement, rank> const& flow_direction_partition,
-            InflowCountCommunicator<rank>&& communicator-> hpx::tuple<
+            InflowCountCommunicator<rank>&& communicator)
+            -> hpx::tuple<
                 hpx::future<std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()>>,
                 std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()>>
         {
@@ -455,7 +456,8 @@ namespace lue {
             Policies const& policies,
             ArrayPartition<FlowDirectionElement, rank> const& flow_direction_partition,
             InflowCountCommunicator<rank>&& communicator)
-            -> hpx::tuple<    hpx::future<std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()>>,
+            -> hpx::tuple<
+                hpx::future<std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()>>,
                 hpx::future<std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()>>>
         {
             using FlowDirectionPartition = ArrayPartition<FlowDirectionElement, rank>;
@@ -483,8 +485,8 @@ namespace lue {
             ArrayPartition<FlowDirectionElement, rank> const& flow_direction_partition,
             std::array<std::vector<std::array<Index, rank>>, nr_neighbours<rank>()> const& input_cells_idxs)
             -> ArrayPartition<CountElement, rank>
-        { hpx_assert(flow_d
-            rection_partition.is_ready());
+        {
+            lue_hpx_assert(flow_direction_partition.is_ready());
 
             auto const partition_offset = flow_direction_partition.offset(hpx::launch::sync);
             auto const flow_direction_data = flow_direction_partition.data(hpx::launch::sync);
@@ -546,8 +548,8 @@ namespace lue {
 
             hpx::tie(input_cells_idxs_f, output_cells_idxs_f) =
                 connectivity(policies, flow_direction_partition, std::move(inflow_count_communicator));
-alculate inflow count of each cell
 
+            // Calculate inflow count of each cell
             using CountPartition = ArrayPartition<CountElement, rank>;
 
             // Once both the flow direction partition and the input cells idxs are available, forward to the
@@ -588,7 +590,7 @@ alculate inflow count of each cell
 
 
         template<Rank rank>
-        auto inflow_count_communicator_use_count_by() -> root::ResourceUseCountByKey<LocalitiesPtr<rank>>&
+        auto inflow_count_communicators_use_count_by() -> root::ResourceUseCountByKey<LocalitiesPtr<rank>>&
         {
             static root::ResourceUseCountByKey<LocalitiesPtr<rank>> use_count_by{};
 
@@ -597,7 +599,7 @@ alculate inflow count of each cell
 
 
         template<Rank rank>
-        auto inflow_count_communicator_use_finished() -> root::ResourceUseFinished<LocalitiesPtr<rank>>&
+        auto inflow_count_communicators_use_finished() -> root::ResourceUseFinished<LocalitiesPtr<rank>>&
         {
             static root::ResourceUseFinished<LocalitiesPtr<rank>> use_finished{};
 
@@ -611,7 +613,8 @@ alculate inflow count of each cell
     auto inflow_count(
         Policies const& policies, PartitionedArray<FlowDirectionElement, rank> const& flow_direction)
         -> PartitionedArray<CountElement, rank>
-    { // If this is the first time we are called, for this specific distribution of partitions, then create
+    {
+        // If this is the first time we are called, for this specific distribution of partitions, then create
         // a new set of channels to use. Otherwise, reuse the existing ones.
 
         using InflowCountArray = PartitionedArray<CountElement, rank>;
@@ -645,17 +648,17 @@ alculate inflow count of each cell
 
         // A count representing this call. The first time this function is called, the count is 1, etc.
         Count const communicators_use_count = root::resource_use_count_by(
-            detail::inflow_count_communicator_use_count_by<rank>(), localities_ptr);
+            detail::inflow_count_communicators_use_count_by<rank>(), localities_ptr);
 
-        // A future which becomes ready once  urrent one, is done using th
-            e channels :shared_future<void> precondition_f = root::resource_use_finished(
-            detail::inflow_count_communicator_use_finished<rank>(),
+        // A future which becomes ready once the previous call to this function, with a count 1 less than the
+        // current one, is done using the channels
+        hpx::shared_future<void> precondition_f = root::resource_use_finished(
+            detail::inflow_count_communicators_use_finished<rank>(),
             localities_ptr,
             communicators_use_count - 1);
- ontinue once the preconditio
-            n is met. This serializes multiple calls to this function... This is
-        // unlikely a probl
-            m in real-world situations where there's always more to do.
+
+        // Continue once the precondition is met. This serializes multiple calls to this function... This is
+        // unlikely a problem in real-world situations where there's always more to do.
         using InflowCountPartition = PartitionT<InflowCountArray>;
         using InflowCountPartitions = PartitionsT<InflowCountArray>;
 
@@ -663,14 +666,12 @@ alculate inflow count of each cell
             [policies,
              flow_direction_partitions = flow_direction.partitions(),
              localities,
-             inflow_count_communicators,
-             communicators_use_count](
+             inflow_count_communicators](
                 [[maybe_unused]] hpx::shared_future<void> const& communicators_ready_for_us)
                 -> std::vector<InflowCountPartition>
             {
                 // This code only runs when the communicators are ready for us. Do whatever it takes to
-                // compute a result and return the resulting partitions and a future indicating when we are
-                // done using the communicators.
+                // compute a result and return the resulting partitions.
 
                 Count const nr_partitions{localities.nr_elements()};
 
@@ -690,7 +691,9 @@ alculate inflow count of each cell
                             std::move(inflow_count_communicators[partition_idx]))));
                 }
 
-                return inflow_count_pa
+                return inflow_count_partitions;
+            });
+
         InflowCountPartitions inflow_count_partitions(flow_direction.partitions().shape());
 
         {
@@ -722,39 +725,30 @@ alculate inflow count of each cell
             hpx::when_all(inflow_count_partitions.begin(), inflow_count_partitions.end());
 
         root::add_resource_use_finished(
-            detail::inflow_count_communicator_use_finished<rank>(),
+            detail::inflow_count_communicators_use_finished<rank>(),
             localities_ptr,
-
             communicators_use_count,
             std::move(finished_f));
 
-
-
-
-
         root::resource_use_finished(
-            detail::inflow_count_communicator_use_finished<rank>(), localities_ptr, communicators_use_count)
+            detail::inflow_count_communicators_use_finished<rank>(), localities_ptr, communicators_use_count)
             .then(
                 [localities_ptr,
-                 unicators_use_count]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> auto
+                 communicators_use_count]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> auto
                 {
-
-                                root::resource_use_handled(
-
-
-
-                        detail::inflow_count_communicator_use_finished<rank>(),
+                    root::resource_use_handled(
+                        detail::inflow_count_communicators_use_finished<rank>(),
                         localities_ptr,
                         communicators_use_count - 1);
                 });
 
         return {flow_direction, std::move(inflow_count_partitions)};
     }
-                           \
-                                                                                                             \
 
-                       \
-        LUE_INSTANTIATE_INFLOW_COUNT(Policies, CountElement, FlowDirectionElement)                           \
+}  // namespace lue
+
+
+#define LUE_INSTANTIATE_INFLOW_COUNT(Policies, CountElement, FlowDirectionElement)                           \
                                                                                                              \
     template LUE_ROUTING_OPERATION_EXPORT PartitionedArray<CountElement, 2>                                  \
     inflow_count<CountElement, ArgumentType<void(Policies)>, FlowDirectionElement, 2>(                       \

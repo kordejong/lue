@@ -538,10 +538,8 @@ namespace lue::framework {
             "as_state",
             [](Array const& array) -> hpx::shared_future<void>
             {
-                return hpx::when_all(array.partitions().begin(), array.partitions().end())
-                    .then(
-                        []([[maybe_unused]] auto const& partitions) -> hpx::shared_future<void>
-                        { return hpx::make_ready_future<void>(); });
+                // Return a shared future which becomes ready after all partitions have become ready
+                return hpx::when_all(array.partitions().begin(), array.partitions().end()).share();
             });
     }
 

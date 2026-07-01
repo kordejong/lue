@@ -134,8 +134,8 @@ namespace lue::framework {
                         "as_state",
                         [](Scalar<Element> const& scalar) -> hpx::shared_future<void>
                         {
-                            return scalar.future().then(
-                                []([[maybe_unused]] auto const& future) -> void { return; });
+                            // Return a shared future which becomes ready after the scalar has become ready
+                            return scalar.future();
                         });
                 }
         };

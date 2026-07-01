@@ -29,9 +29,6 @@ namespace lue {
                         {
                             lue_hpx_assert(current_state.is_ready());
 
-                            // ... collect some garbage, and ...
-                            hpx::agas::garbage_collect();
-
                             // ... notify the semaphore about the new lower limit
                             semaphore.signal(lower_limit);
                         });

@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE lue framework algorithm array_like
-#include "lue/framework/algorithm/array_like.hpp"
 #include "lue/framework/algorithm/create_partitioned_array.hpp"
 #include "lue/framework/algorithm/default_policies/all.hpp"
+#include "lue/framework/algorithm/default_policies/array_like.hpp"
 #include "lue/framework/algorithm/default_policies/equal_to.hpp"
 #include "lue/framework/algorithm/locality_id.hpp"
 #include "lue/framework/test/hpx_unit_test.hpp"
@@ -26,7 +26,7 @@ namespace {
 
             Element const fill_value{5};
 
-            auto output_array = lue::array_like(input_array, fill_value);
+            auto output_array = array_like(input_array, fill_value);
 
             BOOST_CHECK(all(output_array == fill_value).future().get());
 

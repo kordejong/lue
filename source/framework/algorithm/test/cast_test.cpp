@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE lue framework algorithm cast
-#include "lue/framework/algorithm/array_like.hpp"
 #include "lue/framework/algorithm/create_partitioned_array.hpp"
 #include "lue/framework/algorithm/default_policies/all.hpp"
+#include "lue/framework/algorithm/default_policies/array_like.hpp"
 #include "lue/framework/algorithm/default_policies/cast.hpp"
 #include "lue/framework/algorithm/default_policies/equal_to.hpp"
 #include "lue/framework/algorithm/policy/policy_traits.hpp"
@@ -34,7 +34,7 @@ namespace {
 
             // Request the cast of the array
             auto array_we_got = cast<OutputElement>(array);
-            auto array_we_want = lue::array_like(array, static_cast<OutputElement>(fill_value));
+            auto array_we_want = array_like(array, static_cast<OutputElement>(fill_value));
 
             BOOST_CHECK(all(array_we_got == array_we_want).future().get());
         }

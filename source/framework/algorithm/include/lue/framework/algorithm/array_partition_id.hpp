@@ -1,5 +1,6 @@
 #pragma once
-#include "lue/framework/algorithm/array_like.hpp"
+#include "lue/framework/algorithm/default_policies/array_like.hpp"
+#include "lue/framework/algorithm/definition/array_like.hpp"
 
 
 namespace lue {
@@ -25,7 +26,7 @@ namespace lue {
         using Policies = policy::array_like::DefaultPolicies<OutputElement, InputElement>;
         Policies policies{};
 
-        ArrayLikePartitionAction<Policies, InputElement, OutputElement, rank> action;
+        detail::ArrayLikePartitionAction<Policies, InputElement, OutputElement, rank> action{};
 
         Localities<rank> const& localities{input_array.localities()};
         InputPartitions const& input_partitions{input_array.partitions()};

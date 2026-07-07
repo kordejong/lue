@@ -1045,6 +1045,23 @@ block()
                     list(APPEND generated_source_files "${output_pathname}")
                 endforeach()
             endif()
+
+            foreach(SomeElement IN LISTS LUE_FRAMEWORK_ELEMENTS)
+                string(REPLACE "std::" "" some_element ${SomeElement})
+
+                # Instantiate array_like
+                set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/array_like-${Policies}_${element}_${some_element}.cpp")
+
+                generate_template_instantiation(
+                    INPUT_PATHNAME
+                        "${CMAKE_CURRENT_SOURCE_DIR}/${offset}/array_like.cpp.in"
+                    OUTPUT_PATHNAME
+                        "${output_pathname}"
+                    DICTIONARY
+                        '{"Policies":"${Policies}","OutputElement":"${Element}","InputElement":"${SomeElement}"}'
+                )
+                list(APPEND generated_source_files "${output_pathname}")
+            endforeach()
         endforeach()
 
         foreach(Element IN LISTS LUE_FRAMEWORK_FLOATING_POINT_ELEMENTS)

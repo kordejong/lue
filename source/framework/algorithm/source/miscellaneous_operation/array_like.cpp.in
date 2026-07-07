@@ -1,0 +1,10 @@
+#include "lue/framework/algorithm/default_policies/array_like.hpp"
+#include "lue/framework/algorithm/definition/array_like.hpp"
+#include "lue/framework/algorithm/value_policies/array_like.hpp"
+
+
+namespace lue {
+
+    LUE_INSTANTIATE_ARRAY_LIKE(ESC(policy::array_like::{{Policies}} < {{OutputElement}}, {{InputElement}} >));
+
+}  // namespace lue

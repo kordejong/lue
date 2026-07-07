@@ -46,6 +46,7 @@ set(local_operation_names
 )
 
 set(miscellaneous_operation_names
+    miscellaneous/array_like
     miscellaneous/create_array
     miscellaneous/create_scalar
 )

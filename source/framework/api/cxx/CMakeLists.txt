@@ -137,6 +137,7 @@ target_sources(lue_framework_api_cxx
         source/local/valid.cpp
         source/local/where2.cpp
         source/local/where3.cpp
+        source/miscellaneous/array_like.cpp
         source/miscellaneous/create_array.cpp
         source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp

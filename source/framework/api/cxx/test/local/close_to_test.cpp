@@ -1,7 +1,7 @@
-#include "lue/framework/configure.hpp"
 #define BOOST_TEST_MODULE lue framework api cxx local close_to
+#include "unit_test.hpp"
 #include "lue/framework/api/cxx/local/close_to.hpp"
-#include "lue/framework/test/hpx_unit_test.hpp"
+#include "lue/framework/configure.hpp"
 #include "lue/framework.hpp"
 
 

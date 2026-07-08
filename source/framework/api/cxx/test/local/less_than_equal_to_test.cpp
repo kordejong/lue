@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE lue framework api cxx local less_than_equal_to
-#include "lue/framework/api/cxx/operator.hpp"
+#include "lue/framework/api/cxx/local/less_than_equal_to.hpp"
 #include "lue/framework/test/hpx_unit_test.hpp"
 #include "lue/framework.hpp"
 

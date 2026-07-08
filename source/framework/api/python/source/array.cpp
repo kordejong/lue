@@ -1,5 +1,6 @@
 #include "lue/framework/api/cxx/miscellaneous/create_array.hpp"
-#include "lue/framework/api/cxx/operator.hpp"
+#include "lue/framework/api/cxx/local/add.hpp"
+#include "lue/framework/api/cxx/local/subtract.hpp"
 #include <pybind11/stl.h>
 
 

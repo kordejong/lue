@@ -1,6 +1,7 @@
 #include "lue/framework/api/cxx/scalar.hpp"
+#include "lue/framework/api/cxx/local/add.hpp"
+#include "lue/framework/api/cxx/local/subtract.hpp"
 #include "lue/framework/api/cxx/miscellaneous/create_scalar.hpp"
-#include "lue/framework/api/cxx/operator.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 #include <format>

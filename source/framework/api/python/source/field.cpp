@@ -1,4 +1,5 @@
-#include "lue/framework/api/cxx/operator.hpp"
+#include "lue/framework/api/cxx/local/add.hpp"
+#include "lue/framework/api/cxx/local/subtract.hpp"
 #include <pybind11/operators.h>
 
 
@@ -22,6 +23,10 @@ namespace lue::api {
             .def("__add__", add, pybind11::is_operator())
             .def("__radd__", add, pybind11::is_operator())
 
+            // a - b, a -= b
+            // .def(pybind11::self - pybind11::self)
+            .def("__sub__", subtract, pybind11::is_operator())
+            .def("__rsub__", subtract, pybind11::is_operator())
 
             // TODO
             // https://pybind11.readthedocs.io/en/stable/advanced/classes.html#operator-overloading

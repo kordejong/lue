@@ -96,6 +96,7 @@ target_sources(lue_framework_api_cxx
     PRIVATE
         ${generated_source_files}
         source/as_field.cpp
+        source/as_state.cpp
         source/focal/mean.cpp
         source/io.cpp
         source/local/abs.cpp

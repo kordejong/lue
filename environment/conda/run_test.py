@@ -1,6 +1,7 @@
 import lue
 import lue.data_model as ldm
 import lue.framework as lfr
+import lue.framework_x as lfrx
 import lue.pcraster as lpr
 import lue.qa.scalability.instrument as lqi
 

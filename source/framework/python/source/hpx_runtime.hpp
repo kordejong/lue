@@ -29,17 +29,19 @@ namespace lue {
 
         private:
 
-            hpx::spinlock _mutex;
-            hpx::condition_variable_any _condition_variable;
-
-            std::mutex _startup_mutex;
-            std::condition_variable _startup_condition_variable;
             bool _running;
 
             lue::CommandLine _command_line;
 
             hpx::runtime* _runtime;
             std::vector<std::string> const _configuration;
+
+            std::mutex _startup_mutex;
+            std::condition_variable _startup_condition_variable;
+
+            hpx::spinlock _teardown_mutex;
+            hpx::condition_variable_any _teardown_condition_variable;
+
     };
 
 }  // namespace lue

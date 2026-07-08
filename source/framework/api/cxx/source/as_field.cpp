@@ -1,5 +1,5 @@
-#include "overload.hpp"
 #include "lue/framework/api/cxx/as_field.hpp"
+#include "overload.hpp"
 
 
 namespace lue {
@@ -27,7 +27,10 @@ namespace lue {
 
     namespace api {
 
-        auto as_field(Array& array) -> Field
+        // as_field grabs the internals of the variant passed in. This variant isn't useful anymore
+        // afterwards.
+
+        auto as_field(Array array) -> Field
         {
             return std::visit(
                 overload{
@@ -37,14 +40,15 @@ namespace lue {
         }
 
 
-        auto as_field(Literal& literal) -> Field
+        auto as_field(Literal literal) -> Field
         {
             return std::visit(
-                overload{[](auto literal) -> Field { return lue::as_field(literal); }}, literal.variant());
+                overload{[](auto literal) -> Field { return lue::as_field(literal); }},
+                literal.variant());
         }
 
 
-        auto as_field(Scalar& scalar) -> Field
+        auto as_field(Scalar scalar) -> Field
         {
             return std::visit(
                 overload{

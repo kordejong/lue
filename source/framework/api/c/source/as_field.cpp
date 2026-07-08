@@ -9,8 +9,8 @@
 
 auto lue_array_as_field(LUE_Array* array) -> LUE_Field*
 {
-    auto* result =
-        new LUE_Field{.instance = new lue::api::Field{lue::api::as_field(lue_as_cxx_array(array))}};
+    auto* result = new LUE_Field{
+        .instance = new lue::api::Field{lue::api::as_field(std::move(lue_as_cxx_array(array)))}};
 
     lue_destruct_array(array);
 
@@ -20,8 +20,8 @@ auto lue_array_as_field(LUE_Array* array) -> LUE_Field*
 
 auto lue_literal_as_field(LUE_Literal* literal) -> LUE_Field*
 {
-    auto* result =
-        new LUE_Field{.instance = new lue::api::Field{lue::api::as_field(lue_as_cxx_literal(literal))}};
+    auto* result = new LUE_Field{
+        .instance = new lue::api::Field{lue::api::as_field(std::move(lue_as_cxx_literal(literal)))}};
 
     lue_destruct_literal(literal);
 
@@ -31,8 +31,8 @@ auto lue_literal_as_field(LUE_Literal* literal) -> LUE_Field*
 
 auto lue_scalar_as_field(LUE_Scalar* scalar) -> LUE_Field*
 {
-    auto* result =
-        new LUE_Field{.instance = new lue::api::Field{lue::api::as_field(lue_as_cxx_scalar(scalar))}};
+    auto* result = new LUE_Field{
+        .instance = new lue::api::Field{lue::api::as_field(std::move(lue_as_cxx_scalar(scalar)))}};
 
     lue_destruct_scalar(scalar);
 

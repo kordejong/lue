@@ -11,8 +11,7 @@ namespace lue::detail {
         Policies const& policies, ArrayPartitionData<FlowDirectionElement, rank> const& flow_direction_data)
         -> ArrayPartitionData<CountElement, rank>
     {
-        // Only(!) handle the cells whose downstream cells are
-        // contained within this partition.
+        // Only(!) handle the cells whose downstream cells are contained within this partition
         auto const& partition_shape{flow_direction_data.shape()};
         auto const [nr_elements0, nr_elements1] = partition_shape;
 
@@ -35,10 +34,8 @@ namespace lue::detail {
 
                     if (rd != idx0 || cd != idx1)
                     {
-                        // Current cell is not a sink. In
-                        // a valid flow direction network,
-                        // the destination cell cannot contain
-                        // no-data.
+                        // Current cell is not a sink. In a valid flow direction network, the destination
+                        // cell cannot contain no-data.
                         lue_hpx_assert(!indp.is_no_data(flow_direction_data(rd, cd)));
                         inflow_count_data(rd, cd) += 1;
                     }

@@ -371,6 +371,7 @@ namespace lue {
             auto operator()(Idxs... idxs) const -> Element const&
             {
                 static_assert(sizeof...(idxs) == rank);
+                lue_hpx_assert(!empty());
 
                 if constexpr (BuildOptions::validate_idxs)
                 {
@@ -388,6 +389,7 @@ namespace lue {
             auto operator()(Idxs... idxs) -> Element&
             {
                 static_assert(sizeof...(idxs) == rank);
+                lue_hpx_assert(!empty());
 
                 if constexpr (BuildOptions::validate_idxs)
                 {

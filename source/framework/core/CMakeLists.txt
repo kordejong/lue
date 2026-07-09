@@ -68,6 +68,7 @@ target_sources(lue_framework_core
         source/configuration_entry.cpp
         source/debug.cpp
         source/framework.cpp
+        source/locality.cpp
         source/numa_domain.cpp
         source/runtime.cpp
 )

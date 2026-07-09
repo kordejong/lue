@@ -4,7 +4,7 @@
 #include "lue/framework/core/indices.hpp"
 #include "lue/framework/core/offset.hpp"
 #include "lue/framework/core/shape.hpp"
-#include <hpx/include/lcos.hpp>
+#include <hpx/channel.hpp>
 #include <cstdint>
 
 
@@ -68,8 +68,7 @@ namespace lue::detail {
     class Communicator
     {
 
-            // For now, assume we are working with a 2D world of
-            // neighbours to communicate with
+            // For now, assume we are working with a 2D world of neighbours to communicate with
             static_assert(rank == 2);
             static_assert(nr_neighbours<rank>() == 8);
 
@@ -77,7 +76,7 @@ namespace lue::detail {
         public:
 
             using Value = T;
-            using Channel = hpx::lcos::channel<T>;
+            using Channel = hpx::distributed::channel<T>;
             using Channels = std::array<Channel, nr_neighbours<rank>()>;
             using Shape = lue::Shape<Count, rank>;
             using Indices = lue::Indices<Index, rank>;
@@ -87,6 +86,13 @@ namespace lue::detail {
             Communicator() = default;
 
 
+            /*!
+                @brief      .
+                @tparam     .
+                @param      idxs Indices of partition
+                @return     .
+                @exception  .
+            */
             Communicator(
                 hpx::id_type const locality_id,
                 std::string const& basename,
@@ -100,22 +106,22 @@ namespace lue::detail {
                 _receive_channels{}
 
             {
-                [[maybe_unused]] auto nr_valid_channels = [](Channels const& channels)
+                [[maybe_unused]] auto nr_valid_channels = [](Channels const& channels) -> auto
                 {
                     return std::count_if(
                         channels.begin(),
                         channels.end(),
-                        [](Channel const& channel) { return bool(channel); });
+                        [](Channel const& channel) -> auto { return bool(channel); });
                 };
 
-                [[maybe_unused]] auto same_channels_are_valid =
-                    [](Channels const& channels1, Channels const& channels2)
+                [[maybe_unused]] auto same_channels_are_valid = [](Channels const& channels1,
+                                                                   Channels const& channels2) -> auto
                 {
                     return std::equal(
                         channels1.begin(),
                         channels1.end(),
                         channels2.begin(),
-                        [](Channel const& channel1, Channel const& channel2)
+                        [](Channel const& channel1, Channel const& channel2) -> auto
                         {
                             return (bool(channel1) && bool(channel2)) || (!bool(channel1) && !bool(channel2));
                         });
@@ -187,25 +193,56 @@ namespace lue::detail {
             }
 
 
-            void send(accu::Direction const& direction, T const& value)
+            void send(accu::Direction const& direction, T value, std::size_t const generation)
             {
                 lue_hpx_assert(has_neighbour(direction));
 
                 auto& channel{send_channel(direction)};
 
-                channel.set(value);
+                channel.set(std::move(value), generation);
             }
 
 
-            void send(T const& value)
+            void send(accu::Direction const& direction, T value)
+            {
+                lue_hpx_assert(has_neighbour(direction));
+
+                auto& channel{send_channel(direction)};
+
+                channel.set(std::move(value));
+            }
+
+
+            void send(T value, std::size_t const generation)
             {
                 for (auto& channel : _send_channels)
                 {
                     if (channel)
                     {
-                        channel.set(value);
+                        channel.set(std::move(value), generation);
                     }
                 }
+            }
+
+
+            void send(T value)
+            {
+                for (auto& channel : _send_channels)
+                {
+                    if (channel)
+                    {
+                        channel.set(std::move(value));
+                    }
+                }
+            }
+
+
+            auto get(accu::Direction const direction, std::size_t const generation) -> hpx::future<T>
+            {
+                auto& channel{receive_channel(direction)};
+                lue_hpx_assert(channel);
+
+                return channel.get(hpx::launch::async, generation);
             }
 
 
@@ -214,7 +251,7 @@ namespace lue::detail {
                 auto& channel{receive_channel(direction)};
                 lue_hpx_assert(channel);
 
-                return channel.get();
+                return channel.get(hpx::launch::async);
             }
 
 
@@ -266,8 +303,7 @@ namespace lue::detail {
                     }
                 }
 
-                return hpx::when_all(futures).then([]([[maybe_unused]] auto&& futures)
-                                                   { return hpx::make_ready_future(); });
+                return hpx::when_all(futures.begin(), futures.end());
             }
 
 
@@ -362,7 +398,6 @@ namespace lue::detail {
                 hpx::id_type const locality_id, std::string const& basename, accu::Direction const direction)
             {
                 lue_hpx_assert(!send_channel(direction));
-
                 send_channel(direction) = Channel{locality_id};
                 lue_hpx_assert(send_channel(direction));
 
@@ -382,8 +417,6 @@ namespace lue::detail {
 
             void setup_receive_channel(std::string const& basename, accu::Direction const direction)
             {
-                lue_hpx_assert(!receive_channel(direction));
-
                 // Directions to us, from communicator at direction passed in
                 static std::array<accu::Direction, nr_neighbours<rank>()> sender_direction{
                     accu::Direction::south,
@@ -396,6 +429,7 @@ namespace lue::detail {
                     accu::Direction::south_east,
                 };
 
+                lue_hpx_assert(!receive_channel(direction));
                 receive_channel(direction) = hpx::find_from_basename<Channel>(
                     channel_name(basename, sender_direction[direction]), neighbour_idx(direction));
                 lue_hpx_assert(receive_channel(direction));

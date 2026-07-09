@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(instantiate_partitions_per_locality)
     {
         using namespace lue::default_policies;
 
-        if constexpr (lue::arithmetic_element_supported<std::uint32_t>)
+#ifdef LUE_FRAMEWORK_LOCALITY_ID_ELEMENT_AVAILABLE
         {
             using Element = std::uint32_t;  // locality IDs are uint32_t
             using Functor = NumberPartitionsPerLocality<Element, rank>;
@@ -218,6 +218,7 @@ BOOST_AUTO_TEST_CASE(instantiate_partitions_per_locality)
             std::set<Element> const unique_values = unique(array).get();
             BOOST_CHECK_EQUAL(unique_values.size(), hpx::get_num_localities().get());
         }
+#endif
     }
 }
 

@@ -52,12 +52,12 @@ test:
     - lue.data_model
     - lue.framework
     - lue.pcraster
-    - lue.qa.scalability
+    - lue.qa.scalability                         # [not win and not unix]
   commands:
     - lue_translate -h
     - lue_validate -h
     - lue_calculate.py -h
-    - lue_scalability.py -h
+    - lue_scalability.py -h                      # [not win and not unix]
 
 
 about:

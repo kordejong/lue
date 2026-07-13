@@ -524,3 +524,53 @@ function(lue_configure_static_library_for_tests)
             ${link_libraries}
     )
 endfunction()
+
+function(lue_configure_python_test)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        TARGET
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(target ${ARG_TARGET})
+
+    set_property(
+        TEST
+            ${target}
+        APPEND
+        PROPERTY
+            # Preload the allocator's shared library, if necessary.
+            ENVIRONMENT_MODIFICATION
+                LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+    )
+
+    set_property(
+        TEST
+            ${target}
+        APPEND
+        PROPERTY
+            # Add the path to our Python modules to PYTHONPATH.
+            # No need to append the PATH here with locations to our DDLs. Python won't pick the up.
+            ENVIRONMENT_MODIFICATION
+                PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+    )
+
+    set_property(
+        TEST
+            ${target}
+        APPEND
+        PROPERTY
+            FIXTURES_REQUIRED
+                lue_py_test_fixture
+    )
+endfunction()

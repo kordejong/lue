@@ -13,14 +13,9 @@ add_test(
                     --pattern "*_test.py"
 )
 
-set_property(
-    TEST
+lue_configure_python_test(
+    TARGET
         lue_py_framework_python_test
-    APPEND
-    PROPERTY
-        # Preload the tcmalloc shared library, if necessary.
-        ENVIRONMENT_MODIFICATION
-            LD_PRELOAD=path_list_append:$<$<PLATFORM_ID:Linux>:${Tcmalloc_LIBRARY}>
 )
 
 set_property(
@@ -30,16 +25,5 @@ set_property(
     PROPERTY
         # Add the path to our Python modules to PYTHONPATH.
         ENVIRONMENT_MODIFICATION
-            PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
             PYTHONPATH=path_list_prepend:${CMAKE_CURRENT_SOURCE_DIR}  # lue_unit_test.py
-            # No need to append the PATH here with locations to our DDLs. Python won't pick them up.
-)
-
-set_property(
-    TEST
-        lue_py_framework_python_test
-    APPEND
-    PROPERTY
-        FIXTURES_REQUIRED
-            lue_py_test_fixture
 )

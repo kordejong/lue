@@ -53,12 +53,25 @@ BOOST_AUTO_TEST_CASE(use_case03)
 
     // Create fragment given collection of cells idxs, and append
     lue::SerialRouteFragment<2> fragment{cell_idxs};
+
+#if __GNUC__ == 15 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ == 0
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
+
+    // For some reason, these lines result in compiler warnings about array bounds. Seen on gcc-15, icw
+    // jemalloc. Seems like a compiler bug.
+
     fragment.append(cell_idxs[0]);
     fragment.append(cell_idxs[1]);
     fragment.append(cell_idxs[2]);
+
+#if __GNUC__ == 15 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ == 0
+#pragma GCC diagnostic pop
+#endif
 
     cell_idxs.reserve(2 * cell_idxs.size());  // Make sure iterators stay valid during insert
     cell_idxs.insert(cell_idxs.end(), cell_idxs.begin(), cell_idxs.end());
 
     BOOST_TEST(fragment.cell_idxs() == cell_idxs, boost::test_tools::per_element());
-}
+ }

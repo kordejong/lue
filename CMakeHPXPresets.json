@@ -57,7 +57,7 @@
                 "HPX_WITH_FETCH_ASIO": "FALSE",
                 "HPX_WITH_FETCH_HWLOC": "FALSE",
                 "HPX_WITH_HIDDEN_VISIBILITY": "TRUE",
-                "HPX_WITH_MALLOC": "jemalloc"
+                "HPX_WITH_MALLOC": "mimalloc"
             }
         },
         {

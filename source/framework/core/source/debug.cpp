@@ -10,6 +10,7 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 

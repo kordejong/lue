@@ -37,8 +37,7 @@
                 "HPX_WITH_FETCH_ASIO": "FALSE",
                 "HPX_WITH_FETCH_HWLOC": "FALSE",
                 "HPX_WITH_HIDDEN_VISIBILITY": "TRUE",
-                "HPX_WITH_GOOGLE_PERFTOOLS": "TRUE",
-                "HPX_WITH_MALLOC": "tcmalloc"
+                "HPX_WITH_MALLOC": "jemalloc"
             }
         },
         {
@@ -48,8 +47,7 @@
                 "HPX_WITH_FETCH_ASIO": "TRUE",
                 "HPX_WITH_FETCH_HWLOC": "FALSE",
                 "HPX_WITH_HIDDEN_VISIBILITY": "FALSE",
-                "HPX_WITH_GOOGLE_PERFTOOLS": "TRUE",
-                "HPX_WITH_MALLOC": "tcmalloc"
+                "HPX_WITH_MALLOC": "jemalloc"
             }
         },
         {
@@ -59,8 +57,7 @@
                 "HPX_WITH_FETCH_ASIO": "FALSE",
                 "HPX_WITH_FETCH_HWLOC": "FALSE",
                 "HPX_WITH_HIDDEN_VISIBILITY": "TRUE",
-                "HPX_WITH_GOOGLE_PERFTOOLS": "FALSE",
-                "HPX_WITH_MALLOC": "mimalloc"
+                "HPX_WITH_MALLOC": "jemalloc"
             }
         },
         {

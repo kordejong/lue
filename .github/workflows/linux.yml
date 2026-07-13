@@ -100,8 +100,8 @@ jobs:
             libboost-dev \
             libglfw3-dev \
             libgdal-dev \
-            libgoogle-perftools-dev \
             libhdf5-dev \
+            libjmalloc-dev \
             libvulkan-dev \
             ${{ matrix.compiler.package }} \
             ninja-build \
@@ -114,7 +114,7 @@ jobs:
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
         env:
-          hpx_build_nr: 1
+          hpx_build_nr: 2
         with:
           cache_key: ${{ matrix.os }}_${{ matrix.compiler.cxx }}_python-${{ matrix.python_version }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
           c_compiler: ${{ matrix.compiler.c }}

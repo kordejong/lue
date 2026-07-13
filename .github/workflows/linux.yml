@@ -87,8 +87,6 @@ jobs:
 
       - name: setup platform
         run: |
-          sudo apt-get update
-          sudo apt-get remove libunwind-14-dev
           sudo apt-get install \
             cmake \
             doxygen \
@@ -101,7 +99,7 @@ jobs:
             libglfw3-dev \
             libgdal-dev \
             libhdf5-dev \
-            libjmalloc-dev \
+            libjemalloc-dev \
             libvulkan-dev \
             ${{ matrix.compiler.package }} \
             ninja-build \
@@ -110,9 +108,6 @@ jobs:
             texlive-latex-extra \
             texlive-pictures
           pip3 install -r ${{ env.lue_source_directory }}/environment/configuration/requirements-dev.txt
-          ls /usr
-          ls /usr/include
-          ls /usr/lib
 
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
@@ -123,7 +118,6 @@ jobs:
           c_compiler: ${{ matrix.compiler.c }}
           cxx_compiler: ${{ matrix.compiler.cxx }}
           build_type: Release
-          cmake_flags: "-D BOOST_INCLUDEDIR=/usr/include -D BOOST_LIBRARYDIR=/usr/lib"
           cmake_preset: hpx_release_linux_node_configuration
           cmake_preset_file: ${{ env.lue_source_directory }}/CMakeHPXPresets.json
           hpx_branch: ${{ env.hpx_branch }}

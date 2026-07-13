@@ -58,8 +58,8 @@ jobs:
       lue_development_install_directory: lue_development_install
       lue_consume_source_directory: lue_consume_source
       lue_consume_build_directory: lue_consume_build
-      hpx_version: 1.11.0
-      hpx_branch: v1.11.0
+      hpx_version: 2.0.0-alpha
+      hpx_branch: master
       hpx_source_directory: hpx_source
       hpx_build_directory: hpx_build
       hpx_install_directory: hpx_install
@@ -96,7 +96,7 @@ jobs:
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
         env:
-          hpx_build_nr: 2
+          hpx_build_nr: 3
         with:
           cache_key: macos-${{ matrix.macos_version }}_${{ matrix.compiler.cxx }}_python-${{ matrix.python_version }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
           c_compiler: ${{ matrix.compiler.c }}

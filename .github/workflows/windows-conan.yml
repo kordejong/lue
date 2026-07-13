@@ -71,8 +71,8 @@ jobs:
       conda_package_prefix: "C:/Users/runneradmin/conda_pkgs_dir"
       # conda-build provides the conda-develop command
       conda_packages: "conda-build conan docopt jinja2 matplotlib ninja numpy ruamel.yaml"
-      hpx_version: 1.11.0
-      hpx_branch: v1.11.0
+      hpx_version: 2.0.0-alpha
+      hpx_branch: master
       hpx_source_directory: hpx_source
       hpx_build_directory: hpx_build
       hpx_install_directory: hpx_install

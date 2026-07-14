@@ -145,12 +145,6 @@ target_sources(lue_framework_api_cxx
         source/type_info.cpp
 )
 
-# TODO Integrate with target_sources call?
-target_include_directories(lue_framework_api_cxx
-    PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>
-)
-
 target_link_libraries(lue_framework_api_cxx
     PRIVATE
         lue::framework_focal_operation

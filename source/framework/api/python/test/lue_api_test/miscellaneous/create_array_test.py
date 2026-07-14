@@ -1,15 +1,6 @@
-import numpy as np
-
 import lue.framework_x as lfrx
 import lue_test
-
-
-def setUpModule():
-    lue_test.start_hpx_runtime()
-
-
-def tearDownModule():
-    lue_test.stop_hpx_runtime()
+from lue_test.operation_test import setUpModule, tearDownModule
 
 
 class CreateArrayTest(lue_test.TestCase):
@@ -17,15 +8,15 @@ class CreateArrayTest(lue_test.TestCase):
     def test_create_array(self):
         array_shape = (60, 40)
         partition_shape = (6, 4)
+        element_type = lfrx.signed_integral_element_types[0]
 
-        # element_type = np.int32
-
-        # fill_value = lfrx.create_scalar(5, element_type)
-        # array = lfrx.create_array(
-        #     array_shape, fill_value, partition_shape=partition_shape
-        # )
-
-        # print(array)
+        for element_type in lfrx.arithmetic_element_types:
+            scalar = lfrx.create_scalar(5, element_type)
+            array = lfrx.create_array(
+                array_shape, fill_value=scalar, partition_shape=partition_shape
+            )
+            self.assertEqual(array.dtype, element_type)
+            self.assertEqual(array.shape, array_shape)
 
         # TODO Mirror c++ tests
 

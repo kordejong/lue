@@ -7,6 +7,15 @@
 #include <cassert>
 
 
+/*!
+    @brief      .
+    @tparam     .
+    @param      .
+    @return     .
+    @exception  .
+
+    The @array passed in is destructed.
+*/
 auto lue_array_as_field(LUE_Array* array) -> LUE_Field*
 {
     auto* result = new LUE_Field{
@@ -18,6 +27,15 @@ auto lue_array_as_field(LUE_Array* array) -> LUE_Field*
 }
 
 
+/*!
+    @brief      .
+    @tparam     .
+    @param      .
+    @return     .
+    @exception  .
+
+    The @literal passed in is destructed.
+*/
 auto lue_literal_as_field(LUE_Literal* literal) -> LUE_Field*
 {
     auto* result = new LUE_Field{
@@ -29,6 +47,15 @@ auto lue_literal_as_field(LUE_Literal* literal) -> LUE_Field*
 }
 
 
+/*!
+    @brief      .
+    @tparam     .
+    @param      .
+    @return     .
+    @exception  .
+
+    The @scalar passed in is destructed.
+*/
 auto lue_scalar_as_field(LUE_Scalar* scalar) -> LUE_Field*
 {
     auto* result = new LUE_Field{

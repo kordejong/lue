@@ -1,6 +1,7 @@
 #pragma once
 #include "lue/framework/api/c/array.h"
 #include "lue/framework/api/c/export.h"
+#include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/literal.h"
 #include "lue/framework/api/c/scalar.h"
 #include <stddef.h>
@@ -44,6 +45,8 @@ LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_float64(double value);
         double: lue_create_literal_float64)(X)
 
 LUE_FCAPI_EXPORT LUE_Scalar* lue_create_scalar(LUE_Literal* value);
+
+LUE_FCAPI_EXPORT LUE_Array* lue_array_like(LUE_Array* array, LUE_Scalar* fill_value);
 
 #ifdef __cplusplus
 }

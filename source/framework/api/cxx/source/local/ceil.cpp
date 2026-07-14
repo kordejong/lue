@@ -1,7 +1,7 @@
 #include "lue/framework/api/cxx/local/ceil.hpp"
-#include "detail/unsupported_overload.hpp"
-#include "overload.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
 #include "lue/framework/algorithm/value_policies/ceil.hpp"
+#include "lue/framework/api/cxx/detail/unsupported_overload.hpp"
 
 
 namespace lue {

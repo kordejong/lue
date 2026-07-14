@@ -1,6 +1,8 @@
-#include "lue/framework/api/cxx/miscellaneous/create_array.hpp"
+#include "lue/framework/api/cxx/array.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
 #include "lue/framework/api/cxx/local/add.hpp"
 #include "lue/framework/api/cxx/local/subtract.hpp"
+#include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 
 
@@ -8,6 +10,41 @@ using namespace pybind11::literals;
 
 
 namespace lue::api {
+
+    namespace {
+
+        // TODO: Define and use a Array concept here
+        template<typename Array>
+        auto dtype() -> pybind11::dtype
+        {
+            return pybind11::dtype::of<ElementT<Array>>();
+        }
+
+
+        auto dtype(Array const& array) -> pybind11::dtype
+        {
+            return std::visit(
+                overload{[](auto const& array) -> pybind11::dtype { return api::dtype<decltype(array)>(); }},
+                array.variant());
+        }
+
+
+        template<Arithmetic Element>
+        auto shape(PartitionedArray<Element, 2> const& array) -> std::tuple<Count, Count>
+        {
+            return {array.shape()[0], array.shape()[1]};
+        }
+
+
+        auto shape(Array const& array) -> std::tuple<Count, Count>
+        {
+            return std::visit(
+                overload{[](auto const& array) -> std::tuple<Count, Count> { return api::shape(array); }},
+                array.variant());
+        }
+
+    }  // Anonymous namespace
+
 
     void bind_array(pybind11::module& module)
     {
@@ -31,22 +68,15 @@ namespace lue::api {
             // TODO
             // https://pybind11.readthedocs.io/en/stable/advanced/classes.html#operator-overloading
 
-            ;
+            .def_property_readonly(
+                "dtype",
+                [](Array const& self) -> pybind11::dtype { return dtype(self); })
 
-        module.def(
-            "create_array",
-            [](Shape<Count, 2> const& array_shape,
-               Scalar const& fill_value,
-               std::optional<Shape<Count, 2>> const& partition_shape) -> Array
-            {
-                return partition_shape ? create_array(array_shape, *partition_shape, fill_value)
-                                       : create_array(array_shape, fill_value);
-            },
-            "array_shape"_a,
-            "fill_value"_a,
-            pybind11::kw_only(),
-            "partition_shape"_a = std::optional<Shape<Count, 2>>{},
-            pybind11::return_value_policy::move);
+            .def_property_readonly(
+                "shape",
+                [](Array const& self) -> std::tuple<Count, Count> { return shape(self); })
+
+            ;
     }
 
 }  // namespace lue::api

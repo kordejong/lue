@@ -1,5 +1,5 @@
 #include "lue/framework/api/cxx/as_field.hpp"
-#include "overload.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
 
 
 namespace lue {
@@ -43,8 +43,7 @@ namespace lue {
         auto as_field(Literal literal) -> Field
         {
             return std::visit(
-                overload{[](auto literal) -> Field { return lue::as_field(literal); }},
-                literal.variant());
+                overload{[](auto literal) -> Field { return lue::as_field(literal); }}, literal.variant());
         }
 
 

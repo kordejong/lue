@@ -1,5 +1,5 @@
 #pragma once
-#include "detail/type_name.hpp"
+#include "lue/framework/api/cxx/detail/type_name.hpp"
 #include "lue/framework/api/cxx/field.hpp"
 #include "lue/string.hpp"
 #include <concepts>

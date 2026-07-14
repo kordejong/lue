@@ -13,10 +13,10 @@ BOOST_AUTO_TEST_CASE(array_like)
     using OutputArray = lue::PartitionedArray<OutputElement, 2>;
 
     {
-        lue::api::Field const array = InputArray{};
-        lue::api::Field const fill_value = Scalar{};
-        lue::api::Field const result = lue::api::array_like(array, fill_value);
+        lue::api::Array const input_array = InputArray{};
+        lue::api::Scalar const fill_value = Scalar{};
+        lue::api::Array const output_array = lue::api::array_like(input_array, fill_value);
 
-        BOOST_CHECK(std::holds_alternative<OutputArray>(result.variant()));
+        BOOST_CHECK(std::holds_alternative<OutputArray>(output_array.variant()));
     }
 }

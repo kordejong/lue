@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE lue framework api cxx create_array
+#define BOOST_TEST_MODULE lue framework api cxx array_like
 #include "unit_test.hpp"
 #include "lue/framework/api/cxx/miscellaneous/array_like.hpp"
 #include "lue/framework.hpp"

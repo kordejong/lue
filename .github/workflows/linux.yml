@@ -209,6 +209,7 @@ jobs:
 
           export PYTHONPATH="${{ env.lue_runtime_install_directory }}/lib/python${{ matrix.python_version }}:$PYTHONPATH"
           export LD_LIBRARY_PATH="${{ env.hpx_install_directory }}/lib:$LD_LIBRARY_PATH"
+          export LD_PRELOAD="$(find $(jemalloc-config --libdir) -name libjemalloc.so):$LD_PRELOAD"
 
           ${{ env.lue_runtime_install_directory }}/bin/lue_calculate.py --version
           ${{ env.lue_runtime_install_directory }}/bin/lue_scalability.py --version

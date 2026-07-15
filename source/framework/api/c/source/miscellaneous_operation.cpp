@@ -3,7 +3,16 @@
 #include "field.hpp"
 #include "literal.hpp"
 #include "scalar.hpp"
+#include "type_info.hpp"
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
+
+
+auto lue_cast(LUE_Field* field, LUE_ElementType const element_type) -> LUE_Field*
+{
+    lue::api::Field result = lue::api::cast(lue_as_cxx_field(field), lue_to_cxx_enum(element_type));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
 
 
 auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_Scalar const* fill_value) -> LUE_Array*

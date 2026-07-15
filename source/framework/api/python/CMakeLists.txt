@@ -39,6 +39,7 @@ target_sources(lue_py_framework_x
         source/routing_operation.cpp
         source/scalar.cpp
         source/submodule.cpp
+        source/type_info.cpp
 )
 
 target_include_directories(lue_py_framework_x

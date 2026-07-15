@@ -50,6 +50,36 @@ static void array_like_test()
 }
 
 
+static void cast_test()
+{
+    typedef float InputElement;
+    LUE_Field* input_field = NULL;
+
+    {
+        LUE_Rank const rank = 2;
+        LUE_Count const array_shape[] = {60, 40};
+        InputElement const value = 5.5F;
+        LUE_Literal* literal = lue_create_literal(value);
+        LUE_Scalar* scalar = lue_create_scalar(literal);
+        LUE_Array* array = lue_create_array(rank, array_shape, scalar);
+
+        input_field = lue_as_field(array);
+
+        lue_destruct(scalar);
+        lue_destruct(literal);
+    }
+
+    LUE_Field* output_field = lue_cast(input_field, LUE_ElementType_Int32);
+
+    CU_ASSERT_NOT_EQUAL(output_field, NULL);
+    CU_ASSERT_EQUAL(lue_data_model(output_field), LUE_DataModel_Array);
+    CU_ASSERT_EQUAL(lue_element_type(output_field), LUE_ElementType_Int32);
+
+    lue_destruct(input_field);
+    lue_destruct(output_field);
+}
+
+
 static void create_array_test()
 {
     typedef float Element;
@@ -104,6 +134,7 @@ static void create_scalar_test()
 HPX_UNIT_TEST_SUITE(
     "miscellaneous_operation",
     CUNIT_CI_TEST(array_like_test),
+    CUNIT_CI_TEST(cast_test),
     CUNIT_CI_TEST(create_array_test),
     CUNIT_CI_TEST(create_literal_test),
     CUNIT_CI_TEST(create_scalar_test));

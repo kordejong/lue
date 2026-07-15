@@ -1,9 +1,32 @@
+#include "lue/framework/api/cxx/detail/overload.hpp"
 #include "lue/framework/api/cxx/local/add.hpp"
 #include "lue/framework/api/cxx/local/subtract.hpp"
+#include "lue/framework/api/cxx/type_info.hpp"
+#include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 
 
 namespace lue::api {
+
+    namespace {
+
+        // TODO: Define and use a Field concept here
+        template<typename Field>
+        auto dtype() -> pybind11::dtype
+        {
+            return pybind11::dtype::of<ElementT<Field>>();
+        }
+
+
+        auto dtype(Field const& field) -> pybind11::dtype
+        {
+            return std::visit(
+                overload{[](auto const& field) -> pybind11::dtype { return api::dtype<decltype(field)>(); }},
+                field.variant());
+        }
+
+    }  // Anonymous namespace
+
 
     void bind_field(pybind11::module& module)
     {
@@ -30,6 +53,14 @@ namespace lue::api {
 
             // TODO
             // https://pybind11.readthedocs.io/en/stable/advanced/classes.html#operator-overloading
+
+            .def_property_readonly(
+                "data_model",
+                [](Field const& self) -> DataModel { return data_model(self); })
+
+            .def_property_readonly(
+                "dtype",
+                [](Field const& self) -> pybind11::dtype { return dtype(self); })
 
             ;
     }

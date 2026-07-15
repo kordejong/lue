@@ -4,6 +4,7 @@
 #include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/literal.h"
 #include "lue/framework/api/c/scalar.h"
+#include "lue/framework/api/c/type_info.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -15,6 +16,11 @@ extern "C" {
 
 typedef size_t LUE_Rank;
 typedef ptrdiff_t LUE_Count;
+
+
+LUE_FCAPI_EXPORT LUE_Array* lue_array_like(LUE_Array* array, LUE_Scalar* fill_value);
+
+LUE_FCAPI_EXPORT LUE_Field* lue_cast(LUE_Field* field, LUE_ElementType element_type);
 
 LUE_FCAPI_EXPORT LUE_Array* lue_create_array(
     LUE_Rank rank, LUE_Count const* array_shape, LUE_Scalar const* fill_value);
@@ -45,8 +51,6 @@ LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_float64(double value);
         double: lue_create_literal_float64)(X)
 
 LUE_FCAPI_EXPORT LUE_Scalar* lue_create_scalar(LUE_Literal* value);
-
-LUE_FCAPI_EXPORT LUE_Array* lue_array_like(LUE_Array* array, LUE_Scalar* fill_value);
 
 #ifdef __cplusplus
 }

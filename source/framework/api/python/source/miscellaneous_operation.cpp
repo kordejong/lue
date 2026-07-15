@@ -12,30 +12,12 @@ namespace lue::api {
 
     namespace {
 
-        template<typename Element>
-        auto create_scalar(double const value) -> std::optional<Scalar>
+        template<typename Result, typename CaseHandler, typename... Arguments>
+        auto switch_on_dtype(pybind11::dtype const& dtype, Arguments&&... arguments) -> Result
         {
-            std::optional<Scalar> result{};
-
-            if constexpr (lue::arithmetic_element_supported<Element>)
-            {
-                result = lue::api::create_scalar(static_cast<Element>(value));
-            }
-
-            return result;
-        }
-
-
-        auto create_scalar(double const value, pybind11::dtype const& dtype) -> Scalar
-        {
-            // TODO Out of range values must result in no-data values. This logic must be in the API layer or
-            // higher. All bindings need it.
-            //
-            // auto output_value = value_policies::cast<std::int32_t>(input_value);
-
             auto const kind = dtype.kind();
             auto const size = dtype.itemsize();  // bytes
-            std::optional<Scalar> scalar{};
+            std::optional<Result> result{};
 
             // NOLINTBEGIN(bugprone-switch-missing-default-case)
             switch (kind)
@@ -47,22 +29,26 @@ namespace lue::api {
                     {
                         case 1:
                         {
-                            scalar = create_scalar<std::int8_t>(value);
+                            result = CaseHandler::template operator()<std::int8_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 2:
                         {
-                            scalar = create_scalar<std::int16_t>(value);
+                            result = CaseHandler::template operator()<std::int16_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 4:
                         {
-                            scalar = create_scalar<std::int32_t>(value);
+                            result = CaseHandler::template operator()<std::int32_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 8:
                         {
-                            scalar = create_scalar<std::int64_t>(value);
+                            result = CaseHandler::template operator()<std::int64_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                     }
@@ -76,22 +62,26 @@ namespace lue::api {
                     {
                         case 1:
                         {
-                            scalar = create_scalar<std::uint8_t>(value);
+                            result = CaseHandler::template operator()<std::uint8_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 2:
                         {
-                            scalar = create_scalar<std::uint16_t>(value);
+                            result = CaseHandler::template operator()<std::uint16_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 4:
                         {
-                            scalar = create_scalar<std::uint32_t>(value);
+                            result = CaseHandler::template operator()<std::uint32_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 8:
                         {
-                            scalar = create_scalar<std::uint64_t>(value);
+                            result = CaseHandler::template operator()<std::uint64_t>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                     }
@@ -105,12 +95,14 @@ namespace lue::api {
                     {
                         case 4:
                         {
-                            scalar = create_scalar<float>(value);
+                            result = CaseHandler::template operator()<float>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                         case 8:
                         {
-                            scalar = create_scalar<double>(value);
+                            result = CaseHandler::template operator()<double>(
+                                std::forward<Arguments>(arguments)...);
                             break;
                         }
                     }
@@ -120,12 +112,56 @@ namespace lue::api {
             }
             // NOLINTEND(bugprone-switch-missing-default-case)
 
-            if (!scalar)
+            if (!result)
             {
                 throw std::runtime_error(std::format("Unsupported dtype (kind={}, itemsize={})", kind, size));
             }
 
-            return std::move(*scalar);
+            return std::move(*result);
+        }
+
+
+        struct Caster
+        {
+                template<Arithmetic Element>
+                static auto operator()(Field const& field) -> Field
+                {
+                    return lue::api::cast(field, TypeTraits<Element>::element_type);
+                }
+        };
+
+
+        auto cast(Field const& field, pybind11::dtype const& dtype) -> Field
+        {
+            return switch_on_dtype<Field, Caster>(dtype, field);
+        }
+
+
+        struct ScalarCreator
+        {
+                template<Arithmetic Element>
+                static auto operator()(double const value) -> std::optional<Scalar>
+                {
+                    std::optional<Scalar> result{};
+
+                    if constexpr (lue::arithmetic_element_supported<Element>)
+                    {
+                        result = lue::api::create_scalar(static_cast<Element>(value));
+                    }
+
+                    return result;
+                }
+        };
+
+
+        auto create_scalar(double const value, pybind11::dtype const& dtype) -> Scalar
+        {
+            // TODO Out of range values must result in no-data values. This logic must be in the API layer or
+            // higher. All bindings need it.
+            //
+            // auto output_value = value_policies::cast<std::int32_t>(input_value);
+
+            return switch_on_dtype<Scalar, ScalarCreator>(dtype, value);
         }
 
     }  // Anonymous namespace
@@ -133,13 +169,23 @@ namespace lue::api {
 
     void bind_miscellaneous_operations(pybind11::module& module)
     {
-        module.def("array_like",
+        module.def(
+            "array_like",
             [](Array const& array, Scalar const& fill_value) -> Array
-            {
-                return array_like(array, fill_value);
-            },
+            { return array_like(array, fill_value); },
             "array"_a,
             "fill_value"_a);
+
+        module.def(
+            "cast",
+            [](Field const& field, pybind11::object const& dtype_args) -> Field
+            {
+                pybind11::dtype const dtype{pybind11::dtype::from_args(dtype_args)};
+
+                return cast(field, dtype);
+            },
+            "field"_a,
+            "dtype"_a);
 
         module.def(
             "create_array",

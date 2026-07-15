@@ -7,22 +7,7 @@ add_test(
         --pattern "*_test.py"
 )
 
-set_property(
-    TEST
+lue_configure_python_test(
+    TARGET
         lue_qa_command_test
-    APPEND
-    PROPERTY
-        # Add the path to our Python modules to PYTHONPATH.
-        ENVIRONMENT_MODIFICATION
-            PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
-            # No need to append the PATH here with locations to our DDLs. Python won't pick them up.
-)
-
-set_property(
-    TEST
-        lue_qa_command_test
-    APPEND
-    PROPERTY
-        FIXTURES_REQUIRED
-            lue_py_test_fixture
 )

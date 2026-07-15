@@ -71,8 +71,8 @@ jobs:
       conda_package_prefix: "C:/Users/runneradmin/conda_pkgs_dir"
       # conda-build provides the conda-develop command
       conda_packages: "conda-build conan docopt jinja2 matplotlib ninja numpy ruamel.yaml"
-      hpx_version: 1.11.0
-      hpx_branch: v1.11.0
+      hpx_version: 2.0.0-alpha
+      hpx_branch: master
       hpx_source_directory: hpx_source
       hpx_build_directory: hpx_build
       hpx_install_directory: hpx_install
@@ -162,20 +162,20 @@ jobs:
           cp ${{ env.lue_source_directory }}/CMakeHPXPresets.json ${{ env.hpx_source_directory }}
           cp ${{ env.lue_source_directory }}/CMakePresets.json ${{ env.hpx_source_directory }}
 
-          # Conan's Boost::headers target can't find the Boost headers. Sigh... Hack the path to the headers into the target.
-          sed -i'' "54 a \ \ \ \ target_include_directories(Boost::headers INTERFACE \${boost_PACKAGE_FOLDER_${build_type^^}}\/include)" \
+          # Conan's Boost::headers target can't find the Boost headers. Sigh... Hack the path to the headers
+          # into the target.
+          sed -i'' "73 a \ \ \ \ target_include_directories(Boost::headers INTERFACE \${boost_PACKAGE_FOLDER_${build_type^^}}\/include)" \
             ${{ env.hpx_source_directory }}/cmake/HPX_SetupBoost.cmake
 
           # Conan's hwloc target is named different than in all other cases. Sigh...
-          sed -i'' '23 a \ \ add_library(Hwloc::hwloc ALIAS hwloc::hwloc)' ${{ env.hpx_source_directory }}/cmake/HPX_SetupHwloc.cmake
+          sed -i'' '25 a \ \ add_library(Hwloc::hwloc ALIAS hwloc::hwloc)' ${{ env.hpx_source_directory }}/cmake/HPX_SetupHwloc.cmake
 
           # Conan's asio target is named different than in all other cases. Sigh...
-          sed -i'' '17 a \ \ add_library(Asio::asio ALIAS asio::asio)' ${{ env.hpx_source_directory }}/cmake/HPX_SetupAsio.cmake
-
+          sed -i'' '27 a \ \ add_library(Asio::asio ALIAS asio::asio)' ${{ env.hpx_source_directory }}/cmake/HPX_SetupAsio.cmake
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
         env:
-          hpx_build_nr: 1
+          hpx_build_nr: 1 # Build number for current HPX version / branch
         with:
           cache_key: ${{ matrix.os }}_${{ matrix.compiler.cxx }}-${{ matrix.vs.msvc_toolset }}_python-${{ matrix.python_version }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
           c_compiler: ${{ matrix.compiler.c }}

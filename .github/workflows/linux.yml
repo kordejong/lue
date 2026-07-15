@@ -64,8 +64,8 @@ jobs:
       lue_development_install_directory: lue_development_install
       lue_consume_source_directory: lue_consume_source
       lue_consume_build_directory: lue_consume_build
-      hpx_version: 1.11.0
-      hpx_branch: v1.11.0
+      hpx_version: 2.0.0-alpha
+      hpx_branch: master
       hpx_source_directory: hpx_source
       hpx_build_directory: hpx_build
       hpx_install_directory: hpx_install
@@ -88,7 +88,6 @@ jobs:
       - name: setup platform
         run: |
           sudo apt-get update
-          sudo apt-get remove libunwind-14-dev
           sudo apt-get install \
             cmake \
             doxygen \
@@ -100,8 +99,8 @@ jobs:
             libboost-dev \
             libglfw3-dev \
             libgdal-dev \
-            libgoogle-perftools-dev \
             libhdf5-dev \
+            libjemalloc-dev \
             libvulkan-dev \
             ${{ matrix.compiler.package }} \
             ninja-build \
@@ -114,7 +113,7 @@ jobs:
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
         env:
-          hpx_build_nr: 1
+          hpx_build_nr: 1 # Build number for current HPX version / branch
         with:
           cache_key: ${{ matrix.os }}_${{ matrix.compiler.cxx }}_python-${{ matrix.python_version }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
           c_compiler: ${{ matrix.compiler.c }}
@@ -210,6 +209,8 @@ jobs:
 
           export PYTHONPATH="${{ env.lue_runtime_install_directory }}/lib/python${{ matrix.python_version }}:$PYTHONPATH"
           export LD_LIBRARY_PATH="${{ env.hpx_install_directory }}/lib:$LD_LIBRARY_PATH"
+          export LD_PRELOAD="$(find /usr/lib -name libjemalloc.so):$LD_PRELOAD"
+          echo $LD_PRELOAD
 
           ${{ env.lue_runtime_install_directory }}/bin/lue_calculate.py --version
           ${{ env.lue_runtime_install_directory }}/bin/lue_scalability.py --version

@@ -78,13 +78,13 @@ namespace lue {
             }
 
 
-            void append(CellIdx const& cell_idxs)
+            void append(CellIdx const cell_idx)
             {
                 // It doesn't make sense to keep adding idxs when the location of the next
                 // fragment is already known, does it?
                 lue_hpx_assert(!_next_fragment_location);
 
-                _idxs.push_back(cell_idxs);
+                _idxs.push_back(cell_idx);
             }
 
 

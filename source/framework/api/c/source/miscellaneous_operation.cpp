@@ -5,6 +5,7 @@
 #include "scalar.hpp"
 #include "type_info.hpp"
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
+#include "lue/configure.hpp"
 
 
 auto lue_cast(LUE_Field* field, LUE_ElementType const element_type) -> LUE_Field*
@@ -15,7 +16,8 @@ auto lue_cast(LUE_Field* field, LUE_ElementType const element_type) -> LUE_Field
 }
 
 
-auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_Scalar const* fill_value) -> LUE_Array*
+auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_Scalar const* fill_value)
+    -> LUE_Array*
 {
     assert(rank == 2);
 
@@ -36,16 +38,46 @@ auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_S
         return new LUE_Literal{.instance = new lue::api::Literal{std::move(result)}};                        \
     }
 
-CreateLiteral(uint8_t, uint8)
-CreateLiteral(uint16_t, uint16)
-CreateLiteral(uint32_t, uint32)
-CreateLiteral(uint64_t, uint64)
-CreateLiteral(int8_t, int8)
-CreateLiteral(int16_t, int16)
-CreateLiteral(int32_t, int32)
-CreateLiteral(int64_t, int64)
-CreateLiteral(float, float32)
-CreateLiteral(double, float64)
+
+#ifdef LUE_FRAMEWORK_WITH_UINT8_ELEMENT
+CreateLiteral(uint8_t, uint8);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_UINT16_ELEMENT
+CreateLiteral(uint16_t, uint16);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_UINT32_ELEMENT
+CreateLiteral(uint32_t, uint32);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_UINT64_ELEMENT
+CreateLiteral(uint64_t, uint64);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_INT8_ELEMENT
+CreateLiteral(int8_t, int8);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_INT16_ELEMENT
+CreateLiteral(int16_t, int16);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_INT32_ELEMENT
+CreateLiteral(int32_t, int32);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_INT64_ELEMENT
+CreateLiteral(int64_t, int64);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_FLOAT32_ELEMENT
+CreateLiteral(float, float32);
+#endif
+
+#ifdef LUE_FRAMEWORK_WITH_FLOAT64_ELEMENT
+CreateLiteral(double, float64);
+#endif
 
 #undef CreateLiteral
 

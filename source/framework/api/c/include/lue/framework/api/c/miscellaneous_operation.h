@@ -25,6 +25,7 @@ LUE_FCAPI_EXPORT LUE_Field* lue_cast(LUE_Field* field, LUE_ElementType element_t
 LUE_FCAPI_EXPORT LUE_Array* lue_create_array(
     LUE_Rank rank, LUE_Count const* array_shape, LUE_Scalar const* fill_value);
 
+
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_uint8(uint8_t value);
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_uint16(uint16_t value);
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_uint32(uint32_t value);
@@ -35,6 +36,7 @@ LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_int32(int32_t value);
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_int64(int64_t value);
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_float32(float value);
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_float64(double value);
+
 
 #define lue_create_literal(X)                                                                                \
     _Generic(                                                                                                \

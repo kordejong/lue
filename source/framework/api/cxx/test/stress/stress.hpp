@@ -49,7 +49,7 @@ namespace lue::stress {
                     {
                         cxxopts::Options options{
                             // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                            std::filesystem::path{argv[0]}.filename(),
+                            std::filesystem::path{argv[0]}.filename().string(),
                             "Program to verify memory isn't increasing while iterating"};
 
                         options.custom_help("");

@@ -7,4 +7,10 @@ namespace lue::api {
 
     auto LUE_FAPI_EXPORT equal_to(Field const& field1, Field const& field2) -> Field;
 
+
+    inline auto operator==(lue::api::Field const& lhs, lue::api::Field const& rhs)
+    {
+        return lue::api::equal_to(lhs, rhs);
+    }
+
 }  // namespace lue::api

@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE lue framework api cxx local equal_to
-#include "lue/framework/api/cxx/operator.hpp"
-#include "lue/framework/test/hpx_unit_test.hpp"
+#include "lue/framework/api/cxx/local/equal_to.hpp"
+#include "unit_test.hpp"
 #include "lue/framework.hpp"
 
 

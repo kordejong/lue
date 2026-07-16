@@ -7,4 +7,9 @@ namespace lue::api {
 
     auto LUE_FAPI_EXPORT less_than(Field const& field1, Field const& field2) -> Field;
 
+    inline auto operator<(lue::api::Field const& lhs, lue::api::Field const& rhs)
+    {
+        return lue::api::less_than(lhs, rhs);
+    }
+
 }  // namespace lue::api

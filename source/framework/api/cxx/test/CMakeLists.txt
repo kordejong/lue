@@ -45,16 +45,22 @@ set(local_operation_names
     local/where
 )
 
+set(miscellaneous_operation_names
+    miscellaneous/array_like
+    miscellaneous/cast
+    miscellaneous/create_array
+    miscellaneous/create_scalar
+)
+
 set(routing_operation_names
     routing/accu
 )
 
 set(names
-    create_array
-    create_scalar
     ${focal_operation_names}
     # io
     ${local_operation_names}
+    ${miscellaneous_operation_names}
     ${routing_operation_names}
 )
 
@@ -64,13 +70,14 @@ foreach(name ${names})
 
     add_executable(${test_name} ${module_name}.cpp)
 
+    target_include_directories(${test_name}
+        PRIVATE
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    )
+
     target_link_libraries(${test_name}
         PRIVATE
             lue::framework_api_cxx
-            lue_framework_algorithm_test
-            # lue::framework_algorithm
-            # lue::framework_global_operation  # unique
-            lue::framework_test
             Boost::headers
     )
 
@@ -117,3 +124,24 @@ endforeach()
 #             lue_framework_api_cxx
 #     )
 # endforeach()
+
+
+set(scope lue.framework.api.cxx.test.stress)
+set(names
+    # game_of_life
+    local_operation
+)
+
+foreach(name ${names})
+    set(target_name ${scope}.${name})
+    add_executable(${target_name} stress/${name}.cpp)
+
+    target_link_libraries(${target_name}
+        PRIVATE
+            lue::framework_api_cxx
+            lue::framework_model
+            lue::utility
+            HPX::iostreams_component
+            HPX::wrap_main
+    )
+endforeach()

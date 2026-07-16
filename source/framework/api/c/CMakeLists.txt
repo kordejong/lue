@@ -23,11 +23,22 @@ target_sources(lue_framework_api_c
             include/lue
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/export.h
     PRIVATE
+        source/array.cpp
+        source/as_field.cpp
         source/field.cpp
         source/future.cpp
         source/io.cpp
+        source/literal.cpp
         source/local_operation.cpp
+        source/miscellaneous_operation.cpp
+        source/runtime.cpp
+        source/scalar.cpp
+        source/type_info.cpp
 )
+
+# set_property(TARGET lue_framework_api_c
+#     PROPERTY C_STANDARD 11
+# )
 
 target_link_libraries(lue_framework_api_c
     PRIVATE

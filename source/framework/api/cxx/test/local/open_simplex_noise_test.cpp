@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE lue framework api cxx local open_simplex_noise
 #include "lue/framework/api/cxx/local/open_simplex_noise.hpp"
-#include "lue/framework/test/hpx_unit_test.hpp"
+#include "unit_test.hpp"
 #include "lue/framework.hpp"
 
 

@@ -27,25 +27,39 @@ target_sources(lue_py_framework_x
             include
     PRIVATE
         source/array.cpp
+        source/as_field.cpp
+        source/as_state.cpp
         source/extension.cpp
         source/field.cpp
         source/focal_operation.cpp
         # source/io.cpp
         source/kernel.cpp
         source/local_operation.cpp
+        source/miscellaneous_operation.cpp
         source/routing_operation.cpp
         source/scalar.cpp
         source/submodule.cpp
+        source/type_info.cpp
+)
+
+target_include_directories(lue_py_framework_x
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>
+        $<TARGET_PROPERTY:lue::py,SOURCE_DIR>/include  # bind.hpp
+        $<TARGET_PROPERTY:lue::py_framework,SOURCE_DIR>/include
+        $<TARGET_PROPERTY:lue::py_framework,SOURCE_DIR>/source
 )
 
 target_link_libraries(lue_py_framework_x
     PRIVATE
         lue::framework_api_cxx
+        lue::framework_model
         pybind11::module
 )
 
 lue_install_runtime_libraries(
-    TARGETS lue_py_framework_x
+    TARGETS
+        lue_py_framework_x
 )
 
 if(LUE_PYTHON_FROM_CONDA AND NOT DEFINED ENV{CONDA_BUILD})
@@ -60,13 +74,12 @@ if(LUE_PYTHON_FROM_CONDA AND NOT DEFINED ENV{CONDA_BUILD})
     )
 endif()
 
-# TODO
-# install(
-#     DIRECTORY
-#         ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/framework
-#     DESTINATION ${LUE_INSTALL_PYTHON_PACKAGE_DIR}
-#     COMPONENT lue_runtime
-# )
+install(
+    DIRECTORY
+        ${CMAKE_BINARY_DIR}/${LUE_BUILD_PYTHON_PACKAGE_DIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/framework_x
+    DESTINATION ${LUE_INSTALL_PYTHON_PACKAGE_DIR}
+    COMPONENT lue_runtime
+)
 
 if(LUE_BUILD_TESTS)
     add_subdirectory(test)

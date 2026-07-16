@@ -1,0 +1,29 @@
+#include "lue/framework/api/cxx/miscellaneous/create_scalar.hpp"
+#include "lue/framework/api/cxx/detail/unsupported_overload.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
+#include "lue/concept.hpp"
+
+
+namespace lue {
+
+    template<Arithmetic T>
+    auto create_scalar(T const& value) -> lue::Scalar<T>
+    {
+        return lue::Scalar<T>{value};
+    }
+
+
+    namespace api {
+
+        /*!
+            @brief      Create a scalar given a literal value
+        */
+        auto create_scalar(Literal const& value) -> Scalar
+        {
+            return std::visit(
+                overload{[](auto const& value) -> Scalar { return lue::create_scalar(value); }},
+                value.variant());
+        }
+
+    }  // namespace api
+}  // namespace lue

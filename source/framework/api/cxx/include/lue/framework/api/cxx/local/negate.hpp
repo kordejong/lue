@@ -7,4 +7,10 @@ namespace lue::api {
 
     auto LUE_FAPI_EXPORT negate(Field const& field) -> Field;
 
+
+    inline auto operator-(lue::api::Field const& argument)
+    {
+        return lue::api::negate(argument);
+    }
+
 }  // namespace lue::api

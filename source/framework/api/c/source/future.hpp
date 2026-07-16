@@ -4,7 +4,7 @@
 #include <cassert>
 
 
-inline auto as_cxx_future_ptr(Future const* future) -> lue::api::Future const*
+inline auto lue_as_cxx_future_ptr(LUE_Future const* future) -> lue::api::Future const*
 {
     assert(future);
     assert(future->instance);
@@ -13,7 +13,7 @@ inline auto as_cxx_future_ptr(Future const* future) -> lue::api::Future const*
 }
 
 
-inline auto as_cxx_future_ptr(Future* future) -> lue::api::Future*
+inline auto lue_as_cxx_future_ptr(LUE_Future* future) -> lue::api::Future*
 {
     assert(future);
     assert(future->instance);
@@ -22,13 +22,13 @@ inline auto as_cxx_future_ptr(Future* future) -> lue::api::Future*
 }
 
 
-inline auto as_cxx_future(Future const* future) -> lue::api::Future const&
+inline auto lue_as_cxx_future(LUE_Future const* future) -> lue::api::Future const&
 {
-    return *as_cxx_future_ptr(future);
+    return *lue_as_cxx_future_ptr(future);
 }
 
 
-inline auto as_cxx_future(Future* future) -> lue::api::Future&
+inline auto lue_as_cxx_future(LUE_Future* future) -> lue::api::Future&
 {
-    return *as_cxx_future_ptr(future);
+    return *lue_as_cxx_future_ptr(future);
 }

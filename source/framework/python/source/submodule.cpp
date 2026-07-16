@@ -14,30 +14,25 @@
 namespace lue::framework {
     namespace {
 
-        HPXRuntime* runtime{nullptr};
+        std::unique_ptr<HPXRuntime> runtime{};
 
 
         void start_hpx_runtime(std::vector<std::string> const& configuration)
         {
             // Iff the pointer to the runtime is not pointing to an instance, instantiate one. This will
             // start the HPX runtime.
-            if (runtime == nullptr)
+            if (!runtime)
             {
-                runtime = new HPXRuntime{configuration};
+                runtime = std::make_unique<HPXRuntime>(configuration);
             }
         }
 
 
         void stop_hpx_runtime()
         {
-            // Iff the pointer to the runtime is pointing to an instance, delete
-            // it. This will stop the HPX runtime.
-            if (runtime != nullptr)
-            {
-                HPXRuntime* r = runtime;
-                runtime = nullptr;
-                delete r;
-            }
+            // Iff the pointer to the runtime is pointing to an instance, delete it. This will stop the HPX
+            // runtime.
+            runtime.reset();
         }
 
 

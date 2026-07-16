@@ -118,7 +118,6 @@ namespace lue::framework {
         pybind11::class_<hpx::future<void>>(module, "future<void>")
             .def("get", pybind11::overload_cast<>(&hpx::future<void>::get));
 
-
         bind<SharedFutureBinder1, ArithmeticElements>(module);
         bind<SharedFutureBinder2, IntegralElements, FloatingPointElements>(module);
 

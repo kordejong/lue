@@ -1560,7 +1560,7 @@ namespace lue {
                 .then(
                     hpx::unwrapping(
 
-                        [route_id, max_nr_cells](auto&& tuple_f) -> auto
+                        [=](auto&& tuple_f) -> auto
                         {
                             auto component_fs = std::get<0>(tuple_f).get();
                             auto max_value_fs = std::get<1>(tuple_f).get();
@@ -1611,7 +1611,7 @@ namespace lue {
                                     route_id, std::move(downstream_maxima), Count{0}, max_nr_cells);
 
                             return start_f.then(
-                                [route_id, components = std::move(components)](
+                                [=, components = std::move(components)](
                                     hpx::future<typename Route::FragmentLocation> start_f) -> auto
                                 {
                                     RouteStarts starts{};

@@ -93,6 +93,7 @@ repos:
                   source/framework/algorithm/.*|
                   source/framework/api/c/.*|
                   source/framework/api/cxx/test/io_test.cpp|
+                  source/framework/api/cxx/test/unit_test.hpp|
                   source/framework/api/python/source/io.cpp|
                   source/framework/core/.*|
                   source/framework/image_land/.*|

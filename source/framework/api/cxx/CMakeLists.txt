@@ -8,6 +8,17 @@ block()
     list(TRANSFORM Elements APPEND "\"")
     list(JOIN Elements ", " Elements)
 
+    set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/array.hpp")
+    generate_template_instantiation(
+        INPUT_PATHNAME
+            "${CMAKE_CURRENT_SOURCE_DIR}/${offset}/array.hpp.in"
+        OUTPUT_PATHNAME
+            ${output_pathname}
+        DICTIONARY
+            '{"Elements":[${Elements}]}'
+    )
+    list(APPEND generated_source_files "${output_pathname}")
+
     set(output_pathname "${CMAKE_CURRENT_BINARY_DIR}/${offset}/field.hpp")
     generate_template_instantiation(
         INPUT_PATHNAME
@@ -84,8 +95,8 @@ target_sources(lue_framework_api_cxx
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/cxx/scalar.hpp
     PRIVATE
         ${generated_source_files}
-        source/create_array.cpp
-        source/create_scalar.cpp
+        source/as_field.cpp
+        source/as_state.cpp
         source/focal/mean.cpp
         source/io.cpp
         source/local/abs.cpp
@@ -127,13 +138,12 @@ target_sources(lue_framework_api_cxx
         source/local/valid.cpp
         source/local/where2.cpp
         source/local/where3.cpp
+        source/miscellaneous/array_like.cpp
+        source/miscellaneous/cast.cpp
+        source/miscellaneous/create_array.cpp
+        source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
-)
-
-# TODO Integrate with target_sources call?
-target_include_directories(lue_framework_api_cxx
-    PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source>
+        source/type_info.cpp
 )
 
 target_link_libraries(lue_framework_api_cxx

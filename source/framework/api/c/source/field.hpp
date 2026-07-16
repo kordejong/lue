@@ -4,7 +4,7 @@
 #include <cassert>
 
 
-inline auto as_cxx_field_ptr(Field const* field) -> lue::api::Field const*
+inline auto lue_as_cxx_field_ptr(LUE_Field const* field) -> lue::api::Field const*
 {
     assert(field);
     assert(field->instance);
@@ -13,7 +13,7 @@ inline auto as_cxx_field_ptr(Field const* field) -> lue::api::Field const*
 }
 
 
-inline auto as_cxx_field_ptr(Field* field) -> lue::api::Field*
+inline auto lue_as_cxx_field_ptr(LUE_Field* field) -> lue::api::Field*
 {
     assert(field);
     assert(field->instance);
@@ -22,13 +22,13 @@ inline auto as_cxx_field_ptr(Field* field) -> lue::api::Field*
 }
 
 
-inline auto as_cxx_field(Field const* field) -> lue::api::Field const&
+inline auto lue_as_cxx_field(LUE_Field const* field) -> lue::api::Field const&
 {
-    return *as_cxx_field_ptr(field);
+    return *lue_as_cxx_field_ptr(field);
 }
 
 
-inline auto as_cxx_field(Field* field) -> lue::api::Field&
+inline auto lue_as_cxx_field(LUE_Field* field) -> lue::api::Field&
 {
-    return *as_cxx_field_ptr(field);
+    return *lue_as_cxx_field_ptr(field);
 }

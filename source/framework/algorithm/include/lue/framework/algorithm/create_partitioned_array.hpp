@@ -10,6 +10,7 @@
 #include "lue/framework/core/math.hpp"
 #include "lue/framework/partitioned_array_decl.hpp"
 #include "lue/framework/serial_route.hpp"
+#include <hpx/topology/topology.hpp>
 #include <optional>
 
 
@@ -32,7 +33,7 @@ namespace lue {
                 }
 
 
-                Index operator()(Index const partition_idx) const
+                auto operator()(Index const partition_idx) const -> Index
                 {
                     return map_to_range(
                         Index{0}, _nr_partitions - 1, Index{0}, _nr_localities - 1, partition_idx);
@@ -77,7 +78,7 @@ namespace lue {
                     _partition_shape{partition_shapes[0]},
                     _partition_creator{partition_creator},
                     _locality_idx_by_partition_idx{nr_elements(_partitions), Index(localities.size())},
-                    _localities_vector{std::forward<std::vector<hpx::id_type>>(localities)},
+                    _localities_vector{std::move(localities)},
                     _partition_shapes{std::move(partition_shapes)}
 
                 {
@@ -85,16 +86,16 @@ namespace lue {
                         std::none_of(
                             _localities.begin(),
                             _localities.end(),
-                            [](hpx::id_type const locality_id) { return bool{locality_id}; }));
+                            [](hpx::id_type const& locality_id) -> bool { return bool{locality_id}; }));
                     lue_hpx_assert(
                         std::all_of(
                             _localities_vector.begin(),
                             _localities_vector.end(),
-                            [](hpx::id_type const locality_id) { return bool{locality_id}; }));
+                            [](hpx::id_type const& locality_id) -> bool { return bool{locality_id}; }));
                 }
 
 
-                Localities localities()
+                auto localities() -> Localities
                 {
                     // Sink return. Call this method only once...
                     lue_hpx_assert(!_localities.empty());
@@ -102,12 +103,12 @@ namespace lue {
                         std::all_of(
                             _localities.begin(),
                             _localities.end(),
-                            [](hpx::id_type const locality_id) { return bool{locality_id}; }));
+                            [](hpx::id_type const& locality_id) -> bool { return bool{locality_id}; }));
                     return std::move(_localities);
                 }
 
 
-                Partitions partitions()
+                auto partitions() -> Partitions
                 {
                     // Sink return. Call this method only once...
                     lue_hpx_assert(!_partitions.empty());
@@ -124,29 +125,28 @@ namespace lue {
                         std::all_of(
                             _localities.begin(),
                             _localities.end(),
-                            [](hpx::id_type const locality_id) { return bool{locality_id}; }));
+                            [](hpx::id_type const& locality_id) -> bool { return bool{locality_id}; }));
                 }
 #endif
 
 
             protected:
 
-                hpx::id_type locality_id(Index const partition_idx)  // Along curve!
+                auto locality_id(Index const partition_idx) -> hpx::id_type  // Along curve!
                 {
-                    // partition_idx is an index along a curve visiting all
-                    // partitions
+                    // partition_idx is an index along a curve visiting all partitions
                     return _localities_vector[_locality_idx_by_partition_idx(partition_idx)];
                 }
 
 
                 template<typename... Idxs>
-                Offset offset(Idxs const... partition_idxs)  // In array!
+                auto offset(Idxs const... partition_idxs) -> Offset  // In array!
                 {
                     Offset offset{partition_idxs...};
 
-                    for (std::size_t d = 0; d < rank; ++d)
+                    for (std::size_t dimension_idx = 0; dimension_idx < rank; ++dimension_idx)
                     {
-                        offset[d] *= _partition_shape[d];
+                        offset[dimension_idx] *= _partition_shape[dimension_idx];
                     }
 
                     return offset;
@@ -154,19 +154,17 @@ namespace lue {
 
 
                 template<typename... Idxs>
-                Shape const& partition_shape(Idxs const... partition_idxs)  // In array!
+                auto partition_shape(Idxs const... partition_idxs) -> Shape const&  // In array!
                 {
                     return _partition_shapes(partition_idxs...);
                 }
 
 
-                std::size_t nr_partitions() const
+                auto nr_partitions() const -> std::size_t
                 {
                     return nr_elements(_partitions);
                 }
 
-
-            protected:
 
                 Policies _policies;
 
@@ -212,7 +210,7 @@ namespace lue {
                     Base{
                         policies,
                         partition_creator,
-                        std::forward<std::vector<hpx::id_type>>(localities),
+                        std::move(localities),
                         array_shape,
                         std::move(partition_shapes)}
 
@@ -264,7 +262,7 @@ namespace lue {
                     Base{
                         policies,
                         partition_creator,
-                        std::forward<std::vector<hpx::id_type>>(localities),
+                        std::move(localities),
                         array_shape,
                         std::move(partition_shapes)},
                     _current_locality_id{},
@@ -322,7 +320,7 @@ namespace lue {
                 using Idxs = std::vector<std::array<Index, rank>>;
 
 
-                void prepare_for_new_locality(hpx::id_type const locality_id)
+                void prepare_for_new_locality(hpx::id_type const& locality_id)
                 {
                     lue_hpx_assert(locality_id);
                     _current_locality_id = locality_id;
@@ -452,9 +450,8 @@ namespace lue {
                 Localities<rank<Shape>>,
                 PartitionsT<PartitionedArray<OutputElementT<Functor>, rank<Shape>>>>
         {
-            // Create array containing partitions. Each of these partitions
-            // will be a component client instance referring to a, possibly
-            // remote, component server instance.
+            // Create array containing partitions. Each of these partitions will be a component client
+            // instance referring to a, possibly remote, component server instance.
 
             using Element = OutputElementT<Functor>;
             using OutputArray = PartitionedArray<Element, rank<Shape>>;
@@ -469,16 +466,15 @@ namespace lue {
 
             std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-            [[maybe_unused]] Count const nr_localities = localities.size();
+            [[maybe_unused]] auto const nr_localities = static_cast<Count>(localities.size());
             lue_hpx_assert(nr_localities > 0);
 
             if (!(BuildOptions::build_qa && BuildOptions::qa_with_tests))
             {
-                // In general, the number of localities should be smaller than
-                // the number of partitions. Otherwise more hardware is used than
-                // necessary. The exception is when we are building with tests
-                // turned on. Tests may have to run on more localities than there
-                // are partitions.
+                // In general, the number of localities should be smaller than the number of partitions.
+                // Otherwise more hardware is used than necessary. The exception is when we are building with
+                // tests turned on. Tests may have to run on more localities than there are partitions.
+
                 if (nr_partitions < nr_localities)
                 {
                     throw std::runtime_error(
@@ -489,8 +485,30 @@ namespace lue {
                 }
             }
 
-            lue_hpx_assert(hpx::find_here() == hpx::find_root_locality());
-            lue_hpx_assert(localities[0] == hpx::find_root_locality());
+            // Partitions will be instantiated in an order which depends on their spatial "nearness": each
+            // subsequent partition instantiated is near the previous one. Partitions are binned and assigned
+            // to localities. To end up with nearby localities (in hardware sense) containing nearby
+            // partitions (in real-world sense), the localities must be ordered first.
+
+            // Order localities in such a way that
+
+            // - Group localities by cluster node. Within each cluster node:
+            //    - Group localities by socket. Within each socket:
+            //       - Group localities by NUMA node (likely / ideally 1 per NUMA node), and then:
+            //       - Order just grouped localities by inter-NUMA latency (so within the socket)
+
+            // TODO: hier verder
+            // auto const& topology = hpx::get_runtime().get_topology();
+            // topology.print_hwloc(std::cout);
+            //
+            // for (auto const& locality_id : localities)
+            // {
+            //     std::cout << locality_id << "\n";
+            // }
+            //
+            //
+            // lue_hpx_assert(hpx::find_here() == hpx::find_root_locality());
+            // lue_hpx_assert(localities[0] == hpx::find_root_locality());
 
             // for(auto const locality: localities)
             // {
@@ -901,9 +919,8 @@ namespace lue {
         @param      partition_creator Functor responsible for instantiating the partitions
         @return     Newly created partitioned array
 
-        This function creates a new array pointing to partitions that are
-        distributed over the available localities. It is responsible for
-        creating tasks that will execute on those localities. These tasks
+        This function creates a new array pointing to partitions that are distributed over the available
+        localities. It is responsible for creating tasks that will execute on those localities. These tasks
         use the functor passed in to instantitiate the partitions.
 
         Possible uses of this function include creating an array and:
@@ -918,11 +935,10 @@ namespace lue {
         Shape<Count, rank> const& partition_shape,
         Functor const& partition_creator) -> PartitionedArray<OutputElementT<Functor>, rank>
     {
-        // Create the array partitions that, together make up the partitioned
-        // array.
+        // Create the array partitions that, together make up the partitioned array.
 
-        // Given the shape of the array and the shape of the array partitions,
-        // determine the shape of the array in partitions
+        // Given the shape of the array and the shape of the array partitions, determine the shape of the
+        // array in partitions
 
         auto [localities, partitions] =
             detail::instantiate_partitions(policies, array_shape, partition_shape, partition_creator);

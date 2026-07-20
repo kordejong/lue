@@ -70,6 +70,7 @@ endforeach()
 # )
 
 set(names
+    focal_operation
     local_operation
     miscellaneous_operation
 )

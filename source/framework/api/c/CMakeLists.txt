@@ -26,8 +26,10 @@ target_sources(lue_framework_api_c
         source/array.cpp
         source/as_field.cpp
         source/field.cpp
+        source/focal_operation.cpp
         source/future.cpp
         source/io.cpp
+        source/kernel.cpp
         source/literal.cpp
         source/local_operation.cpp
         source/miscellaneous_operation.cpp

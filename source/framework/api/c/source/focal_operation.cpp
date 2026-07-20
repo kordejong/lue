@@ -4,9 +4,62 @@
 #include "lue/framework/api/cxx/focal_operation.hpp"
 
 
+auto lue_focal_diversity(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result =
+        lue::api::focal_diversity(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_focal_high_pass(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result =
+        lue::api::focal_high_pass(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_focal_majority(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result =
+        lue::api::focal_majority(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_focal_maximum(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result =
+        lue::api::focal_maximum(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
 auto lue_focal_mean(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
 {
     lue::api::Field result = lue::api::focal_mean(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_focal_minimum(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result =
+        lue::api::focal_minimum(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_focal_sum(LUE_Field const* field, LUE_BooleanKernel const* kernel) -> LUE_Field*
+{
+    lue::api::Field result = lue::api::focal_sum(lue_as_cxx_field(field), lue_as_cxx_boolean_kernel(kernel));
 
     return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }

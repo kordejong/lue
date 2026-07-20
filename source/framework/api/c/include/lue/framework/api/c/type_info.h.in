@@ -4,6 +4,7 @@
 #include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/literal.h"
 #include "lue/framework/api/c/scalar.h"
+#include <stdint.h>
 
 
 #ifdef __cplusplus
@@ -11,14 +12,14 @@ extern "C" {
 #endif
 
 
-typedef enum {
+typedef enum : uint8_t {
     LUE_DataModel_Array,
     LUE_DataModel_Scalar,
     LUE_DataModel_Literal,
 } LUE_DataModel;
 
 
-typedef enum {
+typedef enum : uint8_t {
     LUE_ElementType_UInt8,
     LUE_ElementType_UInt16,
     LUE_ElementType_UInt32,
@@ -30,6 +31,9 @@ typedef enum {
     LUE_ElementType_Float32,
     LUE_ElementType_Float64,
 } LUE_ElementType;
+
+
+uint8_t const LUE_ElementType_Count = ${LUE_ELEMENT_TYPE_COUNT};
 
 
 LUE_FCAPI_EXPORT LUE_DataModel lue_data_model(LUE_Field const* field);
@@ -45,9 +49,9 @@ LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_scalar(LUE_Scalar const* scala
 #define lue_element_type(X)                                                                                  \
     _Generic(                                                                                                \
         (X),                                                                                                 \
-        LUE_Array*: lue_element_type_array,                                                                      \
-        LUE_Field*: lue_element_type_field,                                                                      \
-        LUE_Literal*: lue_element_type_literal,                                                                  \
+        LUE_Array*: lue_element_type_array,                                                                  \
+        LUE_Field*: lue_element_type_field,                                                                  \
+        LUE_Literal*: lue_element_type_literal,                                                              \
         LUE_Scalar*: lue_element_type_scalar)(X)
 
 

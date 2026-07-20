@@ -54,9 +54,45 @@ namespace lue::api {
     void bind_focal_operations(pybind11::module& module)
     {
         module.def(
+            "focal_diversity",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_diversity(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
+            "focal_high_pass",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_high_pass(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
+            "focal_majority",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_majority(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
+            "focal_maximum",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_maximum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
             "focal_mean",
-            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> auto
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
             { return focal_mean(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
+            "focal_minimum",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_minimum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
+        module.def(
+            "focal_sum",
+            [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
+            { return focal_sum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
     }

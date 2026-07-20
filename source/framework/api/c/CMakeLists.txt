@@ -13,6 +13,21 @@ generate_export_header(lue_framework_api_c
     EXPORT_MACRO_NAME LUE_FCAPI_EXPORT
 )
 
+if(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::uint32_t")
+    set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_UInt32")
+elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::uint64_t")
+    set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_UInt64")
+elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int32_t")
+    set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_Int32")
+elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int64_t")
+    set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_Int64")
+endif()
+
+configure_file(
+    include/lue/framework/api/c/type_info.h.in
+    include/lue/framework/api/c/type_info.h
+)
+
 target_sources(lue_framework_api_c
     PUBLIC
         FILE_SET HEADERS
@@ -21,6 +36,7 @@ target_sources(lue_framework_api_c
             ${CMAKE_CURRENT_BINARY_DIR}/include
         FILES
             include/lue
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/type_info.h
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/export.h
     PRIVATE
         source/array.cpp

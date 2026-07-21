@@ -619,14 +619,16 @@ namespace lue {
 
         lue_hpx_assert(to_lue_finished_f.valid());
 
-        return to_lue_finished_f.then(
-            [dataset_path, to_lue_order
-             // , to_lue_p = std::move(to_lue_p)
-        ]([[maybe_unused]] auto const& to_lue_finished_f) mutable -> auto
-            {
-                // to_lue_p.set_value();
-                // lue_hpx_assert(detail::root::to_lue_done(dataset_path, to_lue_order).is_ready());
-            });
+        return std::move(to_lue_finished_f);
+
+        // return to_lue_finished_f.then(
+        //     [dataset_path, to_lue_order
+        //      // , to_lue_p = std::move(to_lue_p)
+        // ]([[maybe_unused]] auto const& to_lue_finished_f) mutable -> auto
+        //     {
+        //         // to_lue_p.set_value();
+        //         // lue_hpx_assert(detail::root::to_lue_done(dataset_path, to_lue_order).is_ready());
+        //     });
     }
 
 

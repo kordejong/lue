@@ -503,12 +503,10 @@ endif()
 
 
 if(LUE_MDSPAN_REQUIRED)
-    FetchContent_Declare(mdspan
-        GIT_REPOSITORY https://github.com/kokkos/mdspan.git
-        GIT_TAG 9ceface91483775a6c74d06ebf717bbb2768452f  # 0.6.0
-        SYSTEM
+    CPMAddPackage(
+        URI "gh:kokkos/mdspan#9ceface91483775a6c74d06ebf717bbb2768452f"  # 0.6.0
+        SYSTEM TRUE
     )
-    FetchContent_MakeAvailable(mdspan)
 endif()
 
 

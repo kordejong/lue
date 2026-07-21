@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(focal_mean_raster_kernel)
     using Kernel = lue::Kernel<Weight, 2>;
 
     lue::api::Field const raster = Array{};
-    lue::api::BooleanKernel const kernel = Kernel{};
+    lue::api::Kernel const kernel = Kernel{};
 
     lue::api::Field result = lue::api::focal_mean(raster, kernel);
 

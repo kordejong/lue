@@ -26,7 +26,7 @@ LUE_FCAPI_EXPORT LUE_Field* lue_cast(LUE_Field* field, LUE_ElementType element_t
 LUE_FCAPI_EXPORT LUE_Array* lue_create_array(
     LUE_Rank rank, LUE_Count const* array_shape, LUE_Scalar const* fill_value);
 
-LUE_FCAPI_EXPORT LUE_BooleanKernel* lue_create_box_kernel(LUE_Count radius);
+LUE_FCAPI_EXPORT LUE_Kernel* lue_create_box_kernel(LUE_Count radius, LUE_Literal const* weight);
 
 
 LUE_FCAPI_EXPORT LUE_Literal* lue_create_literal_uint8(uint8_t value);

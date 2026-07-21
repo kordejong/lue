@@ -6,6 +6,6 @@
 
 namespace lue::api {
 
-    auto LUE_FAPI_EXPORT focal_mean(Field const& field, BooleanKernel const& kernel) -> Field;
+    auto LUE_FAPI_EXPORT focal_mean(Field const& field, Kernel const& kernel) -> Field;
 
 }  // namespace lue::api

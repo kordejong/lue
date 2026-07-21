@@ -13,6 +13,12 @@ generate_export_header(lue_framework_api_c
     EXPORT_MACRO_NAME LUE_FCAPI_EXPORT
 )
 
+if(LUE_FRAMEWORK_BOOLEAN_ELEMENT STREQUAL "std::uint8_t")
+    set(LUE_ELEMENT_TYPE_BOOLEAN "LUE_ElementType_UInt8")
+elseif(LUE_FRAMEWORK_BOOLEAN_ELEMENT STREQUAL "std::int8_t")
+    set(LUE_ELEMENT_TYPE_BOOLEAN "LUE_ElementType_Int8")
+endif()
+
 if(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::uint32_t")
     set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_UInt32")
 elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::uint64_t")
@@ -22,6 +28,8 @@ elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int32_t")
 elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int64_t")
     set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_Int64")
 endif()
+
+string(REPLACE "std::" "" LUE_BooleanElement ${LUE_FRAMEWORK_BOOLEAN_ELEMENT})
 
 configure_file(
     include/lue/framework/api/c/type_info.h.in

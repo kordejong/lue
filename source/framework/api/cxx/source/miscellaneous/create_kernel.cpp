@@ -1,14 +1,29 @@
 #include "lue/framework/api/cxx/miscellaneous/create_kernel.hpp"
 #include "lue/framework/algorithm/kernel.hpp"
-#include "lue/concept.hpp"
-#include "lue/framework.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
+#include "lue/framework/api/cxx/detail/unsupported_overload.hpp"
 
 
-namespace lue::api {
+namespace lue {
 
-    auto create_box_kernel(Count const radius) -> BooleanKernel
+    auto box_kernel(Count const radius, auto const weight) -> api::Kernel
     {
-        return box_kernel<BooleanElement, 2>(radius, 1);
+        api::detail::unsupported_overload("create_box_kernel", radius, weight);
+
+        return {};
     }
 
-}  // namespace lue::api
+    namespace api {
+
+        auto create_box_kernel(Count const radius, Literal const& weight) -> Kernel
+        {
+            return std::visit(
+                overload{
+                    [radius](auto const weight) -> Kernel
+                    { return box_kernel<std::remove_const_t<decltype(weight)>, 2>(radius, weight); }},
+                weight.variant());
+        }
+
+    }  // namespace api
+
+}  // namespace lue

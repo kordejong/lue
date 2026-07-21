@@ -25,7 +25,7 @@ namespace lue {
         /*!
             @brief      TODO
         */
-        auto focal_sum(Field const& field, BooleanKernel const& kernel) -> Field
+        auto focal_sum(Field const& field, Kernel const& kernel) -> Field
         {
             return std::visit(
                 overload{

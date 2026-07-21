@@ -33,7 +33,11 @@ typedef enum : uint8_t {
 } LUE_ElementType;
 
 
+uint8_t const LUE_ElementType_Boolean = ${LUE_ELEMENT_TYPE_BOOLEAN};
+
 uint8_t const LUE_ElementType_Count = ${LUE_ELEMENT_TYPE_COUNT};
+
+typedef ${LUE_BooleanElement} LUE_BooleanElement;
 
 
 LUE_FCAPI_EXPORT LUE_DataModel lue_data_model(LUE_Field const* field);

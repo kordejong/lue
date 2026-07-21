@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(focal_diversity_raster_kernel)
     using Kernel = lue::Kernel<Weight, 2>;
 
     lue::api::Field const raster = InputArray{};
-    lue::api::BooleanKernel const kernel = Kernel{};
+    lue::api::Kernel const kernel = Kernel{};
 
     lue::api::Field result = lue::api::focal_diversity(raster, kernel);
 

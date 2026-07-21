@@ -1,12 +1,15 @@
 set(scope lue_framework_api_cxx)
 
 set(focal_operation_names
+    focal/aspect
+    focal/convolve
     focal/diversity
     focal/high_pass
     focal/majority
     focal/maximum
     focal/mean
     focal/minimum
+    focal/slope
     focal/sum
 )
 

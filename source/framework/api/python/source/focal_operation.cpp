@@ -1,4 +1,5 @@
 #include "lue/framework/api/cxx/focal_operation.hpp"
+#include "switch_on_dtype.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 
@@ -10,21 +11,40 @@ namespace lue::api {
 
     namespace {
 
-        template<Arithmetic Weight, Rank rank, Arithmetic Element>
-        auto array_to_kernel(pybind11::array_t<Element> const& array) -> lue::Kernel<Weight, rank>
+        struct NumPyArrayToKernelConverter
         {
-            using Kernel = lue::Kernel<Weight, rank>;
-            using Shape = typename Kernel::Shape;
+                template<Arithmetic Weight>
+                static auto operator()(Shape<Count, 2> const& shape, pybind11::buffer_info const& buffer)
+                    -> std::optional<lue::api::Kernel>
+                {
+                    std::optional<lue::api::Kernel> result{};
 
-            // Verify rank of shape of array corresponds with the one requested
-            if (array.ndim() != rank)
+                    if constexpr (lue::arithmetic_element_supported<Weight>)
+                    {
+                        lue::Kernel<Weight, 2> kernel{shape};
+
+                        std::copy_n(static_cast<Weight*>(buffer.ptr), buffer.size, kernel.begin());
+
+                        return kernel;
+                    }
+
+                    return result;
+                }
+        };
+
+
+        auto array_to_kernel(pybind11::array const& array) -> lue::api::Kernel
+        {
+            Rank const rank = array.ndim();
+
+            if (rank != 2)
             {
                 throw std::runtime_error(
-                    std::format(
-                        "Rank of array shape must be equal to rank of array ({} != {})", array.ndim(), 2));
+                    std::format("Rank of array with kernel weights must be 2 ({} != {})", array.ndim(), 2));
             }
 
-            Shape shape{};
+            Shape<Count, 2> shape{};
+
             std::copy_n(array.shape(), rank, shape.begin());
 
             if (!is_hypercube(shape))
@@ -33,19 +53,9 @@ namespace lue::api {
                     std::format("Shape of array to use as kernel must be a hypercube (a square in 2D)"));
             }
 
-
-            // TODO In the current case (uint8 to uint8) all is well. In general it might not be.
-            static_assert(std::is_same_v<Element, Weight>);
-            // if(!is_convertible<Element, Weight>)
-            // {
-            // }
-
             pybind11::buffer_info buffer{array.request()};
 
-            Kernel kernel{shape};
-            std::copy_n(static_cast<Element*>(buffer.ptr), buffer.size, kernel.begin());
-
-            return kernel;
+            return switch_on_dtype<Kernel, NumPyArrayToKernelConverter>(array.dtype(), shape, buffer);
         }
 
     }  // Anonymous namespace
@@ -53,48 +63,56 @@ namespace lue::api {
 
     void bind_focal_operations(pybind11::module& module)
     {
+        module.def("aspect", aspect, "elevation"_a);
+        module.def(
+            "convolve",
+            [](Field const& field, pybind11::array const& kernel) -> Field
+            { return convolve(field, array_to_kernel(kernel)); },
+            "array"_a,
+            "kernel"_a.noconvert());
         module.def(
             "focal_diversity",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_diversity(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_diversity(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_high_pass",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_high_pass(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_high_pass(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_majority",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_majority(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_majority(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_maximum",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_maximum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_maximum(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_mean",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_mean(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_mean(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_minimum",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_minimum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_minimum(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
         module.def(
             "focal_sum",
             [](Field const& field, pybind11::array_t<BooleanElement> const& kernel) -> Field
-            { return focal_sum(field, array_to_kernel<BooleanElement, 2>(kernel)); },
+            { return focal_sum(field, array_to_kernel(kernel)); },
             "array"_a,
             "kernel"_a.noconvert());
+        module.def("slope", slope, "elevation"_a, "cell_size"_a);
     }
 
 }  // namespace lue::api

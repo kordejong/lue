@@ -17,6 +17,7 @@ namespace lue {
     namespace default_policies {
 
         template<std::integral Element, typename Kernel>
+            requires std::same_as<ElementT<Kernel>, BooleanElement> && (rank<Kernel> == 2)
         auto focal_majority(PartitionedArray<Element, 2> const& array, Kernel const& kernel)
             -> PartitionedArray<Element, 2>
         {

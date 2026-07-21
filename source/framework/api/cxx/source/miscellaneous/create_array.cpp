@@ -1,15 +1,13 @@
 #include "lue/framework/api/cxx/miscellaneous/create_array.hpp"
-#include "lue/framework/api/cxx/detail/unsupported_overload.hpp"
-#include "lue/framework/api/cxx/detail/overload.hpp"
 #include "lue/framework/algorithm/create_partitioned_array.hpp"
+#include "lue/framework/api/cxx/detail/overload.hpp"
+#include "lue/framework/api/cxx/detail/unsupported_overload.hpp"
 
 
 namespace lue {
 
     auto create_partitioned_array(
-        [[maybe_unused]] auto const& array_shape,
-        [[maybe_unused]] auto const& partition_shape,
-        auto const& fill_value) -> api::Array
+        auto const& array_shape, auto const& partition_shape, auto const& fill_value) -> api::Array
     {
         api::detail::unsupported_overload("create_array", array_shape, partition_shape, fill_value);
 
@@ -17,8 +15,7 @@ namespace lue {
     }
 
 
-    auto create_partitioned_array([[maybe_unused]] auto const& array_shape, auto const& fill_value)
-        -> api::Array
+    auto create_partitioned_array(auto const& array_shape, auto const& fill_value) -> api::Array
     {
         api::detail::unsupported_overload("create_array", array_shape, fill_value);
 

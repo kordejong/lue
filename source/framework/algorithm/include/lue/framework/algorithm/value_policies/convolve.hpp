@@ -17,6 +17,7 @@ namespace lue {
     namespace value_policies {
 
         template<std::floating_point Element, typename Kernel>
+            requires std::floating_point<ElementT<Kernel>> && (rank<Kernel> == 2)
         auto convolve(PartitionedArray<Element, 2> const& array, Kernel const& kernel)
             -> PartitionedArray<Element, 2>
         {

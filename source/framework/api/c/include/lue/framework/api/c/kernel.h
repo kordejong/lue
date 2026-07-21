@@ -7,20 +7,20 @@ extern "C" {
 #endif
 
 
-struct LUE_BooleanKernel
+struct LUE_Kernel
 {
 
         /*!
-            @brief      Opaque pointer to the C++ BooleanKernel instance
+            @brief      Opaque pointer to the C++ Kernel instance
         */
         void* instance;
 };
 
 
-typedef struct LUE_BooleanKernel LUE_BooleanKernel;
+typedef struct LUE_Kernel LUE_Kernel;
 
 
-LUE_FCAPI_EXPORT void lue_destruct_boolean_kernel(LUE_BooleanKernel* kernel);
+LUE_FCAPI_EXPORT void lue_destruct_kernel(LUE_Kernel* kernel);
 
 
 #ifdef __cplusplus

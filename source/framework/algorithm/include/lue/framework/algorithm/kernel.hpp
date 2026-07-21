@@ -118,8 +118,8 @@ namespace lue {
     }
 
 
-    template<typename Weight, Rank rank>
-    Kernel<Weight, rank> box_kernel(Radius const radius, Weight const value)
+    template<Arithmetic Weight, Rank rank>
+    auto box_kernel(Radius const radius, Weight const value) -> Kernel<Weight, rank>
     {
         using Kernel = Kernel<Weight, rank>;
         using Shape = ShapeT<Kernel>;

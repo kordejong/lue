@@ -5,8 +5,12 @@
 
 namespace lue {
 
-    template<typename Policies, typename Element, Rank rank>
-    PartitionedArray<Element, rank> aspect(
-        Policies const& policies, PartitionedArray<Element, rank> const& elevation);
+    template<typename Policies>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                 std::floating_point<policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>>
+    auto aspect(
+        Policies const& policies, PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& elevation)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>;
 
 }  // namespace lue

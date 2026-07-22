@@ -12,6 +12,7 @@ namespace lue::api {
     void bind_focal_operations(pybind11::module& module);
     void bind_io(pybind11::module& module);
     void bind_kernel(pybind11::module& module);
+    void bind_literal(pybind11::module& module);
     void bind_local_operations(pybind11::module& module);
     void bind_miscellaneous_operations(pybind11::module& module);
     void bind_routing_operations(pybind11::module& module);
@@ -25,6 +26,7 @@ namespace lue::api {
 
         bind_array(submodule);
         bind_field(submodule);
+        bind_literal(submodule);
         bind_scalar(submodule);
         bind_type_info(submodule);
 

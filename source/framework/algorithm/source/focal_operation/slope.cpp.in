@@ -5,8 +5,7 @@
 namespace lue {
 
     LUE_INSTANTIATE_SLOPE(
-            ESC(policy::slope::{{ Policies }}<{{ Element }}>),
-            {{ Element }}
+            ESC(policy::slope::{{ Policies }}<{{ Element }}>)
         );
 
 }  // namespace lue

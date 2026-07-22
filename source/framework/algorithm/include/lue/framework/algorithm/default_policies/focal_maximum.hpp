@@ -18,6 +18,7 @@ namespace lue {
     namespace default_policies {
 
         template<Arithmetic Element, typename Kernel>
+            requires std::same_as<ElementT<Kernel>, BooleanElement> && (rank<Kernel> == 2)
         auto focal_maximum(PartitionedArray<Element, 2> const& array, Kernel const& kernel)
             -> PartitionedArray<Element, 2>
         {

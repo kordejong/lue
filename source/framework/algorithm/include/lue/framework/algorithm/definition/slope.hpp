@@ -9,10 +9,17 @@
 
 namespace lue {
 
-    template<typename Policies, typename Element>
-    PartitionedArray<Element, 2> slope(
-        [[maybe_unused]] Policies const& policies, Gradients<Element> const& gradients)
+    template<typename Policies>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                 std::floating_point<policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>>
+    auto slope(
+        [[maybe_unused]] Policies const& policies,
+        Gradients<policy::InputElementT<Policies, 0>> const& gradients)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
     {
+        using Element = policy::InputElementT<Policies, 0>;
+
         auto const& [dz_dx, dz_dy] = gradients;
 
         using PowPolicies = policy::Policies<
@@ -103,9 +110,15 @@ namespace lue {
         +----+----+----+
         @endcode
     */
-    template<typename Policies, typename Element>
-    PartitionedArray<Element, 2> slope(
-        Policies const& policies, PartitionedArray<Element, 2> const& elevation, Element const cell_size)
+    template<typename Policies>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                 std::floating_point<policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>>
+    auto slope(
+        Policies const& policies,
+        PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& elevation,
+        policy::InputElementT<Policies, 0> const cell_size)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
     {
         return slope(policies, gradients(policies, elevation, cell_size));
     }
@@ -113,8 +126,9 @@ namespace lue {
 }  // namespace lue
 
 
-#define LUE_INSTANTIATE_SLOPE(Policies, Element)                                                             \
+#define LUE_INSTANTIATE_SLOPE(Policies)                                                                      \
                                                                                                              \
-    template LUE_FOCAL_OPERATION_EXPORT PartitionedArray<Element, 2>                                         \
-    slope<ArgumentType<void(Policies)>, Element>(                                                            \
-        ArgumentType<void(Policies)> const&, PartitionedArray<Element, 2> const&, Element const);
+    template LUE_FOCAL_OPERATION_EXPORT auto slope<ArgumentType<void(Policies)>>(                            \
+        ArgumentType<void(Policies)> const&,                                                                 \
+        PartitionedArray<policy::InputElementT<Policies, 0>, 2> const&,                                      \
+        policy::InputElementT<Policies, 0>) -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>;

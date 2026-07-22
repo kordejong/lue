@@ -27,6 +27,7 @@ namespace lue {
     namespace default_policies {
 
         template<std::integral Count, std::integral Element, typename Kernel>
+            requires std::same_as<ElementT<Kernel>, BooleanElement> && (rank<Kernel> == 2)
         auto focal_diversity(PartitionedArray<Element, 2> const& array, Kernel const& kernel)
             -> PartitionedArray<Count, 2>
         {

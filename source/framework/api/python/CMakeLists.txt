@@ -34,6 +34,7 @@ target_sources(lue_py_framework_x
         source/focal_operation.cpp
         # source/io.cpp
         source/kernel.cpp
+        source/literal.cpp
         source/local_operation.cpp
         source/miscellaneous_operation.cpp
         source/routing_operation.cpp

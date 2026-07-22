@@ -24,20 +24,4 @@ namespace lue::api {
             using VariantWrapper::VariantWrapper;
     };
 
-
-    /*!
-        @brief      Class for representing kernels with boolean weights
-    */
-    class BooleanKernel:
-        public VariantWrapper<
-            lue::Kernel<{{ BooleanElement }}, 2>
-        >
-
-    {
-
-        public:
-
-            using VariantWrapper::VariantWrapper;
-    };
-
 }  // namespace lue::api

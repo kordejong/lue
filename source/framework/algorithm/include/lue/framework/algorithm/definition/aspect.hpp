@@ -9,7 +9,7 @@
 namespace lue {
     namespace detail {
 
-        template<typename InputElement>
+        template<std::floating_point InputElement>
         class Aspect
         {
 
@@ -68,10 +68,17 @@ namespace lue {
     }  // namespace detail
 
 
-    template<typename Policies, typename Element>
-    PartitionedArray<Element, 2> aspect(
-        [[maybe_unused]] Policies const& policies, Gradients<Element> const& gradients)
+    template<typename Policies>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                 std::floating_point<policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>>
+    auto aspect(
+        [[maybe_unused]] Policies const& policies,
+        Gradients<policy::InputElementT<Policies, 0>> const& gradients)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
     {
+        using Element = policy::InputElementT<Policies, 0>;
+
         auto const& [dz_dx, dz_dy] = gradients;
 
         using AspectPolicies = policy::Policies<
@@ -87,10 +94,16 @@ namespace lue {
     }
 
 
-    template<typename Policies, typename Element, Rank rank>
-    PartitionedArray<Element, rank> aspect(
-        [[maybe_unused]] Policies const& policies, PartitionedArray<Element, rank> const& elevation)
+    template<typename Policies>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                 std::floating_point<policy::OutputElementT<Policies, 0>> &&
+                 std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>>
+    auto aspect(
+        Policies const& policies, PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& elevation)
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>
     {
+        using Element = policy::InputElementT<Policies, 0>;
+
         // TODO Somehow deduce this type from the policy passed in. This must result in one of
         //      the policy types for which we instantiate the gradient operation. For now,
         //      we just use the same policy as used in policy::gradients::DefaultValuePolicies.
@@ -106,8 +119,8 @@ namespace lue {
 }  // namespace lue
 
 
-#define LUE_INSTANTIATE_ASPECT(Policies, Element)                                                            \
+#define LUE_INSTANTIATE_ASPECT(Policies)                                                                     \
                                                                                                              \
-    template LUE_FOCAL_OPERATION_EXPORT PartitionedArray<Element, 2>                                         \
-    aspect<ArgumentType<void(Policies)>, Element, 2>(                                                        \
-        ArgumentType<void(Policies)> const&, PartitionedArray<Element, 2> const&);
+    template LUE_FOCAL_OPERATION_EXPORT auto aspect<ArgumentType<void(Policies)>>(                           \
+        ArgumentType<void(Policies)> const&, PartitionedArray<policy::InputElementT<Policies, 0>, 2> const&) \
+        -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>;

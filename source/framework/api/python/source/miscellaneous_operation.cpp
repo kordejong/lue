@@ -1,4 +1,5 @@
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
+#include "switch_on_dtype.hpp"
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
@@ -11,115 +12,6 @@ using namespace pybind11::literals;
 namespace lue::api {
 
     namespace {
-
-        template<typename Result, typename CaseHandler, typename... Arguments>
-        auto switch_on_dtype(pybind11::dtype const& dtype, Arguments&&... arguments) -> Result
-        {
-            auto const kind = dtype.kind();
-            auto const size = dtype.itemsize();  // bytes
-            std::optional<Result> result{};
-
-            // NOLINTBEGIN(bugprone-switch-missing-default-case)
-            switch (kind)
-            {
-                case 'i':
-                {
-                    // Signed integer
-                    switch (size)
-                    {
-                        case 1:
-                        {
-                            result = CaseHandler::template operator()<std::int8_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 2:
-                        {
-                            result = CaseHandler::template operator()<std::int16_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 4:
-                        {
-                            result = CaseHandler::template operator()<std::int32_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 8:
-                        {
-                            result = CaseHandler::template operator()<std::int64_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-                case 'u':
-                {
-                    // Unsigned integer
-                    switch (size)
-                    {
-                        case 1:
-                        {
-                            result = CaseHandler::template operator()<std::uint8_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 2:
-                        {
-                            result = CaseHandler::template operator()<std::uint16_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 4:
-                        {
-                            result = CaseHandler::template operator()<std::uint32_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 8:
-                        {
-                            result = CaseHandler::template operator()<std::uint64_t>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-                case 'f':
-                {
-                    // Floating-point
-                    switch (size)
-                    {
-                        case 4:
-                        {
-                            result = CaseHandler::template operator()<float>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                        case 8:
-                        {
-                            result = CaseHandler::template operator()<double>(
-                                std::forward<Arguments>(arguments)...);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-            }
-            // NOLINTEND(bugprone-switch-missing-default-case)
-
-            if (!result)
-            {
-                throw std::runtime_error(std::format("Unsupported dtype (kind={}, itemsize={})", kind, size));
-            }
-
-            return std::move(*result);
-        }
-
 
         struct Caster
         {
@@ -137,6 +29,30 @@ namespace lue::api {
         }
 
 
+        struct LiteralCreator
+        {
+                template<Arithmetic Element>
+                static auto operator()(double const value) -> std::optional<Literal>
+                {
+                    std::optional<Literal> result{};
+
+                    if constexpr (lue::arithmetic_element_supported<Element>)
+                    {
+                        // TODO: Use cast which handles out of range correctly
+                        result = static_cast<Element>(value);
+                    }
+
+                    return result;
+                }
+        };
+
+
+        auto create_literal(double const value, pybind11::dtype const& dtype) -> Literal
+        {
+            return switch_on_dtype<Literal, LiteralCreator>(dtype, value);
+        }
+
+
         struct ScalarCreator
         {
                 template<Arithmetic Element>
@@ -146,6 +62,7 @@ namespace lue::api {
 
                     if constexpr (lue::arithmetic_element_supported<Element>)
                     {
+                        // TODO: Use cast which handles out of range correctly
                         result = lue::api::create_scalar(static_cast<Element>(value));
                     }
 
@@ -156,11 +73,6 @@ namespace lue::api {
 
         auto create_scalar(double const value, pybind11::dtype const& dtype) -> Scalar
         {
-            // TODO Out of range values must result in no-data values. This logic must be in the API layer or
-            // higher. All bindings need it.
-            //
-            // auto output_value = value_policies::cast<std::int32_t>(input_value);
-
             return switch_on_dtype<Scalar, ScalarCreator>(dtype, value);
         }
 
@@ -200,6 +112,17 @@ namespace lue::api {
             "fill_value"_a,
             pybind11::kw_only(),
             "partition_shape"_a = std::optional<Shape<Count, 2>>{});
+
+        module.def(
+            "create_literal",
+            [](double const value, pybind11::object const& dtype_args) -> Literal
+            {
+                pybind11::dtype const dtype{pybind11::dtype::from_args(dtype_args)};
+
+                return create_literal(value, dtype);
+            },
+            "value"_a,
+            "dtype"_a);
 
         module.def(
             "create_scalar",

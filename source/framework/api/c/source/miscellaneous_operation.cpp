@@ -30,6 +30,14 @@ auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_S
 }
 
 
+auto lue_create_box_kernel(LUE_Count const radius, LUE_Literal const* weight) -> LUE_Kernel*
+{
+    lue::api::Kernel result = lue::api::create_box_kernel(radius, lue_as_cxx_literal(weight));
+
+    return new LUE_Kernel{.instance = new lue::api::Kernel{std::move(result)}};
+}
+
+
 #define CreateLiteral(type, type_name)                                                                       \
     auto lue_create_literal_##type_name(type const value) -> LUE_Literal*                                    \
     {                                                                                                        \

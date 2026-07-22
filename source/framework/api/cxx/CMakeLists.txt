@@ -97,7 +97,16 @@ target_sources(lue_framework_api_cxx
         ${generated_source_files}
         source/as_field.cpp
         source/as_state.cpp
+        source/focal/aspect.cpp
+        source/focal/convolve.cpp
+        source/focal/diversity.cpp
+        source/focal/high_pass.cpp
+        source/focal/majority.cpp
+        source/focal/maximum.cpp
         source/focal/mean.cpp
+        source/focal/minimum.cpp
+        source/focal/slope.cpp
+        source/focal/sum.cpp
         source/io.cpp
         source/local/abs.cpp
         source/local/acos.cpp
@@ -141,6 +150,7 @@ target_sources(lue_framework_api_cxx
         source/miscellaneous/array_like.cpp
         source/miscellaneous/cast.cpp
         source/miscellaneous/create_array.cpp
+        source/miscellaneous/create_kernel.cpp
         source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
         source/type_info.cpp

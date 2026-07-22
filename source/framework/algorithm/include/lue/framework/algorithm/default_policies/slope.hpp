@@ -5,7 +5,7 @@
 namespace lue {
     namespace policy::slope {
 
-        template<typename Element>
+        template<std::floating_point Element>
         using DefaultPolicies = policy::DefaultSpatialOperationPolicies<
             AllValuesWithinDomain<Element, Element>,
             OutputElements<Element>,
@@ -16,9 +16,9 @@ namespace lue {
 
     namespace default_policies {
 
-        template<typename Element, Rank rank>
-        PartitionedArray<Element, rank> slope(
-            PartitionedArray<Element, rank> const& elevation, Element const cell_size)
+        template<std::floating_point Element>
+        auto slope(PartitionedArray<Element, 2> const& elevation, Element const cell_size)
+            -> PartitionedArray<Element, 2>
         {
             using Policies = policy::slope::DefaultPolicies<Element>;
 

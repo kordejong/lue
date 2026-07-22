@@ -1,5 +1,6 @@
 #pragma once
 #include "lue/framework/algorithm/policy.hpp"
+#include "lue/framework/configure.hpp"
 #include "lue/framework/partitioned_array_decl.hpp"
 
 
@@ -9,7 +10,7 @@ namespace lue {
         requires std::floating_point<policy::InputElementT<Policies, 0>> &&
                  std::floating_point<policy::OutputElementT<Policies, 0>> &&
                  std::same_as<policy::InputElementT<Policies, 0>, policy::OutputElementT<Policies, 0>> &&
-                 std::integral<ElementT<Kernel>> && (rank<Kernel> == 2)
+                 std::same_as<ElementT<Kernel>, BooleanElement> && (rank<Kernel> == 2)
     auto focal_mean(
         Policies const& policies,
         PartitionedArray<lue::policy::InputElementT<Policies, 0>, 2> const& array,

@@ -17,7 +17,7 @@ namespace lue {
     namespace default_policies {
 
         template<std::floating_point Element, typename Kernel>
-            requires std::integral<ElementT<Kernel>> && (rank<Kernel> == 2)
+            requires std::same_as<ElementT<Kernel>, BooleanElement> && (rank<Kernel> == 2)
         auto focal_mean(PartitionedArray<Element, 2> const& array, Kernel const& kernel)
             -> PartitionedArray<Element, 2>
         {

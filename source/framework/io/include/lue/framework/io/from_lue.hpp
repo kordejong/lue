@@ -19,15 +19,6 @@
     The goal is to return an array as soon as possible, allowing the caller to create more work, while
     the read-tasks start the reading. The idea is that, as soon as partitions have been read, they can
     participate in computations, while other partitions are still being read.
-
-    Root process:
-    - Wait for all previous from_lue / to_lue calls using the same file have finished
-    - Tell each process to read its partitions
-    - Return array
-
-    Worker process:
-    - Wait for all partitions to read to become ready
-    - Launch a task which reads all partitions serially, from the same OS thread
 */
 
 namespace lue {
@@ -40,7 +31,16 @@ namespace lue {
             CreateHyperslab create_hyperslab,
             Partitions const& partitions)
         {
+            // TODO: Use no-data policy
+            // If no-data in the HDF5 dataset, write no-data to the LUE partition
+
             AnnotateFunction const annotate{"read: partitions"};
+
+            // Synchronously write all partitions, from the same OS thread
+            lue_hpx_assert(std::all_of(
+                partitions.begin(),
+                partitions.end(),
+                [](auto const& partition) -> auto { return partition.is_ready(); }));
 
             // Open value. Configure for use of parallel I/O if relevant.
             hdf5::Dataset::TransferPropertyList transfer_property_list{};
@@ -60,7 +60,6 @@ namespace lue {
             for (std::size_t partition_idx = 0; partition_idx < std::size(partitions); ++partition_idx)
             {
                 Partition const& partition{partitions[partition_idx]};
-                lue_hpx_assert(partition.is_ready());
 
                 auto partition_ptr{detail::ready_component_ptr(partition)};
                 auto& partition_server{*partition_ptr};
@@ -68,9 +67,6 @@ namespace lue {
 
                 array.read(
                     memory_datatype, create_hyperslab(partition_server), transfer_property_list, buffer);
-
-                // TODO Use no-data policy
-                // If no-data in the dataset, write no-data to the partition
             }
         }
 
@@ -140,7 +136,6 @@ namespace lue {
                         read_partitions(policies, array, create_hyperslab, partitions);
                     }
 
-                    // TODO: No need anymore for the ready future, right?
                     return {std::move(partitions), hpx::make_ready_future()};
                 },
                 hpx::when_all(partitions));
@@ -397,6 +392,11 @@ namespace lue {
 
             root::add_from_lue_finished(
                 dataset_path, from_lue_order, hpx::future{std::move(from_lue_finished_ff)});
+            root::from_lue_finished(dataset_path, from_lue_order)
+                .then(
+                    [dataset_path,
+                     from_lue_order]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> void
+                    { root::from_lue_handled(dataset_path, from_lue_order - 1); });
 
             std::vector<hpx::future<Partition>> partition_fs =
                 hpx::split_future<Partition>(std::move(partitions_f), array.nr_partitions());
@@ -531,7 +531,7 @@ namespace lue {
                             // reading has finished. Under the hood the "new" partition is the same and
                             // the original one, but this is not relevant for the caller.
 
-                            // TODO: Is it? Since we are reusing the original partition (which is already
+                            // NOTE: Is it? Since we are reusing the original partition (which is already
                             //       ready), the caller may think the partition is already ready(?).
 
                             lue_hpx_assert(!array_partitions[partition_idx].valid());
@@ -571,6 +571,11 @@ namespace lue {
 
             root::add_from_lue_finished(
                 dataset_path, from_lue_order, hpx::future{std::move(from_lue_finished_ff)});
+            root::from_lue_finished(dataset_path, from_lue_order)
+                .then(
+                    [dataset_path,
+                     from_lue_order]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> void
+                    { root::from_lue_handled(dataset_path, from_lue_order - 1); });
 
             std::vector<hpx::future<Partition>> partition_fs =
                 hpx::split_future<Partition>(std::move(partitions_f), array.nr_partitions());
@@ -613,7 +618,7 @@ namespace lue {
 
             grid_shape = lh5::Shape{input_raster_view.grid_shape()};
 
-            lue_hpx_assert(rank<Shape> == 2);  // TODO(KDJ)
+            lue_hpx_assert(rank<Shape> == 2);
 
             return Shape{
                 {static_cast<typename Shape::value_type>(grid_shape[0]),
@@ -643,7 +648,7 @@ namespace lue {
 
             grid_shape = lh5::Shape{input_raster_view.grid_shape()};
 
-            lue_hpx_assert(rank<Shape> == 2);  // TODO(KDJ)
+            lue_hpx_assert(rank<Shape> == 2);
 
             return Shape{
                 {static_cast<typename Shape::value_type>(grid_shape[0]),

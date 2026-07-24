@@ -16,28 +16,7 @@
 
     The goal is to return an array as soon as possible, allowing the caller to create more work, while
     the write-tasks start the writing.
-
-    Root process:
-
-    - Wait for all previous from_lue / to_lue calls using the same file have finished
-    - Parallel I/O:
-        - Tell each process to write its partitions
-    - Serial I/O:
-        - Tell each process in turn to write its partitions
-    - Return a future which becomes ready once all processes have finished writing their partitions and the
-    dataset is closed again
-
-    Worker process:
-
-    - Wait for all partitions to write have become ready
-    - Launch a task which writes all partitions serially
 */
-
-
-// - [ ] Refactor the local count stuff with the global count stuff
-// - [ ] Refactor the constant / variable code as much as possible
-// - [ ] Can we used barriers instead of our own synchronization stuff?
-// - [ ] Try to keep the size of counting stuff datastructures within bounds
 
 
 namespace lue {
@@ -50,13 +29,16 @@ namespace lue {
             CreateHyperslab create_hyperslab,
             data_model::Array& array)
         {
+            // TODO: Use no-data policy
+            // If no-data in the LUE array, write no-data to the HDF5 dataset
+
+            AnnotateFunction const annotate{"to_lue: partitions"};
+
             // Synchronously write all partitions, from the same OS thread
             lue_hpx_assert(std::all_of(
                 partitions.begin(),
                 partitions.end(),
                 [](auto const& partition) -> auto { return partition.is_ready(); }));
-
-            AnnotateFunction const annotate{"to_lue: partitions"};
 
             // Open value. Configure for use of parallel I/O if relevant.
             hdf5::Dataset::TransferPropertyList transfer_property_list{};
@@ -365,6 +347,11 @@ namespace lue {
                 });
 
             root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));
+            root::to_lue_finished(dataset_path, to_lue_order)
+                .then(
+                    [dataset_path,
+                     to_lue_order]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> void
+                    { root::to_lue_handled(dataset_path, to_lue_order - 1); });
 
             return root::to_lue_finished(dataset_path, to_lue_order)
                 .then([]([[maybe_unused]] hpx::shared_future<void> const& to_lue_finished_f) -> void {});
@@ -490,6 +477,11 @@ namespace lue {
                 });
 
             root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));
+            root::to_lue_finished(dataset_path, to_lue_order)
+                .then(
+                    [dataset_path,
+                     to_lue_order]([[maybe_unused]] hpx::shared_future<void> const& finished_f) -> void
+                    { root::to_lue_handled(dataset_path, to_lue_order - 1); });
 
             return root::to_lue_finished(dataset_path, to_lue_order)
                 .then([]([[maybe_unused]] hpx::shared_future<void> const& to_lue_finished_f) -> void {});

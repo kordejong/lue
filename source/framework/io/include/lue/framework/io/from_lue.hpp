@@ -391,7 +391,15 @@ namespace lue {
                 }));
 
             root::add_from_lue_finished(
-                dataset_path, from_lue_order, hpx::future{std::move(from_lue_finished_ff)});
+                dataset_path,
+                from_lue_order,
+                from_lue_finished_ff.then(
+                    [](hpx::future<hpx::future<void>>&& from_lue_finished_ff)
+                    {
+                        return from_lue_finished_ff.get().then(
+                            []([[maybe_unused]] hpx::future<void>&& from_lue_finished_f) { return; });
+                    }));
+
             root::from_lue_finished(dataset_path, from_lue_order)
                 .then(
                     [dataset_path,
@@ -570,7 +578,15 @@ namespace lue {
                 }));
 
             root::add_from_lue_finished(
-                dataset_path, from_lue_order, hpx::future{std::move(from_lue_finished_ff)});
+                dataset_path,
+                from_lue_order,
+                from_lue_finished_ff.then(
+                    [](hpx::future<hpx::future<void>>&& from_lue_finished_ff)
+                    {
+                        return from_lue_finished_ff.get().then(
+                            []([[maybe_unused]] hpx::future<void>&& from_lue_finished_f) { return; });
+                    }));
+
             root::from_lue_finished(dataset_path, from_lue_order)
                 .then(
                     [dataset_path,

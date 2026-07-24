@@ -91,7 +91,7 @@ namespace lue {
                  phenomenon_name,
                  property_set_name,
                  property_name,
-                 object_id](auto&& partitions_f) mutable -> void
+                 object_id](auto&& partitions_f) -> void
                 {
                     AnnotateFunction const annotate{"to_lue: partitions constant"};
 
@@ -170,7 +170,7 @@ namespace lue {
                  property_set_name,
                  property_name,
                  object_id,
-                 time_step_idx](auto&& partitions_f) mutable -> void
+                 time_step_idx](auto&& partitions_f) -> void
                 {
                     AnnotateFunction const annotate{"to_lue: partitions variable"};
 
@@ -268,7 +268,7 @@ namespace lue {
                  partition_idxs_by_locality = std::move(partition_idxs_by_locality),
                  array_pathname,
                  dataset_path,
-                 object_id]([[maybe_unused]] auto const& precondition_f) mutable -> hpx::future<void>
+                 object_id]([[maybe_unused]] auto const& precondition_f) -> hpx::future<void>
                 {
                     std::vector<hpx::future<void>> localities_finished{};
 
@@ -335,7 +335,7 @@ namespace lue {
 
 #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
                     // When the last process has finished, all processes have finished
-                    hpx::future<void>& to_lue_finished_f = localities_finished.back();
+                    hpx::future<void> to_lue_finished_f = std::move(localities_finished.back());
 #else
                     hpx::future<void> to_lue_finished_f =
                         hpx::when_all(localities_finished.begin(), localities_finished.end());
@@ -343,7 +343,7 @@ namespace lue {
 
                     lue_hpx_assert(to_lue_finished_f.valid());
 
-                    return std::move(to_lue_finished_f);
+                    return to_lue_finished_f;
                 });
 
             root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));
@@ -396,7 +396,7 @@ namespace lue {
                  array_pathname,
                  dataset_path,
                  object_id,
-                 time_step_idx]([[maybe_unused]] auto const& precondition_f) mutable -> hpx::future<void>
+                 time_step_idx]([[maybe_unused]] auto const& precondition_f) -> hpx::future<void>
                 {
                     std::vector<hpx::future<void>> localities_finished{};
 
@@ -465,7 +465,7 @@ namespace lue {
 
 #ifndef LUE_FRAMEWORK_WITH_PARALLEL_IO
                     // When the last process has finished, all processes have finished
-                    hpx::future<void>& to_lue_finished_f = localities_finished.back();
+                    hpx::future<void> to_lue_finished_f = std::move(localities_finished.back());
 #else
                     hpx::future<void> to_lue_finished_f =
                         hpx::when_all(localities_finished.begin(), localities_finished.end());
@@ -473,7 +473,7 @@ namespace lue {
 
                     lue_hpx_assert(to_lue_finished_f.valid());
 
-                    return std::move(to_lue_finished_f);
+                    return to_lue_finished_f;
                 });
 
             root::add_to_lue_finished(dataset_path, to_lue_order, std::move(to_lue_finished_f));

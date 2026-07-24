@@ -1,6 +1,5 @@
 #include "lue/framework/io/lue.hpp"
 #include "lue/framework/core/define.hpp"
-#include "lue/framework/core/locality.hpp"
 #include "lue/framework/core/serialize_resource_usage.hpp"
 #include <hpx/runtime.hpp>
 
@@ -94,14 +93,6 @@ namespace lue::detail::root {
         using CallFinished = ResourceUseFinished<std::filesystem::path>;
 
 
-        auto to_lue_finished() -> CallFinished&
-        {
-            static CallFinished to_lue_finished{};
-
-            return to_lue_finished;
-        }
-
-
         auto from_lue_finished() -> CallFinished&
         {
             static CallFinished from_lue_finished;
@@ -109,19 +100,15 @@ namespace lue::detail::root {
             return from_lue_finished;
         }
 
+
+        auto to_lue_finished() -> CallFinished&
+        {
+            static CallFinished to_lue_finished{};
+
+            return to_lue_finished;
+        }
+
     }  // Anonymous namespace
-
-
-    /*!
-        @brief      Add a @ future which becomes ready once call @a count to to_lue to @a path
-                    finishes
-
-        This function must be called from the root locality, on the main thread.
-    */
-    void add_to_lue_finished(std::filesystem::path const& path, Count const count, hpx::future<void> future)
-    {
-        add_resource_use_finished(to_lue_finished(), path, count, std::move(future));
-    }
 
 
     /*!
@@ -137,13 +124,14 @@ namespace lue::detail::root {
 
 
     /*!
-        @brief      Return a future which becomes ready once call @a count to to_lue finishes
+        @brief      Add a @ future which becomes ready once call @a count to to_lue to @a path
+                    finishes
 
         This function must be called from the root locality, on the main thread.
     */
-    auto to_lue_finished(std::filesystem::path const& path, Count const count) -> hpx::shared_future<void>
+    void add_to_lue_finished(std::filesystem::path const& path, Count const count, hpx::future<void> future)
     {
-        return resource_use_finished(to_lue_finished(), path, count);
+        add_resource_use_finished(to_lue_finished(), path, count, std::move(future));
     }
 
 
@@ -156,6 +144,29 @@ namespace lue::detail::root {
     auto from_lue_finished(std::filesystem::path const& path, Count const count) -> hpx::shared_future<void>
     {
         return resource_use_finished(from_lue_finished(), path, count);
+    }
+
+
+    /*!
+        @brief      Return a future which becomes ready once call @a count to to_lue finishes
+
+        This function must be called from the root locality, on the main thread.
+    */
+    auto to_lue_finished(std::filesystem::path const& path, Count const count) -> hpx::shared_future<void>
+    {
+        return resource_use_finished(to_lue_finished(), path, count);
+    }
+
+
+    void from_lue_handled(std::filesystem::path const& path, Count const count)
+    {
+        resource_use_handled(from_lue_finished(), path, count);
+    }
+
+
+    void to_lue_handled(std::filesystem::path const& path, Count const count)
+    {
+        resource_use_handled(to_lue_finished(), path, count);
     }
 
 }  // namespace lue::detail::root

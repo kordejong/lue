@@ -1,10 +1,9 @@
 #include "lue/framework/io/lue.hpp"
 #include "lue/framework/core/define.hpp"
+#include "lue/framework/core/locality.hpp"
+#include "lue/framework/core/serialize_resource_usage.hpp"
+#include "lue/framework/io/serializer.hpp"
 #include <hpx/runtime.hpp>
-#include <array>
-
-// #include <hpx/iostream.hpp>
-// #include <format>
 
 
 namespace lue::detail {
@@ -15,39 +14,10 @@ namespace lue::detail {
     }
 
 
-    auto on_root_locality() -> bool
-    {
-        return hpx::find_here() == hpx::find_root_locality();
-    }
-
-
     namespace root {
         namespace {
 
-            using CountByPath = std::map<std::filesystem::path, Count>;
-
-
-            /*!
-                @brief      .
-                @tparam     .
-                @param      .
-                @return     The number of times this function is called for @a path. The value returned is
-               always larger than zero.
-
-                The @a path passed in adds to this count, so the count returned is always larger than zero.
-
-                This function must be called from the root locality, on the main thread.
-            */
-            auto count_by_path(CountByPath& count_by_path, std::filesystem::path const& path) -> Count
-            {
-                lue_hpx_assert(on_root_locality());
-
-                // If this is the first time path is added, initialize the count to 0
-                count_by_path.try_emplace(path, 0);
-
-                // Increment the count and return it
-                return ++count_by_path.at(path);
-            }
+            using CountByPath = ResourceUseCountByKey<std::filesystem::path>;
 
 
             auto from_lue_count_by_dataset_path() -> CountByPath&
@@ -77,7 +47,7 @@ namespace lue::detail {
         */
         auto from_lue_order(std::filesystem::path const& path) -> Count
         {
-            return count_by_path(from_lue_count_by_dataset_path(), path);
+            return resource_use_count_by(from_lue_count_by_dataset_path(), path);
         }
 
 
@@ -90,7 +60,7 @@ namespace lue::detail {
         */
         auto to_lue_order(std::filesystem::path const& path) -> Count
         {
-            return count_by_path(to_lue_count_by_dataset_path(), path);
+            return resource_use_count_by(to_lue_count_by_dataset_path(), path);
         }
 
 
@@ -102,9 +72,7 @@ namespace lue::detail {
         */
         auto current_from_lue_order(std::filesystem::path const& dataset_path) -> Count
         {
-            auto const& count_by_path{from_lue_count_by_dataset_path()};
-
-            return count_by_path.contains(dataset_path) ? count_by_path.at(dataset_path) : 0;
+            return current_resource_use_count(from_lue_count_by_dataset_path(), dataset_path);
         }
 
 
@@ -116,9 +84,7 @@ namespace lue::detail {
         */
         auto current_to_lue_order(std::filesystem::path const& dataset_path) -> Count
         {
-            auto const& count_by_path{to_lue_count_by_dataset_path()};
-
-            return count_by_path.contains(dataset_path) ? count_by_path.at(dataset_path) : 0;
+            return current_resource_use_count(to_lue_count_by_dataset_path(), dataset_path);
         }
 
 
@@ -127,20 +93,9 @@ namespace lue::detail {
             // TODO: Add logic to remove information again. When adding a future, previous futures can be
             //       removed, right?
 
-
-            // Shared future because multiple future calls may depend on the same previous call
-            using CallFinished = std::map<std::filesystem::path, std::map<Count, hpx::shared_future<void>>>;
+            using CallFinished = ResourceUseFinished<std::filesystem::path>;
 
 
-            /*!
-                @brief      .
-                @tparam     .
-                @param      .
-                @return     .
-                @exception  .
-
-                This function must be called from the root locality, on the main thread.
-            */
             auto to_lue_finished() -> CallFinished&
             {
                 static CallFinished to_lue_finished{};
@@ -149,15 +104,6 @@ namespace lue::detail {
             }
 
 
-            /*!
-                @brief      .
-                @tparam     .
-                @param      .
-                @return     .
-                @exception  .
-
-                This function must be called from the root locality, on the main thread.
-            */
             auto from_lue_finished() -> CallFinished&
             {
                 static CallFinished from_lue_finished;
@@ -165,89 +111,32 @@ namespace lue::detail {
                 return from_lue_finished;
             }
 
-
-            /*!
-                @brief      .
-                @tparam     .
-                @param      .
-                @return     .
-                @exception  .
-
-                This function must be called from the root locality, on the main thread.
-            */
-            void add_call_finished(
-                CallFinished& call_finished,
-                std::filesystem::path const& path,
-                Count const count,
-                hpx::shared_future<void> future)
-            {
-                lue_hpx_assert(on_root_locality());
-
-                lue_hpx_assert((!call_finished.contains(path)) || (!call_finished.at(path).contains(count)));
-                lue_hpx_assert(future.valid());
-
-                call_finished[path][count] = std::move(future);
-
-                lue_hpx_assert(call_finished.contains(path));
-                lue_hpx_assert(call_finished[path].contains(count));
-                lue_hpx_assert(call_finished.at(path).at(count).valid());
-            }
-
-
-            /*!
-                @brief      .
-                @tparam     .
-                @param      .
-                @return     .
-                @exception  .
-
-                This function must be called from the root locality, on the main thread.
-            */
-            auto call_finished(
-                CallFinished& call_finished, std::filesystem::path const& path, Count const count)
-                -> hpx::shared_future<void>
-            {
-#ifndef NDEBUG
-                lue_hpx_assert(on_root_locality());
-
-                if (count > 0)
-                {
-                    lue_hpx_assert(call_finished.contains(path));
-                    lue_hpx_assert(call_finished[path].contains(count));
-                    lue_hpx_assert(call_finished[path][count].valid());
-                }
-#endif
-
-                return count > 0 ? call_finished.at(path).at(count) : hpx::make_ready_future().share();
-            }
-
         }  // Anonymous namespace
 
 
         /*!
             @brief      Add a @ future which becomes ready once call @a count to to_lue to @a path
-            finishes
+                        finishes
 
             This function must be called from the root locality, on the main thread.
         */
         void add_to_lue_finished(
-            std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
+            std::filesystem::path const& path, Count const count, hpx::future<void> future)
         {
-            add_call_finished(to_lue_finished(), path, count, std::move(future));
+            add_resource_use_finished(to_lue_finished(), path, count, std::move(future));
         }
 
 
         /*!
-            @brief      Add a @ future which becomes ready once call @a count to from_lue from @a
-            path
-           finishes
+            @brief      Add a @ future which becomes ready once call @a count to from_lue from @a path
+                        finishes
 
             This function must be called from the root locality, on the main thread.
         */
         void add_from_lue_finished(
-            std::filesystem::path const& path, Count const count, hpx::shared_future<void> future)
+            std::filesystem::path const& path, Count const count, hpx::future<void> future)
         {
-            add_call_finished(from_lue_finished(), path, count, std::move(future));
+            add_resource_use_finished(from_lue_finished(), path, count, std::move(future));
         }
 
 
@@ -258,91 +147,21 @@ namespace lue::detail {
         */
         auto to_lue_finished(std::filesystem::path const& path, Count const count) -> hpx::shared_future<void>
         {
-            return call_finished(to_lue_finished(), path, count);
+            return resource_use_finished(to_lue_finished(), path, count);
         }
 
 
         /*!
-            @brief      Return a future which becomes ready once call @a count to from_lue from @a
-            path
-           finishes
+            @brief      Return a future which becomes ready once call @a count to from_lue from @a path
+                        finishes
 
             This function must be called from the root locality, on the main thread.
         */
         auto from_lue_finished(std::filesystem::path const& path, Count const count)
             -> hpx::shared_future<void>
         {
-            return call_finished(from_lue_finished(), path, count);
+            return resource_use_finished(from_lue_finished(), path, count);
         }
-
-
-        // /*!
-        //     @brief      Type for serializing calls to functions
-        //
-        //     This type is intended to be used on the root locality only.
-        // */
-        // using CallSerializer = Serializer<std::filesystem::path, Count>;
-        //
-        //
-        // namespace {
-        //
-        //     auto to_lue_serializer() -> CallSerializer&
-        //     {
-        //         static Serializer<std::filesystem::path, Count> serializer{};
-        //
-        //         return serializer;
-        //     }
-        //
-        //
-        //     auto from_lue_serializer() -> CallSerializer&
-        //     {
-        //         static Serializer<std::filesystem::path, Count> serializer{};
-        //
-        //         return serializer;
-        //     }
-        //
-        // }  // Anonymous namespace
-
-
-        // auto from_lue_promise_for(std::filesystem::path const& path, Count open_count) ->
-        // hpx::promise<void>
-        // {
-        //     return from_lue_serializer().promise_for(path, open_count);
-        // }
-        //
-        //
-        // auto from_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
-        //     -> hpx::shared_future<void>
-        // {
-        //     return from_lue_serializer().when_predecessor_done(path, open_count);
-        // }
-        //
-        //
-        // auto from_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
-        // {
-        //     return count > 0 ? from_lue_serializer().when_done(path, count)
-        //                      : hpx::make_ready_future().share();
-        // }
-        //
-        //
-        // auto to_lue_promise_for(std::filesystem::path const& path, Count open_count) -> hpx::promise<void>
-        // {
-        //     return to_lue_serializer().promise_for(path, open_count);
-        // }
-        //
-        //
-        // auto to_lue_when_predecessor_done(std::filesystem::path const& path, Count open_count)
-        //     -> hpx::shared_future<void>
-        // {
-        //     return to_lue_serializer().when_predecessor_done(path, open_count);
-        // }
-
-
-        // auto to_lue_done(std::filesystem::path const& path, Count count) -> hpx::shared_future<void>
-        // {
-        //     return count > 0 ? to_lue_serializer().when_done(path, count) :
-        //     hpx::make_ready_future().share();
-        // }
 
     }  // namespace root
 
@@ -419,8 +238,8 @@ namespace lue::detail {
 
 
         /*!
-            @brief      Return a promise to set once from_lue has opened dataset @a path for call @a
-           open_count
+            @brief      Return a promise to set once from_lue has opened dataset @a path for call
+                        @a open_count
 
             This function must be called from a worker locality.
         */
@@ -432,8 +251,8 @@ namespace lue::detail {
 
 
         /*!
-            @brief      Return a promise to set once from_lue has opened dataset @a path for call @a
-           open_count
+            @brief      Return a promise to set once from_lue has opened dataset @a path for call
+                        @a open_count
 
             This function must be called from a worker locality.
         */
@@ -444,12 +263,7 @@ namespace lue::detail {
         }
 
 
-        auto to_lue_open_dataset_when_predecessor_done(
-            std::filesystem::path const& path, Count const open_count) -> hpx::shared_future<void>
-        {
-            return to_lue_open_dataset_serializer().when_predecessor_done(path, open_count);
-        }
-
+#ifndef NDEBUG
 
         /*!
             @brief      Return a future which will become ready once to_lue has closed dataset @a path for
@@ -461,14 +275,6 @@ namespace lue::detail {
             std::filesystem::path const& path, Count const open_count) -> hpx::shared_future<void>
         {
             return to_lue_close_dataset_serializer().when_predecessor_done(path, open_count);
-        }
-
-
-        auto from_lue_open_dataset_when_predecessor_done(
-            std::filesystem::path const& path, Count const open_count) -> hpx::shared_future<void>
-        {
-            // TODO: remove if not used
-            return from_lue_open_dataset_serializer().when_predecessor_done(path, open_count);
         }
 
 
@@ -500,35 +306,6 @@ namespace lue::detail {
 
 
         /*!
-            @brief      Return whether a future is available which will become ready once from_lue has closed
-                        dataset @a path for call @a count
-
-            This function must be called from a worker locality.
-        */
-        auto from_lue_close_dataset_done_available(std::filesystem::path const& path, Count count) -> bool
-        {
-            lue_hpx_assert(count > 0);
-
-            return from_lue_close_dataset_serializer().contains(path, count);
-        }
-
-
-        /*!
-            @brief      Return a future which will become ready once from_lue has closed dataset @a path for
-           call
-                        @a count
-
-            This function must be called from a worker locality.
-        */
-        auto from_lue_close_dataset_done(std::filesystem::path const& path, Count const count)
-            -> hpx::shared_future<void>
-        {
-            return count > 0 ? from_lue_close_dataset_serializer().when_done(path, count)
-                             : hpx::make_ready_future().share();
-        }
-
-
-        /*!
             @brief      Return a future which will become ready once to_lue has closed dataset @a path for
            call
                         @a count
@@ -540,6 +317,20 @@ namespace lue::detail {
         {
             return count > 0 ? to_lue_open_dataset_serializer().when_done(path, count)
                              : hpx::make_ready_future().share();
+        }
+
+
+        /*!
+            @brief      Return whether a future is available which will become ready once from_lue has closed
+                        dataset @a path for call @a count
+
+            This function must be called from a worker locality.
+        */
+        auto from_lue_close_dataset_done_available(std::filesystem::path const& path, Count count) -> bool
+        {
+            lue_hpx_assert(count > 0);
+
+            return from_lue_close_dataset_serializer().contains(path, count);
         }
 
 
@@ -558,9 +349,22 @@ namespace lue::detail {
 
 
         /*!
+            @brief      Return a future which will become ready once from_lue has closed dataset @a path
+                        for call @a count
+
+            This function must be called from a worker locality.
+        */
+        auto from_lue_close_dataset_done(std::filesystem::path const& path, Count const count)
+            -> hpx::shared_future<void>
+        {
+            return count > 0 ? from_lue_close_dataset_serializer().when_done(path, count)
+                             : hpx::make_ready_future().share();
+        }
+
+
+        /*!
             @brief      Return a future which will become ready once to_lue has closed dataset @a path for
-           call
-                        @a count
+                        call @a count
 
             This function must be called from a worker locality.
         */
@@ -570,6 +374,7 @@ namespace lue::detail {
             return count > 0 ? to_lue_close_dataset_serializer().when_done(path, count)
                              : hpx::make_ready_future().share();
         }
+#endif
 
     }  // namespace worker
 

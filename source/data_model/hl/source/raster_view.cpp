@@ -119,25 +119,24 @@ namespace lue::data_model {
 
 
     auto contains_raster(
-        Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-        -> bool
+        Dataset const& dataset,
+        std::string const& phenomenon_name,
+        std::string const& property_set_name) -> bool
     {
         bool result{false};
 
         if (!dataset.phenomena().contains(phenomenon_name))
         {
-            throw std::runtime_error(
-                std::format(
-                    "Dataset {} does not contain phenomenon {}", dataset.pathname(), phenomenon_name));
+            throw std::runtime_error(std::format(
+                "Dataset {} does not contain phenomenon {}", dataset.pathname(), phenomenon_name));
         }
 
         auto const& phenomenon{dataset.phenomena()[phenomenon_name]};
 
         if (!phenomenon.property_sets().contains(property_set_name))
         {
-            throw std::runtime_error(
-                std::format(
-                    "Phenomenon {} does not contain property-set {}", phenomenon_name, property_set_name));
+            throw std::runtime_error(std::format(
+                "Phenomenon {} does not contain property-set {}", phenomenon_name, property_set_name));
         }
 
         if (phenomenon.object_id().nr_objects() == 1)
@@ -337,8 +336,9 @@ namespace lue::data_model {
 
 
         auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool
         {
             bool result{false};
 
@@ -458,7 +458,7 @@ namespace lue::data_model {
             _time_grid(1)
 
         {
-            // FIXME Obtain these from base class?
+            // FIXME: Obtain these from base class?
             Dataset& dataset{**this};
             auto& phenomenon{dataset.phenomena()[phenomenon_name]};
             auto& property_set{phenomenon.property_sets()[property_set_name]};
@@ -615,8 +615,9 @@ namespace lue::data_model {
 
 
         auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool
         {
             bool result{false};
 

@@ -35,6 +35,14 @@ namespace lue::hdf5 {
 
     {
         assert_invariant();
+
+#ifndef NDEBUG
+        if (is_valid())
+        {
+            // The object is ours, so its reference count must be zero at the start
+            assert(reference_count() == 1);
+        }
+#endif
     }
 
 
@@ -221,6 +229,12 @@ namespace lue::hdf5 {
             assert(reference_count() > 0);
 
 #ifndef NDEBUG
+            if (type() == H5I_FILE)
+            {
+                // All child-objects should have gone out of scope by now
+                assert(H5Fget_obj_count(_id, H5F_OBJ_LOCAL | H5F_OBJ_ALL) == 1);
+            }
+
             auto const rc_pre_close = reference_count();
 #endif
 

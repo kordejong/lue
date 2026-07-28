@@ -14,13 +14,16 @@ namespace lue::framework {
 
         template<typename Element, Rank rank>
         auto write_constant_array(
-            PartitionedArray<Element, rank> const& array, std::string const& array_pathname)
-            -> hpx::future<void>
+            PartitionedArray<Element, rank> const& array,
+            std::string const& array_pathname) -> hpx::future<void>
         {
             auto const [dataset_pathname, phenomenon_name, property_set_name, layer_name] =
                 parse_array_pathname(array_pathname);
-            auto const [object_id, _, file_datatype] =
-                ldm::constant::probe_raster(dataset_pathname, phenomenon_name, property_set_name, layer_name);
+            // TODO: Turn this into a function that respects the from_lue / to_lue counts
+            // auto const [object_id, _, file_datatype] =
+            //     ldm::constant::probe_raster(dataset_pathname, phenomenon_name, property_set_name,
+            //     layer_name);
+            ldm::ID const object_id = 5;
 
             verify_rank_supported(rank);
 
@@ -38,8 +41,11 @@ namespace lue::framework {
         {
             auto const [dataset_pathname, phenomenon_name, property_set_name, layer_name] =
                 parse_array_pathname(array_pathname);
-            auto const [object_id, _, file_datatype] =
-                ldm::variable::probe_raster(dataset_pathname, phenomenon_name, property_set_name, layer_name);
+            // TODO: Turn this into a function that respects the from_lue / to_lue counts
+            // auto const [object_id, _, file_datatype] =
+            //     ldm::variable::probe_raster(dataset_pathname, phenomenon_name, property_set_name,
+            //     layer_name);
+            ldm::ID const object_id = 5;
 
             verify_rank_supported(rank);
 

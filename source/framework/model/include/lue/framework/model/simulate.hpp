@@ -29,9 +29,6 @@ namespace lue {
                         {
                             lue_hpx_assert(current_state.is_ready());
 
-                            // ... collect some garbage, and ...
-                            hpx::agas::garbage_collect();
-
                             // ... notify the semaphore about the new lower limit
                             semaphore.signal(lower_limit);
                         });
@@ -65,6 +62,7 @@ namespace lue {
         Count rate_limit = 0)
     {
         lue_hpx_assert(rate_limit >= 0);
+        lue_hpx_assert(first_time_step > 0);
         lue_hpx_assert(first_time_step <= last_time_step);
 
         Count const nr_time_steps{last_time_step - first_time_step + 1};
@@ -76,7 +74,7 @@ namespace lue {
         rate_limit -= 1;  // Otherwise we get rate_limit + 1 time steps in flight
 
         std::int64_t const max_difference{rate_limit};
-        hpx::sliding_semaphore semaphore{max_difference, first_time_step};
+        hpx::sliding_semaphore semaphore{max_difference, first_time_step - 1};
 
         // A type to represent the simulation's "state" after a single time step. It is assumed that once this
         // state becomes ready, that the tasks for the corresponding time step have all finished.
@@ -89,6 +87,7 @@ namespace lue {
             for (Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx, ++current_time_step)
             {
                 State current_state = simulate(model, current_time_step);
+                simulate(progressor, current_time_step);
 
                 // Every time step, attach an additional continuation to the current state. Once this current
                 // state becomes ready, the semaphore will be informed.
@@ -98,8 +97,6 @@ namespace lue {
                 // Set the new upper limit. Wait if necessary. Continue if / once the difference
                 // between the lower and upper limits is not larger than the max_difference set.
                 semaphore.wait(current_time_step);
-
-                simulate(progressor, current_time_step);
 
                 if (current_time_step == last_time_step)
                 {

@@ -198,6 +198,7 @@ namespace lue::data_model::same_shape::constant_shape {
         hdf5::Dataset::CreationPropertyList creation_property_list;
         hdf5::Shape const chunk_dimension_sizes{hdf5::chunk_shape(array_shape, file_datatype.size())};
         creation_property_list.set_chunk(chunk_dimension_sizes);
+        creation_property_list.set_alloc_time(H5D_ALLOC_TIME_LATE);
 
         if (no_data_value != nullptr)
         {

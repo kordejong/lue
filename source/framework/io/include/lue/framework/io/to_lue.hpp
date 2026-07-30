@@ -7,6 +7,7 @@
 #include "lue/framework/io/util.hpp"
 #include "lue/data_model/hl/util.hpp"
 #include "lue/configure.hpp"
+// #include <hpx/runtime_local/service_executors.hpp>
 
 
 /*!
@@ -31,8 +32,6 @@ namespace lue {
         {
             // TODO: Use no-data policy
             // If no-data in the LUE array, write no-data to the HDF5 dataset
-
-            AnnotateFunction const annotate{"to_lue: partitions"};
 
             // Synchronously write all partitions, from the same OS thread
             lue_hpx_assert(std::all_of(
@@ -83,7 +82,13 @@ namespace lue {
             // rescheduled on another OS thread) during the write. In other contexts it is a fine approach as
             // well. It doesn't help to write in parallel from within a process.
 
+            // // Get a reference to one of the IO specific HPX io_service objects
+            // hpx::execution::experimental::io_pool_executor executor;
+            //
+            // // Schedule the handler to run on one of the io_service's OS-threads
+
             return hpx::dataflow(
+                // executor,
                 hpx::launch::async,
                 [policies,
                  array_hyperslab_start,
@@ -161,7 +166,12 @@ namespace lue {
             // rescheduled on another OS thread) during the write. In other contexts it is a fine approach as
             // well. It doesn't help to write in parallel from within a process.
 
+            // // Get a reference to one of the IO specific HPX io_service objects
+            // hpx::execution::experimental::io_pool_executor executor;
+            // // Schedule the handler to run on one of the io_service's OS-threads
+
             return hpx::dataflow(
+                // executor,
                 hpx::launch::async,
                 [policies,
                  array_hyperslab_start,

@@ -130,8 +130,16 @@ namespace lue::data_model::same_shape {
         hdf5::Datatype const& memory_datatype,
         void const* no_data_value) -> Value
     {
+        std::size_t const nr_chunk_dimensions_to_skip = 0;
+
         return create_value(
-            parent, name, file_datatype(memory_datatype), memory_datatype, hdf5::Shape{}, no_data_value);
+            parent,
+            name,
+            file_datatype(memory_datatype),
+            memory_datatype,
+            hdf5::Shape{},
+            nr_chunk_dimensions_to_skip,
+            no_data_value);
     }
 
 
@@ -143,10 +151,17 @@ namespace lue::data_model::same_shape {
         std::string const& name,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        std::size_t nr_chunk_dimensions_to_skip,
         void const* no_data_value) -> Value
     {
         return create_value(
-            parent, name, file_datatype(memory_datatype), memory_datatype, array_shape, no_data_value);
+            parent,
+            name,
+            file_datatype(memory_datatype),
+            memory_datatype,
+            array_shape,
+            nr_chunk_dimensions_to_skip,
+            no_data_value);
     }
 
 
@@ -160,7 +175,16 @@ namespace lue::data_model::same_shape {
         hdf5::Datatype const& memory_datatype,
         void const* no_data_value) -> Value
     {
-        return create_value(parent, name, file_datatype, memory_datatype, hdf5::Shape{}, no_data_value);
+        std::size_t const nr_chunk_dimensions_to_skip = 0;
+
+        return create_value(
+            parent,
+            name,
+            file_datatype,
+            memory_datatype,
+            hdf5::Shape{},
+            nr_chunk_dimensions_to_skip,
+            no_data_value);
     }
 
 
@@ -177,6 +201,7 @@ namespace lue::data_model::same_shape {
         hdf5::Datatype const& file_datatype,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        std::size_t nr_chunk_dimensions_to_skip,
         void const* no_data_value) -> Value
     {
         // The rank of the underlying dataset is one larger than the rank of the
@@ -190,8 +215,11 @@ namespace lue::data_model::same_shape {
         hdf5::Dataspace const dataspace{hdf5::create_dataspace(dimension_sizes, max_dimension_sizes)};
 
         hdf5::Dataset::CreationPropertyList creation_property_list;
-        auto chunk_dimension_sizes = hdf5::chunk_shape(array_shape, file_datatype.size());
+        auto chunk_dimension_sizes =
+            hdf5::chunk_shape(array_shape, nr_chunk_dimensions_to_skip, file_datatype.size());
+        chunk_dimension_sizes.insert(chunk_dimension_sizes.begin(), 1);  // For the first, objects, dimension
         creation_property_list.set_chunk(chunk_dimension_sizes);
+        creation_property_list.set_alloc_time(H5D_ALLOC_TIME_LATE);
 
         if (no_data_value != nullptr)
         {

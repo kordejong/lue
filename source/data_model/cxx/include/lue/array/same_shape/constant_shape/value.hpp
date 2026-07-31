@@ -74,6 +74,7 @@ namespace lue::data_model::same_shape::constant_shape {
         std::string const& name,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        std::size_t nr_chunk_dimensions_to_skip = 0,
         void const* no_data_value = nullptr) -> Value;
 
     LUE_DATA_MODEL_EXPORT auto create_value(
@@ -89,6 +90,7 @@ namespace lue::data_model::same_shape::constant_shape {
         hdf5::Datatype const& file_datatype,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        std::size_t nr_chunk_dimensions_to_skip = 0,
         void const* no_data_value = nullptr) -> Value;
 
     LUE_DATA_MODEL_EXPORT auto value_exists(hdf5::Group const& parent, std::string const& name) -> bool;

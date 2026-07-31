@@ -11,6 +11,9 @@ namespace lue::hdf5 {
 
     LUE_HDF5_EXPORT auto chunk_shape(Shape const& value_shape, std::size_t size_of_element) -> Shape;
 
+    LUE_HDF5_EXPORT auto chunk_shape(
+        Shape const& value_shape, std::size_t nr_dimensions_to_skip, std::size_t size_of_element) -> Shape;
+
     auto size_of_chunk(Shape const& chunk, std::size_t size_of_element) -> Shape::value_type;
 
 
@@ -18,6 +21,13 @@ namespace lue::hdf5 {
     auto chunk_shape(Shape const& value_shape) -> Shape
     {
         return chunk_shape(value_shape, sizeof(T));
+    }
+
+
+    template<typename T>
+    auto chunk_shape(Shape const& value_shape, std::size_t const nr_dimensions_to_skip) -> Shape
+    {
+        return chunk_shape(value_shape, nr_dimensions_to_skip, sizeof(T));
     }
 
 

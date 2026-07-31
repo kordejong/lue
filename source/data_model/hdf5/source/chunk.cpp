@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <tuple>
 
 
@@ -44,7 +45,7 @@ namespace lue::hdf5 {
     */
     auto chunk_shape(Shape const& value_shape, std::size_t const size_of_element) -> Shape
     {
-        Shape result;
+        Shape result(value_shape.size());
 
         auto const value_size_bytes = size_of_shape(value_shape, size_of_element);
         double const nr_values_in_largest_chunk =
@@ -52,26 +53,19 @@ namespace lue::hdf5 {
 
         if (nr_values_in_largest_chunk >= 1.0)
         {
-            // Values are relatively small. At least one item can fit in a chunk.
+            // Values are relatively small. Multiple values fit in a single chunk.
 
-            // Determine how many items can fit in a single chunk.
-            auto const nr_items = static_cast<std::size_t>(std::floor(nr_values_in_largest_chunk));
-
-            result.push_back(nr_items);
-            result.insert(result.begin() + 1, value_shape.begin(), value_shape.end());
+            // NOLINTNEXTLINE(modernize-use-ranges)
+            std::copy(value_shape.begin(), value_shape.end(), result.begin());
         }
         else
         {
-            // Values are relatively large. The value of a single item is chunked.
+            // Values are relatively large. Individual values are chunked.
 
             // Determine how many chunks can fit in a value.
 
-            // Shape of the first chunk dimension is 1.
-            result.resize(value_shape.size() + 1, 0);
-            result[0] = 1;
-
-            // Determine the size of each chunk dimension (except for the first one, which is 1) in case the
-            // chunk is square. These are all in bytes.
+            // Determine the size of each chunk dimension assuming the chunk is "square". These are all in
+            // bytes.
             double const chunk_size_bytes =
                 static_cast<double>(value_size_bytes) * nr_values_in_largest_chunk;
             double const chunk_size_bytes_per_dimension =
@@ -113,14 +107,33 @@ namespace lue::hdf5 {
                 chunk_size_elements_per_dimension *=
                     chunk_size_elements_per_dimension / static_cast<double>(chunk_size_elements_of_dimension);
 
-                result[index + 1] = chunk_size_elements_of_dimension;
-                assert(result[index + 1] <= value_shape[index]);
+                result[index] = chunk_size_elements_of_dimension;
+                assert(result[index] <= value_shape[index]);
             }
         }
 
-        assert(result.size() == value_shape.size() + 1);
+        assert(result.size() == value_shape.size());
 
         return result;
+    }
+
+
+    auto chunk_shape(
+        Shape const& value_shape,
+        std::size_t const nr_dimensions_to_skip,
+        std::size_t const size_of_element) -> Shape
+    {
+        assert(
+            (value_shape.empty() && nr_dimensions_to_skip == 0) ||
+            nr_dimensions_to_skip < value_shape.size());
+
+        auto const it_offset = static_cast<std::ptrdiff_t>(nr_dimensions_to_skip);
+        Shape const real_value_shape(value_shape.begin() + it_offset, value_shape.end());
+        Shape chunk_dimension_sizes = chunk_shape(real_value_shape, size_of_element);
+
+        chunk_dimension_sizes.insert(chunk_dimension_sizes.begin(), nr_dimensions_to_skip, 1);
+
+        return chunk_dimension_sizes;
     }
 
 

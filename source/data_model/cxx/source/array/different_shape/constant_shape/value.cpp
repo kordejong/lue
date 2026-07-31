@@ -107,8 +107,13 @@ namespace lue::data_model::different_shape::constant_shape {
         // function is re-used by expand overloads that will update the
         // nr_objects_tag_attribute.
         std::string const name{std::to_string(id)};
-        same_shape::constant_shape::Value value{
-            same_shape::constant_shape::create_value(*this, name, file_datatype(), memory_datatype(), shape)};
+
+        // The shape passed in doesn't contain a dimension for the time points / periods, so we don't
+        // have to skip a chunk dimension for it
+        std::size_t const nr_chunk_dimensions_to_skip = 0;
+
+        same_shape::constant_shape::Value value{same_shape::constant_shape::create_value(
+            *this, name, file_datatype(), memory_datatype(), shape, nr_chunk_dimensions_to_skip)};
         value.expand(nr_locations_in_time);
 
         return value;
@@ -127,8 +132,10 @@ namespace lue::data_model::different_shape::constant_shape {
         @brief      Create value @a name in @a parent
     */
     auto create_value(
-        hdf5::Group& parent, std::string const& name, hdf5::Datatype const& memory_datatype, Rank const rank)
-        -> Value
+        hdf5::Group& parent,
+        std::string const& name,
+        hdf5::Datatype const& memory_datatype,
+        Rank const rank) -> Value
     {
         return create_value(parent, name, file_datatype(memory_datatype), memory_datatype, rank);
     }

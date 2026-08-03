@@ -230,6 +230,7 @@ namespace lue::data_model::same_shape::constant_shape {
             hdf5::chunk_shape(array_shape, nr_chunk_dimensions_to_skip, file_datatype.size())};
 
         chunk_dimension_sizes.insert(chunk_dimension_sizes.begin(), 1);  // For the first, objects, dimension
+        assert(static_cast<int>(chunk_dimension_sizes.size()) == dataspace.nr_dimensions());
         creation_property_list.set_chunk(chunk_dimension_sizes);
         creation_property_list.set_alloc_time(H5D_ALLOC_TIME_LATE);
 

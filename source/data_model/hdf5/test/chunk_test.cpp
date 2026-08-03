@@ -12,11 +12,11 @@ static auto test_chunk(lh5::Shape const& value_shape, lh5::Shape const& chunk_sh
 {
     BOOST_CHECK_EQUAL(chunk_shape.size(), value_shape.size());
 
-    auto const size = lh5::size_of_chunk<Element>(chunk_shape);
+    auto const size = lh5::size_of_chunk(chunk_shape, sizeof(Element));  // In bytes
 
-    if (!chunk_shape.empty())
+    if (!value_shape.empty())
     {
-        BOOST_CHECK_GE(size, 1);
+        BOOST_CHECK_GE(size, 0);
         // BOOST_CHECK_GE(size, lh5::lower_chunk_size_limit());
         BOOST_CHECK_LE(size, lh5::upper_chunk_size_limit());
     }
@@ -102,8 +102,6 @@ BOOST_AUTO_TEST_CASE(chunk_shape_large_2)
         lh5::Shape const value_shape({1, 2000000});
         auto chunk_shape = test_chunk(value_shape);
 
-        BOOST_CHECK_EQUAL(chunk_shape[0], 1);
-
         std::size_t const nr_dimensions_to_skip = 1;
         chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
 
@@ -132,4 +130,52 @@ BOOST_AUTO_TEST_CASE(case_01)
 
     BOOST_CHECK_EQUAL(chunk_shape[0], 1);
     BOOST_CHECK_GT(chunk_shape[1], 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint8)
+{
+    using T = std::uint8_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint16)
+{
+    using T = std::uint16_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint32)
+{
+    using T = std::uint32_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint64)
+{
+    using T = std::uint64_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
 }

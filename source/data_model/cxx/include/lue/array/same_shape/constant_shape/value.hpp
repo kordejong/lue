@@ -3,6 +3,7 @@
 #include "lue/core/array.hpp"
 #include "lue/core/index_range.hpp"
 #include "lue/hdf5.hpp"
+#include <optional>
 
 
 namespace lue::data_model::same_shape::constant_shape {
@@ -74,8 +75,9 @@ namespace lue::data_model::same_shape::constant_shape {
         std::string const& name,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        void const* no_data_value = nullptr,
         std::size_t nr_chunk_dimensions_to_skip = 0,
-        void const* no_data_value = nullptr) -> Value;
+        std::optional<hdf5::Shape> const& chunk_shape = {}) -> Value;
 
     LUE_DATA_MODEL_EXPORT auto create_value(
         hdf5::Group& parent,
@@ -90,8 +92,9 @@ namespace lue::data_model::same_shape::constant_shape {
         hdf5::Datatype const& file_datatype,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        void const* no_data_value = nullptr,
         std::size_t nr_chunk_dimensions_to_skip = 0,
-        void const* no_data_value = nullptr) -> Value;
+        std::optional<hdf5::Shape> chunk_shape = {}) -> Value;
 
     LUE_DATA_MODEL_EXPORT auto value_exists(hdf5::Group const& parent, std::string const& name) -> bool;
 

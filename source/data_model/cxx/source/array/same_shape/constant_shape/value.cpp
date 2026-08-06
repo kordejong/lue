@@ -1,4 +1,5 @@
 #include "lue/array/same_shape/constant_shape/value.hpp"
+#include <algorithm>
 
 
 namespace lue::data_model::same_shape::constant_shape {
@@ -137,6 +138,7 @@ namespace lue::data_model::same_shape::constant_shape {
         void const* no_data_value) -> Value
     {
         std::size_t const nr_chunk_dimensions_to_skip = 0;
+        std::optional<hdf5::Shape> const& chunk_shape{};
 
         return create_value(
             parent,
@@ -144,8 +146,9 @@ namespace lue::data_model::same_shape::constant_shape {
             file_datatype(memory_datatype),
             memory_datatype,
             hdf5::Shape{},
+            no_data_value,
             nr_chunk_dimensions_to_skip,
-            no_data_value);
+            chunk_shape);
     }
 
 
@@ -157,8 +160,9 @@ namespace lue::data_model::same_shape::constant_shape {
         std::string const& name,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
+        void const* no_data_value,
         std::size_t nr_chunk_dimensions_to_skip,
-        void const* no_data_value) -> Value
+        std::optional<hdf5::Shape> const& chunk_shape) -> Value
     {
         return create_value(
             parent,
@@ -166,8 +170,9 @@ namespace lue::data_model::same_shape::constant_shape {
             file_datatype(memory_datatype),
             memory_datatype,
             array_shape,
+            no_data_value,
             nr_chunk_dimensions_to_skip,
-            no_data_value);
+            chunk_shape);
     }
 
 
@@ -182,6 +187,7 @@ namespace lue::data_model::same_shape::constant_shape {
         void const* no_data_value) -> Value
     {
         std::size_t const nr_chunk_dimensions_to_skip = 0;
+        std::optional<hdf5::Shape> const& chunk_shape{};
 
         return create_value(
             parent,
@@ -189,8 +195,9 @@ namespace lue::data_model::same_shape::constant_shape {
             file_datatype,
             memory_datatype,
             hdf5::Shape{},
+            no_data_value,
             nr_chunk_dimensions_to_skip,
-            no_data_value);
+            chunk_shape);
     }
 
 
@@ -207,8 +214,9 @@ namespace lue::data_model::same_shape::constant_shape {
         hdf5::Datatype const& file_datatype,
         hdf5::Datatype const& memory_datatype,
         hdf5::Shape const& array_shape,
-        std::size_t nr_chunk_dimensions_to_skip,
-        void const* no_data_value) -> Value
+        void const* no_data_value,
+        std::size_t const nr_chunk_dimensions_to_skip,
+        std::optional<hdf5::Shape> chunk_shape) -> Value
     {
         // The rank of the underlying dataset is one larger than the rank of the
         // object arrays. Object arrays are stored one after the other.
@@ -222,16 +230,39 @@ namespace lue::data_model::same_shape::constant_shape {
 
         hdf5::Dataset::CreationPropertyList creation_property_list;
 
-        // TODO: Add one if we are discretized in time. Can we know that here?
-        // For now, add one if the number of dimensions > 2. This doesn't work well in all cases though.
-        nr_chunk_dimensions_to_skip += array_shape.size() > 2 ? 1 : 0;
+        if (!chunk_shape)
+        {
+            hdf5::Shape chunk_shape_{
+                hdf5::chunk_shape(array_shape, nr_chunk_dimensions_to_skip, file_datatype.size())};
+            chunk_shape = chunk_shape_;
+        }
+        else
+        {
+            // In the data model API, chunk shapes are in bytes, so the same shape can be used for different,
+            // same shaped LUE arrays, whatever the number of bytes per element.
+            // In HDF5, chunk shapes are in number of elements, so different shapes should be used for
+            // different, same shaped HDF5 datasets, depending on the number of bytes per element.
+            hdf5::Shape& chunk_shape_{*chunk_shape};
 
-        hdf5::Shape chunk_dimension_sizes{
-            hdf5::chunk_shape(array_shape, nr_chunk_dimensions_to_skip, file_datatype.size())};
+            for (auto& extent : chunk_shape_)
+            {
+                assert(extent >= file_datatype.size());
+                extent /= file_datatype.size();
+            }
+        }
 
-        chunk_dimension_sizes.insert(chunk_dimension_sizes.begin(), 1);  // For the first, objects, dimension
-        assert(static_cast<int>(chunk_dimension_sizes.size()) == dataspace.nr_dimensions());
-        creation_property_list.set_chunk(chunk_dimension_sizes);
+        hdf5::Shape& chunk_shape_{*chunk_shape};
+
+        for (std::size_t idx = 0; idx < chunk_shape_.size(); ++idx)
+        {
+            chunk_shape_[idx] = std::clamp<hdf5::Shape::value_type>(chunk_shape_[idx], 1, array_shape[idx]);
+        }
+
+        chunk_shape_.insert(chunk_shape_.begin(), 1);  // For the first, objects, dimension
+
+        assert(static_cast<int>(chunk_shape_.size()) == dataspace.nr_dimensions());
+
+        creation_property_list.set_chunk(chunk_shape_);
         creation_property_list.set_alloc_time(H5D_ALLOC_TIME_LATE);
 
         if (no_data_value != nullptr)

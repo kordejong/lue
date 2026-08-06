@@ -134,14 +134,16 @@ namespace lue::data_model {
 
 
         LUE_DATA_MODEL_HL_EXPORT auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool;
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool;
 
 
         template<typename DatasetPtr>
         auto open_raster_view(
-            DatasetPtr dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> RasterView<DatasetPtr>
+            DatasetPtr dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> RasterView<DatasetPtr>
         {
             return RasterView<DatasetPtr>{std::move(dataset), phenomenon_name, property_set_name};
         }
@@ -204,19 +206,23 @@ namespace lue::data_model {
                 auto nr_time_steps() const -> hdf5::Shape::value_type;
 
                 template<typename Element>
-                auto add_layer(std::string const& name) -> Layer
+                auto add_layer(std::string const& name, std::optional<hdf5::Shape> const& chunk_shape = {})
+                    -> Layer
                 {
                     if constexpr (std::is_same_v<Element, bool>)
                     {
-                        return add_layer(name, hdf5::native_datatype<std::uint8_t>());
+                        return add_layer(name, hdf5::native_datatype<std::uint8_t>(), chunk_shape);
                     }
                     else
                     {
-                        return add_layer(name, hdf5::native_datatype<Element>());
+                        return add_layer(name, hdf5::native_datatype<Element>(), chunk_shape);
                     }
                 }
 
-                auto add_layer(std::string const& name, hdf5::Datatype const& datatype) -> Layer;
+                auto add_layer(
+                    std::string const& name,
+                    hdf5::Datatype const& datatype,
+                    std::optional<hdf5::Shape> chunk_shape = {}) -> Layer;
 
                 auto layer(std::string const& name) -> Layer;
 
@@ -229,14 +235,16 @@ namespace lue::data_model {
 
 
         LUE_DATA_MODEL_HL_EXPORT auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool;
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool;
 
 
         template<typename DatasetPtr>
         auto open_raster_view(
-            DatasetPtr dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> RasterView<DatasetPtr>
+            DatasetPtr dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> RasterView<DatasetPtr>
         {
             return RasterView<DatasetPtr>{std::move(dataset), phenomenon_name, property_set_name};
         }

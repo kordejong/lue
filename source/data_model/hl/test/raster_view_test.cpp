@@ -155,14 +155,35 @@ BOOST_AUTO_TEST_CASE(use_case_1)
             BOOST_CHECK(view.contains("elevation"));
             BOOST_CHECK_EQUAL(layer.rank(), 3);
 
+            lh5::Shape const chunk_shape_read{layer.creation_property_list().get_chunk()};
+            // nr_time_periods, nr_time_steps, nr_rows, nr_cols
+            BOOST_CHECK_EQUAL(chunk_shape_read.size(), 4);
+            BOOST_CHECK_EQUAL(chunk_shape_read[0], 1);
+            BOOST_CHECK_EQUAL(chunk_shape_read[1], 1);
+
             // layer.write(time_step_idx, elevation_data);
         }
 
         {
             BOOST_CHECK(!view.contains("soil"));
-            ldm::variable::RasterView<DatasetPtr>::Layer layer{view.add_layer<std::uint32_t>("soil")};
+
+            ldm::Count nr_rows{24};  // 6 elements
+            ldm::Count nr_cols{16};  // 4 elements
+            lh5::Shape const chunk_shape_passed{nr_rows, nr_cols};
+
+            ldm::variable::RasterView<DatasetPtr>::Layer layer{
+                view.add_layer<std::uint32_t>("soil", chunk_shape_passed)};
             BOOST_CHECK(view.contains("soil"));
             BOOST_CHECK_EQUAL(layer.rank(), 3);
+
+            lh5::Shape const chunk_shape_read{layer.creation_property_list().get_chunk()};
+
+            // nr_time_periods, nr_time_steps, nr_rows, nr_cols
+            BOOST_CHECK_EQUAL(chunk_shape_read.size(), 4);
+            BOOST_CHECK_EQUAL(chunk_shape_read[0], 1);
+            BOOST_CHECK_EQUAL(chunk_shape_read[1], 1);
+            BOOST_CHECK_EQUAL(chunk_shape_read[2], 6);
+            BOOST_CHECK_EQUAL(chunk_shape_read[3], 4);
 
             // layer.write(time_step_idx, soil_data);
         }

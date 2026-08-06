@@ -30,6 +30,8 @@ namespace lue::hdf5 {
 
                     void set_chunk(Shape const& chunk);
 
+                    auto get_chunk() const -> Shape;
+
                     void set_fill_time(H5D_fill_time_t fill_time);
 
                     void set_fill_value(Datatype const& datatype, void const* value);

@@ -90,18 +90,27 @@ namespace lue::data_model::different_shape::constant_shape {
 
         Existing value arrays are not touched.
     */
-    auto Value::expand(ID const id, hdf5::Shape const& shape, Count const nr_locations_in_time)
-        -> same_shape::constant_shape::Value
+    auto Value::expand(
+        ID const id,
+        hdf5::Shape const& shape,
+        Count const nr_locations_in_time,
+        std::size_t const nr_chunk_dimensions_to_skip,
+        std::optional<hdf5::Shape> const& chunk_shape) -> same_shape::constant_shape::Value
     {
-        same_shape::constant_shape::Value value{expand_(id, shape, nr_locations_in_time)};
+        same_shape::constant_shape::Value value{
+            expand_(id, shape, nr_locations_in_time, nr_chunk_dimensions_to_skip, chunk_shape)};
         attributes().write<Count>(nr_objects_tag, ++_nr_objects);
 
         return value;
     }
 
 
-    auto Value::expand_(ID const id, hdf5::Shape const& shape, Count const nr_locations_in_time)
-        -> same_shape::constant_shape::Value
+    auto Value::expand_(
+        ID const id,
+        hdf5::Shape const& shape,
+        Count const nr_locations_in_time,
+        std::size_t const nr_chunk_dimensions_to_skip,
+        std::optional<hdf5::Shape> const& chunk_shape) -> same_shape::constant_shape::Value
     {
         // Reserve space, but don't update the nr_objects_tag attribute. This
         // function is re-used by expand overloads that will update the
@@ -110,10 +119,16 @@ namespace lue::data_model::different_shape::constant_shape {
 
         // The shape passed in doesn't contain a dimension for the time points / periods, so we don't
         // have to skip a chunk dimension for it
-        std::size_t const nr_chunk_dimensions_to_skip = 0;
 
         same_shape::constant_shape::Value value{same_shape::constant_shape::create_value(
-            *this, name, file_datatype(), memory_datatype(), shape, nr_chunk_dimensions_to_skip)};
+            *this,
+            name,
+            file_datatype(),
+            memory_datatype(),
+            shape,
+            nullptr,
+            nr_chunk_dimensions_to_skip,
+            chunk_shape)};
         value.expand(nr_locations_in_time);
 
         return value;

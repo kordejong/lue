@@ -574,6 +574,7 @@ function(lue_configure_python_test)
             FIXTURES_REQUIRED
                 lue_py_test_fixture
     )
+endfunction()
 
 
 function(tif_to_figure)

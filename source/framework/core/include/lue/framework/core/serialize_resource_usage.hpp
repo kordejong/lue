@@ -124,10 +124,10 @@ namespace lue::detail::root {
         lue_hpx_assert((!use_finished.contains(key)) || (!use_finished.at(key).contains(count)));
         lue_hpx_assert(future.valid());
 
-        use_finished[key][count] = future.share();  // std::move(future);
+        use_finished[key][count] = future.share();
 
         lue_hpx_assert(use_finished.contains(key));
-        lue_hpx_assert(use_finished[key].contains(count));
+        lue_hpx_assert(use_finished.at(key).contains(count));
         lue_hpx_assert(use_finished.at(key).at(count).valid());
     }
 
@@ -159,8 +159,8 @@ namespace lue::detail::root {
         if (count > 0)
         {
             lue_hpx_assert(use_finished.contains(key));
-            lue_hpx_assert(use_finished[key].contains(count));
-            lue_hpx_assert(use_finished[key][count].valid());
+            lue_hpx_assert(use_finished.at(key).contains(count));
+            lue_hpx_assert(use_finished.at(key).at(count).valid());
         }
 #endif
 
@@ -195,13 +195,13 @@ namespace lue::detail::root {
 
         if (count == 0)
         {
-            lue_hpx_assert(!use_finished[key].contains(count));
+            lue_hpx_assert(!use_finished.at(key).contains(count));
         }
         else
         {
-            lue_hpx_assert(use_finished[key].contains(count));
-            lue_hpx_assert(use_finished[key][count].valid());
-            lue_hpx_assert(use_finished[key][count].is_ready());
+            lue_hpx_assert(use_finished.at(key).contains(count));
+            lue_hpx_assert(use_finished.at(key).at(count).valid());
+            lue_hpx_assert(use_finished.at(key).at(count).is_ready());
         }
 #endif
 

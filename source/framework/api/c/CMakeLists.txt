@@ -1,10 +1,13 @@
 add_library(lue_framework_api_c SHARED)
 add_library(lue::framework_api_c ALIAS lue_framework_api_c)
 
-target_compile_features(lue_framework_api_c
-    PUBLIC
-        c_std_${LUE_MIN_C_STANDARD}
-)
+if(NOT WIN32)
+    # MSVC doesn't support this feature. Let's hope the compiler has the features we use.
+    target_compile_features(lue_framework_api_c
+        PUBLIC
+            c_std_${LUE_MIN_C_STANDARD}
+    )
+endif()
 
 set_target_properties(lue_framework_api_c
     PROPERTIES

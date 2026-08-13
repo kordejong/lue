@@ -1,8 +1,5 @@
 #include "stress.hpp"
-#include "lue/framework/api/cxx/as_field.hpp"
-#include "lue/framework/api/cxx/as_state.hpp"
-#include "lue/framework/api/cxx/local_operation.hpp"
-#include "lue/framework/api/cxx/miscellaneous_operation.hpp"
+#include "lue/framework/api/cxx.hpp"
 #include "lue/framework/model.hpp"
 #include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
@@ -35,10 +32,7 @@ namespace {
             {
                 using namespace lue::api;
 
-                _field = uniform(_array_shape,
-                                 _partition_shape,
-                                 as_field(create_scalar(Literal{FloatElement{0}})),
-                                 as_field(create_scalar(Literal{FloatElement{1}})));
+                _field = uniform(_array_shape, _partition_shape, FloatElement{0}, FloatElement{1});
             }
 
 

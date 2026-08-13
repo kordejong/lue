@@ -38,7 +38,6 @@ jobs:
         macos_version: ["15"]
         compiler:
           - { name: clang, c: clang, cxx: clang++ }
-        python_version: ["3.13"]
 
     runs-on: macos-${{ matrix.macos_version }}
 
@@ -75,7 +74,8 @@ jobs:
 
       - name: setup platform
         run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install \
+          # HOMEBREW_NO_AUTO_UPDATE=1
+          brew install \
             boost \
             cxxopts \
             gdal \
@@ -88,17 +88,17 @@ jobs:
             numpy \
             pybind11 \
             python-matplotlib
-          python${{ matrix.python_version }} -m venv --system-site-packages env
+          python3 -m venv --system-site-packages env
           source env/bin/activate
-          pip${{ matrix.python_version }} install --upgrade pip
-          pip${{ matrix.python_version }} install docopt jinja2 ruamel.yaml  # Not part of homebrew yet
+          pip3 install --upgrade pip
+          pip3 install docopt-ng jinja2 ruamel.yaml  # Not part of homebrew yet
 
       - name: "install hpx"
         uses: ./lue_source/.github/actions/install_hpx
         env:
           hpx_build_nr: 1 # Build number for current HPX version / branch
         with:
-          cache_key: macos-${{ matrix.macos_version }}_${{ matrix.compiler.cxx }}_python-${{ matrix.python_version }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
+          cache_key: macos-${{ matrix.macos_version }}_${{ matrix.compiler.cxx }}_hpx-${{ env.hpx_version }}-${{ env.hpx_build_nr }}
           c_compiler: ${{ matrix.compiler.c }}
           cxx_compiler: ${{ matrix.compiler.cxx }}
           build_type: Release
@@ -188,12 +188,12 @@ jobs:
           ${{ env.lue_runtime_install_directory }}/bin/lue_translate --version
           ${{ env.lue_runtime_install_directory }}/bin/lue_validate --version
 
-          export PYTHONPATH="${{ env.lue_runtime_install_directory }}/lib/python${{ matrix.python_version}}:$PYTHONPATH"
+          export PYTHONPATH="$(echo ${{ env.lue_runtime_install_directory }}/lib*/python*):$PYTHONPATH"
           export DYLD_FALLBACK_LIBRARY_PATH="${{ env.hpx_install_directory }}/lib:$DYLD_FALLBACK_LIBRARY_PATH"
 
-          python${{ matrix.python_version }} ${{ env.lue_runtime_install_directory }}/bin/lue_calculate.py --version
-          python${{ matrix.python_version }} ${{ env.lue_runtime_install_directory }}/bin/lue_scalability.py --version
-          python${{ matrix.python_version }} -c "import lue, lue.data_model, lue.framework, lue.framework_x, lue.pcraster, lue.qa.scalability; print(lue.__version__)"
+          python3 ${{ env.lue_runtime_install_directory }}/bin/lue_calculate.py --version
+          python3 ${{ env.lue_runtime_install_directory }}/bin/lue_scalability.py --version
+          python3 -c "import lue, lue.data_model, lue.framework, lue.framework_x, lue.pcraster, lue.qa.scalability; print(lue.__version__)"
 
       - name: consume
         run: |
@@ -219,7 +219,7 @@ jobs:
       # NOTE: Secrets and variables are not passed to workflows that are triggered by a pull request from
       # a fork.
       - name: deploy
-        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.macos_version == '15' && matrix.compiler.cxx == 'clang++' && matrix.python_version == '3.13'
+        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.macos_version == '15' && matrix.compiler.cxx == 'clang++'
         env:
           ftp_server: ${{ secrets.FTP_SERVER }}
           ftp_port: ${{ secrets.FTP_PORT }}

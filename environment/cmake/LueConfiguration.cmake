@@ -514,6 +514,17 @@ endif()
 
 
 # ------------------------------------------------------------------------------
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+try_compile(LUE_C_SUPPORTS_ENUM_WITH_FIXED_UNDERLYING_TYPE
+    SOURCE_FROM_CONTENT c_support_enum_with_fixed_underlying_type.c "enum : int {a, b, c};"
+    C_STANDARD ${LUE_MIN_C_STANDARD}
+)
+unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
+message(STATUS
+    "LUE_C_SUPPORTS_ENUM_WITH_FIXED_UNDERLYING_TYPE: ${LUE_C_SUPPORTS_ENUM_WITH_FIXED_UNDERLYING_TYPE}")
+
+
 if(LUE_PYTHON_REQUIRED)
     # This is the first numpy version supporting Python 3.10
     set(LUE_MIN_NUMPY_VERSION 1.21)

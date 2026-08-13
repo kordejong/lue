@@ -9,7 +9,7 @@
 //       supported types. Picking the wrong type here results in link errors.
 
 
-static void array_like_test()
+static void array_like_test(void)
 {
     typedef float InputElement;
     LUE_Array* input_array = NULL;
@@ -50,7 +50,7 @@ static void array_like_test()
 }
 
 
-static void cast_test()
+static void cast_test(void)
 {
     typedef float InputElement;
     LUE_Field* input_field = NULL;
@@ -80,7 +80,7 @@ static void cast_test()
 }
 
 
-static void create_array_test()
+static void create_array_test(void)
 {
     typedef float Element;
 
@@ -101,7 +101,7 @@ static void create_array_test()
 }
 
 
-static void create_literal_test()
+static void create_literal_test(void)
 {
     typedef uint8_t Element;
 
@@ -115,7 +115,7 @@ static void create_literal_test()
 }
 
 
-static void create_scalar_test()
+static void create_scalar_test(void)
 {
     typedef int32_t Element;
 

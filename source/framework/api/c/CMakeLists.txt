@@ -1,6 +1,11 @@
 add_library(lue_framework_api_c SHARED)
 add_library(lue::framework_api_c ALIAS lue_framework_api_c)
 
+target_compile_features(lue_framework_api_c
+    PUBLIC
+        c_std_${LUE_MIN_C_STANDARD}
+)
+
 set_target_properties(lue_framework_api_c
     PROPERTIES
         EXPORT_NAME framework_api_c
@@ -11,6 +16,11 @@ set_target_properties(lue_framework_api_c
 generate_export_header(lue_framework_api_c
     EXPORT_FILE_NAME include/lue/framework/api/c/export.h
     EXPORT_MACRO_NAME LUE_FCAPI_EXPORT
+)
+
+configure_file(
+    include/lue/framework/api/c/configure.h.in
+    include/lue/framework/api/c/configure.h
 )
 
 if(LUE_FRAMEWORK_BOOLEAN_ELEMENT STREQUAL "std::uint8_t")
@@ -44,8 +54,9 @@ target_sources(lue_framework_api_c
             ${CMAKE_CURRENT_BINARY_DIR}/include
         FILES
             include/lue
-            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/type_info.h
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/configure.h
             ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/export.h
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/framework/api/c/type_info.h
     PRIVATE
         source/array.cpp
         source/as_field.cpp

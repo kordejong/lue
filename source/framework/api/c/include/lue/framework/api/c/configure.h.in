@@ -1,0 +1,3 @@
+#pragma once
+
+#cmakedefine LUE_C_SUPPORT_ENUM_WITH_FIXED_UNDERLYING_TYPE

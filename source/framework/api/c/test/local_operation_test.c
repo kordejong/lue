@@ -10,7 +10,7 @@
 //       supported types. Picking the wrong type here results in link errors.
 
 
-static void abs_test()
+static void abs_test(void)
 {
     typedef int32_t Element;
 

@@ -71,6 +71,8 @@ set(names
     ${local_operation_names}
     ${miscellaneous_operation_names}
     ${routing_operation_names}
+    field
+    variant_wrapper
 )
 
 foreach(name ${names})

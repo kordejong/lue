@@ -51,7 +51,17 @@ namespace lue::api {
 
             template<typename T>
                 requires is_allowed_v<T>
-            VariantWrapper(T&& value):
+            VariantWrapper(T const& value):
+
+                _variant{value}
+
+            {
+            }
+
+
+            template<typename T>
+                requires is_allowed_v<T>
+            VariantWrapper(T&& value) noexcept:
 
                 _variant{std::forward<T>(value)}
 
@@ -59,7 +69,7 @@ namespace lue::api {
             }
 
 
-            VariantWrapper(Variant&& variant):
+            VariantWrapper(Variant&& variant) noexcept:
 
                 _variant{std::move(variant)}
 

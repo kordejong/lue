@@ -13,4 +13,10 @@ namespace lue::api {
         return lue::api::multiply(lhs, rhs);
     }
 
+
+    inline auto operator*=(lue::api::Field const& lhs, lue::api::Field const& rhs)
+    {
+        return lue::api::multiply(lhs, rhs);
+    }
+
 }  // namespace lue::api

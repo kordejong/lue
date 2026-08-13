@@ -13,4 +13,10 @@ namespace lue::api {
         return lue::api::subtract(lhs, rhs);
     }
 
+
+    inline auto operator-=(lue::api::Field const& lhs, lue::api::Field const& rhs)
+    {
+        return lue::api::subtract(lhs, rhs);
+    }
+
 }  // namespace lue::api

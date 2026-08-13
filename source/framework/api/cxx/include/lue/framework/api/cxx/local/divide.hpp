@@ -13,4 +13,10 @@ namespace lue::api {
         return lue::api::divide(lhs, rhs);
     }
 
+
+    inline auto operator/=(lue::api::Field const& lhs, lue::api::Field const& rhs)
+    {
+        return lue::api::divide(lhs, rhs);
+    }
+
 }  // namespace lue::api

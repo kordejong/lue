@@ -10,7 +10,7 @@
 //       supported types. Picking the wrong type here results in link errors.
 
 
-static void aspect_test()
+static void aspect_test(void)
 {
     typedef float Element;
 
@@ -41,7 +41,7 @@ static void aspect_test()
 }
 
 
-static void convolve_test()
+static void convolve_test(void)
 {
     typedef float Element;
 
@@ -85,7 +85,7 @@ static void convolve_test()
 }
 
 
-static void focal_diversity_test()
+static void focal_diversity_test(void)
 {
     typedef int32_t Element;
 
@@ -129,7 +129,7 @@ static void focal_diversity_test()
 }
 
 
-static void focal_high_pass_test()
+static void focal_high_pass_test(void)
 {
     typedef float Element;
 
@@ -173,7 +173,7 @@ static void focal_high_pass_test()
 }
 
 
-static void focal_majority_test()
+static void focal_majority_test(void)
 {
     typedef int32_t Element;
 
@@ -217,7 +217,7 @@ static void focal_majority_test()
 }
 
 
-static void focal_maximum_test()
+static void focal_maximum_test(void)
 {
     typedef float Element;
 
@@ -261,7 +261,7 @@ static void focal_maximum_test()
 }
 
 
-static void focal_mean_test()
+static void focal_mean_test(void)
 {
     typedef float Element;
 
@@ -305,7 +305,7 @@ static void focal_mean_test()
 }
 
 
-static void focal_minimum_test()
+static void focal_minimum_test(void)
 {
     typedef float Element;
 
@@ -349,7 +349,7 @@ static void focal_minimum_test()
 }
 
 
-static void focal_sum_test()
+static void focal_sum_test(void)
 {
     typedef float Element;
 
@@ -393,7 +393,7 @@ static void focal_sum_test()
 }
 
 
-static void slope_test()
+static void slope_test(void)
 {
     typedef float Element;
 

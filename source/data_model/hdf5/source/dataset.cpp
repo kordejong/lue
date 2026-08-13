@@ -7,6 +7,10 @@
 
 namespace lue::hdf5 {
 
+    // Bump if needed, but we need a maximum value (e.g.: see get_chunk)
+    static int const lue_max_rank{10};
+
+
     Dataset::CreationPropertyList::CreationPropertyList():
 
         PropertyList{Identifier{H5Pcreate(H5P_DATASET_CREATE), H5Pclose}}
@@ -25,14 +29,46 @@ namespace lue::hdf5 {
     }
 
 
+    void Dataset::CreationPropertyList::set_alloc_time(H5D_alloc_time_t const alloc_time)
+    {
+        auto status = H5Pset_alloc_time(id(), alloc_time);
+
+        if (status < 0)
+        {
+            throw std::runtime_error("Cannot set allocation time");
+        }
+    }
+
+
     void Dataset::CreationPropertyList::set_chunk(Shape const& chunk)
     {
+        assert(chunk.size() <= lue_max_rank);
+
         auto status = H5Pset_chunk(id(), static_cast<int>(chunk.size()), chunk.data());
 
         if (status < 0)
         {
             throw std::runtime_error("Cannot set chunk size");
         }
+    }
+
+
+    auto Dataset::CreationPropertyList::get_chunk() const -> Shape
+    {
+        Shape chunk(lue_max_rank);
+
+        auto const rank = H5Pget_chunk(id(), static_cast<int>(chunk.size()), chunk.data());
+
+        assert(rank <= lue_max_rank);
+
+        if (rank < 0)
+        {
+            throw std::runtime_error("Cannot get chunk size");
+        }
+
+        chunk.resize(rank);
+
+        return chunk;
     }
 
 
@@ -432,8 +468,9 @@ namespace lue::hdf5 {
 
 
     auto open_dataset(
-        Identifier& parent, std::string const& name, Dataset::AccessPropertyList const& access_property_list)
-        -> Dataset
+        Identifier& parent,
+        std::string const& name,
+        Dataset::AccessPropertyList const& access_property_list) -> Dataset
     {
         Identifier dataset_location{H5Dopen(parent, name.c_str(), access_property_list.id()), H5Dclose};
 

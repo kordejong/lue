@@ -121,9 +121,14 @@ namespace lue::framework {
         bind<SharedFutureBinder1, ArithmeticElements>(module);
         bind<SharedFutureBinder2, IntegralElements, FloatingPointElements>(module);
 
+        // None -> State
         module.def(
             "as_state",
             [](pybind11::none const&) -> hpx::shared_future<void> { return hpx::make_ready_future(); });
+
+        // future<void> -> State
+        module.def(
+            "as_state", [](hpx::future<void>& future) -> hpx::shared_future<void> { return future.share(); });
     }
 
 }  // Namespace lue::framework

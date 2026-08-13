@@ -26,7 +26,11 @@ namespace lue::hdf5 {
 
                     CreationPropertyList(Identifier&& property_list_id);
 
+                    void set_alloc_time(H5D_alloc_time_t alloc_time);
+
                     void set_chunk(Shape const& chunk);
+
+                    auto get_chunk() const -> Shape;
 
                     void set_fill_time(H5D_fill_time_t fill_time);
 

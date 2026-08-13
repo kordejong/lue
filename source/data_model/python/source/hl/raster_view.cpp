@@ -60,13 +60,21 @@ namespace lue::data_model {
 
                 .def(
                     "add_layer",
-                    [](VariableRasterView& self, std::string const& name, pybind11::object const& dtype_args)
+                    [](VariableRasterView& self,
+                       std::string const& name,
+                       pybind11::object const& dtype_args,
+                       std::optional<pybind11::tuple> const& chunk_shape)
                     {
                         pybind11::dtype const dtype{pybind11::dtype::from_args(dtype_args)};
                         hdf5::Datatype const datatype = numpy_type_to_memory_datatype(dtype);
 
-                        return self.add_layer(name, datatype);
-                    });
+                        return chunk_shape ? self.add_layer(name, datatype, tuple_to_shape(*chunk_shape))
+                                           : self.add_layer(name, datatype);
+                    },
+                    "name"_a,
+                    "dtype"_a,
+                    pybind11::kw_only(),
+                    "chunk_shape"_a = std::optional<pybind11::tuple>{});
         }
 
 

@@ -60,23 +60,33 @@ namespace lue::data_model::different_shape::constant_shape {
                 hdf5::Shape const* shapes,
                 Count const* nr_locations_in_time);
 
-            auto expand(ID id, hdf5::Shape const& shape, Count nr_locations_in_time)
-                -> same_shape::constant_shape::Value;
+            auto expand(
+                ID id,
+                hdf5::Shape const& shape,
+                Count nr_locations_in_time,
+                std::size_t nr_chunk_dimensions_to_skip = 0,
+                std::optional<hdf5::Shape> const& chunk_shape = {}) -> same_shape::constant_shape::Value;
 
             auto operator[](ID id) const -> same_shape::constant_shape::Value;
 
         private:
 
-            auto expand_(ID id, hdf5::Shape const& shape, Count nr_locations_in_time)
-                -> same_shape::constant_shape::Value;
+            auto expand_(
+                ID id,
+                hdf5::Shape const& shape,
+                Count nr_locations_in_time,
+                std::size_t nr_chunk_dimensions_to_skip = 0,
+                std::optional<hdf5::Shape> const& chunk_shape = {}) -> same_shape::constant_shape::Value;
 
             Count _nr_objects;
     };
 
 
     LUE_DATA_MODEL_EXPORT auto create_value(
-        hdf5::Group& parent, std::string const& name, hdf5::Datatype const& memory_datatype, Rank rank)
-        -> Value;
+        hdf5::Group& parent,
+        std::string const& name,
+        hdf5::Datatype const& memory_datatype,
+        Rank rank) -> Value;
 
     LUE_DATA_MODEL_EXPORT auto create_value(
         hdf5::Group& parent,

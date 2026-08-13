@@ -119,25 +119,24 @@ namespace lue::data_model {
 
 
     auto contains_raster(
-        Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-        -> bool
+        Dataset const& dataset,
+        std::string const& phenomenon_name,
+        std::string const& property_set_name) -> bool
     {
         bool result{false};
 
         if (!dataset.phenomena().contains(phenomenon_name))
         {
-            throw std::runtime_error(
-                std::format(
-                    "Dataset {} does not contain phenomenon {}", dataset.pathname(), phenomenon_name));
+            throw std::runtime_error(std::format(
+                "Dataset {} does not contain phenomenon {}", dataset.pathname(), phenomenon_name));
         }
 
         auto const& phenomenon{dataset.phenomena()[phenomenon_name]};
 
         if (!phenomenon.property_sets().contains(property_set_name))
         {
-            throw std::runtime_error(
-                std::format(
-                    "Phenomenon {} does not contain property-set {}", phenomenon_name, property_set_name));
+            throw std::runtime_error(std::format(
+                "Phenomenon {} does not contain property-set {}", phenomenon_name, property_set_name));
         }
 
         if (phenomenon.object_id().nr_objects() == 1)
@@ -337,8 +336,9 @@ namespace lue::data_model {
 
 
         auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool
         {
             bool result{false};
 
@@ -458,7 +458,7 @@ namespace lue::data_model {
             _time_grid(1)
 
         {
-            // FIXME Obtain these from base class?
+            // FIXME: Obtain these from base class?
             Dataset& dataset{**this};
             auto& phenomenon{dataset.phenomena()[phenomenon_name]};
             auto& property_set{phenomenon.property_sets()[property_set_name]};
@@ -536,8 +536,10 @@ namespace lue::data_model {
 
 
         template<typename DatasetPtr>
-        auto RasterView<DatasetPtr>::add_layer(std::string const& name, hdf5::Datatype const& datatype) ->
-            typename RasterView<DatasetPtr>::Layer
+        auto RasterView<DatasetPtr>::add_layer(
+            std::string const& name,
+            hdf5::Datatype const& datatype,
+            std::optional<hdf5::Shape> chunk_shape) -> typename RasterView<DatasetPtr>::Layer
         {
             if (this->contains(name))
             {
@@ -570,8 +572,31 @@ namespace lue::data_model {
             std::copy(this->grid_shape().begin(), this->grid_shape().end(), object_array_shape.begin() + 1);
             Count const nr_locations_in_time{1};
 
-            Layer layer{
-                raster_property.value().expand(this->object_id(), object_array_shape, nr_locations_in_time)};
+            // The one location in time represents a period of time which is discretized using time steps.
+            // When creating the HDF5 dataset for the array values, a chunk shape is automatically determined
+            // (if not overridden explicitly). We have to make sure chunks don't extend over the time step
+            // dimension, because that will degrade the performance. I/O normally happens per time step.
+            std::size_t const nr_chunk_dimensions_to_skip = 1;
+
+            if (chunk_shape)
+            {
+                // The shape passed in must have 2 extends. It is the (2D) raster per time step that must be
+                // chunked, so the chunk shape must be related to that.
+                if (chunk_shape->size() != 2)
+                {
+                    throw std::runtime_error(
+                        std::format("Chunk shape for raster layer {} must have 2 extends", name));
+                }
+
+                chunk_shape->insert(chunk_shape->begin(), raster_property.value().file_datatype().size());
+            }
+
+            Layer layer{raster_property.value().expand(
+                this->object_id(),
+                object_array_shape,
+                nr_locations_in_time,
+                nr_chunk_dimensions_to_skip,
+                chunk_shape)};
 
             raster_property.set_time_discretization(
                 TimeDiscretization::regular_grid, time_discretization_property);
@@ -615,8 +640,9 @@ namespace lue::data_model {
 
 
         auto contains_raster(
-            Dataset const& dataset, std::string const& phenomenon_name, std::string const& property_set_name)
-            -> bool
+            Dataset const& dataset,
+            std::string const& phenomenon_name,
+            std::string const& property_set_name) -> bool
         {
             bool result{false};
 

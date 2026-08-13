@@ -9,9 +9,74 @@
 #include <boost/predef.h>
 
 
-// TODO:
-// - Add tests for constant rasters. Requires update in data model code
-// - Revamp parallel I/O logic
+// TODO: Waiting for to_lue to finish fixes an error from occurring in ~5% of the cases:
+
+// clang-format off
+//
+// 184: HDF5-DIAG: Error detected in HDF5 (1.10.10) thread 1:
+// 184:   #000: ../../../src/H5F.c line 412 in H5Fopen(): unable to open file
+// 184:     major: File accessibility
+// 184:     minor: Unable to open file
+// 184:   #001: ../../../src/H5Fint.c line 1698 in H5F_open(): file is already open for read-only
+// 184:     major: File accessibility
+// 184:     minor: Unable to open file
+
+// HDF5-DIAG: Error detected in HDF5 (1.14.6):
+//   #000: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 1044 in H5Dread(): can't synchronously read data
+//     major: Dataset
+// HDF5-DIAG: Error detected in HDF5 (1.14.6):
+//   #000: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5F.c line 827 in H5Fopen(): unable to synchronously open file
+//     major: File accessibility
+//     minor: Unable to open file
+//   #001: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5F.c line 788 in H5F__open_api_common(): unable to open file
+//     major: File accessibility
+//     minor: Unable to open file
+//     minor: Read failed
+//   #007: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 992 in H5D__read_api_common(): can't read data
+//     major: Dataset
+//     minor: Read failed
+//   #008: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 2083 in H5VL_dataset_read(): can't reset VOL wrapper info
+//     major: Virtual Object Layer
+//     minor: Can't reset object
+//   #009: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLint.c line 2406 in H5VL_reset_vol_wrapper(): no VOL object wrap context?
+//     major: Virtual Object Layer
+//     minor: Bad value
+//   #002: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 3680 in H5VL_file_open(): open failed
+//     major: Virtual Object Layer
+//     minor: Can't open object
+//   #003: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 3514 in H5VL__file_open(): open failed
+//     major: Virtual Object Layer
+//     minor: Can't open object
+//   #004: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLnative_file.c line 128 in H5VL__native_file_open(): unable to open file
+//     major: File accessibility
+//     minor: Unable to open file
+//   #005: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5Fint.c line 1925 in H5F_open(): file is already open for read-only
+//     major: File accessibility
+//     minor: Unable to open file
+//   #006: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 1044 in H5Dread(): can't synchronously read data
+//     major: Dataset
+//     minor: Read failed
+//   #007: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 992 in H5D__read_api_common(): can't read data
+//     major: Dataset
+//     minor: Read failed
+//   #008: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 2083 in H5VL_dataset_read(): can't reset VOL wrapper info
+//     major: Virtual Object Layer
+//     minor: Can't reset object
+//   #009: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLint.c line 2406 in H5VL_reset_vol_wrapper(): no VOL object wrap context?
+//     major: Virtual Object Layer
+//     minor: Bad value
+//
+// clang-format on
+//
+// The error suggests that to_lue can't open the dataset because from_lue is not ready reading from it.
+//
+// Waiting for to_lue to finish prevents the issue. Weird thing is that moving these synchronization points
+// elsewhere, like into to_lue or from_lue does not prevent the issue.
+//
+// The good thing is that the issue only occurs when writing and reading from/to the same file. IRL, data
+// different files will likely be used for reading vs writing: output_files = my_model(input_files)
+//
+// https://github.com/computationalgeography/lue/issues/945
 
 
 namespace {
@@ -28,26 +93,34 @@ namespace {
     using Shape = lue::Shape<lue::Count, 2>;
 
 
+    auto layout_raster() -> std::tuple<Shape, Shape>
+    {
+        using NrElements = lue::LargestIntegralElement;
+
+        lue::Count const nr_rows{
+            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
+        lue::Count const nr_cols{
+            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
+        lue::Count const nr_rows_partition{
+            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(10, 100).future().get())};
+        lue::Count const nr_cols_partition{
+            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(10, 100).future().get())};
+
+        Shape const array_shape{nr_rows, nr_cols};
+        Shape const partition_shape{nr_rows_partition, nr_cols_partition};
+
+        return {array_shape, partition_shape};
+    }
+
+
     template<typename Element>
     auto layout_constant_raster(std::string const& array_pathname) -> std::tuple<ObjectID, Shape, Shape>
     {
         auto const [dataset_pathname, phenomenon_name, property_set_name, property_name] =
             lue::parse_array_pathname(array_pathname);
 
-        using NrElements = lue::LargestIntegralElement;
-
-        lue::data_model::Count const nr_rows_partition{static_cast<lue::data_model::Count>(
-            lue::value_policies::uniform<NrElements>(10, 100).future().get())};
-        lue::data_model::Count const nr_cols_partition{static_cast<lue::data_model::Count>(
-            lue::value_policies::uniform<NrElements>(10, 100).future().get())};
-        Shape const partition_shape{
-            static_cast<lue::Count>(nr_rows_partition), static_cast<lue::Count>(nr_cols_partition)};
-
-        lue::data_model::Count const nr_rows{static_cast<lue::data_model::Count>(
-            lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
-        lue::data_model::Count const nr_cols{static_cast<lue::data_model::Count>(
-            lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
-        lue::hdf5::Shape const raster_shape{nr_rows, nr_cols};
+        auto const [array_shape, partition_shape] = layout_raster();
+        auto const [nr_rows, nr_cols] = array_shape;
 
         double const cell_size{10};
         double const west{0};
@@ -59,15 +132,62 @@ namespace {
         // The view grabs the dataset which must not go out of scope before the view has gone out of scope
         DatasetPtr dataset_ptr =
             std::make_shared<lue::data_model::Dataset>(lue::data_model::create_dataset(dataset_pathname));
+
         ConstantRasterView view = lue::data_model::constant::create_raster_view(
-            dataset_ptr, phenomenon_name, property_set_name, raster_shape, space_box);
+            dataset_ptr,
+            phenomenon_name,
+            property_set_name,
+            {static_cast<lue::data_model::Count>(array_shape[0]),
+             static_cast<lue::data_model::Count>(array_shape[1])},
+            space_box);
 
         view.add_layer<Element>(property_name);
 
-        Shape const grid_shape{
-            static_cast<lue::Count>(raster_shape[0]), static_cast<lue::Count>(raster_shape[1])};
+        return {view.object_id(), array_shape, partition_shape};
+    }
 
-        return {view.object_id(), grid_shape, partition_shape};
+
+    template<typename Element>
+    auto layout_constant_rasters(
+        std::string const& property_set_pathname,
+        Shape const& array_shape,
+        lue::Count const nr_rasters) -> std::tuple<ObjectID, std::vector<std::string>>
+    {
+        auto const [dataset_pathname, phenomenon_name, property_set_name, _] =
+            lue::parse_array_pathname(std::format("{}/{}", property_set_pathname, "whatever"));
+
+        auto const [nr_rows, nr_cols] = array_shape;
+
+        double const cell_size{10};
+        double const west{0};
+        double const south{0};
+        double const east{cell_size * static_cast<double>(nr_cols)};
+        double const north{cell_size * static_cast<double>(nr_rows)};
+        SpaceBox const space_box{west, south, east, north};
+
+        // The view grabs the dataset which must not go out of scope before the view has gone out of scope
+        DatasetPtr dataset_ptr =
+            std::make_shared<lue::data_model::Dataset>(lue::data_model::create_dataset(dataset_pathname));
+
+        ConstantRasterView view = lue::data_model::constant::create_raster_view(
+            dataset_ptr,
+            phenomenon_name,
+            property_set_name,
+            {static_cast<lue::data_model::Count>(array_shape[0]),
+             static_cast<lue::data_model::Count>(array_shape[1])},
+            space_box);
+
+        std::string const property_basename = "property";
+        std::vector<std::string> property_names(nr_rasters);
+
+        for (lue::Count raster_idx = 0; raster_idx < nr_rasters; ++raster_idx)
+        {
+            std::string const property_name = std::format("{}-{}", property_basename, raster_idx);
+            view.add_layer<Element>(property_name);
+            property_names[raster_idx] = property_name;
+        }
+
+        return {view.object_id(), property_names};
     }
 
 
@@ -78,29 +198,13 @@ namespace {
         auto const [dataset_pathname, phenomenon_name, property_set_name, property_name] =
             lue::parse_array_pathname(array_pathname);
 
-#if 1
         using NrElements = lue::LargestIntegralElement;
 
-        lue::Count const nr_rows{
-            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
-        lue::Count const nr_cols{
-            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(100, 1000).future().get())};
-        lue::Count const nr_rows_partition{
-            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(10, 100).future().get())};
-        lue::Count const nr_cols_partition{
-            static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(10, 100).future().get())};
+        auto const [array_shape, partition_shape] = layout_raster();
+        auto const [nr_rows, nr_cols] = array_shape;
+
         lue::Count const nr_time_steps{
             static_cast<lue::Count>(lue::value_policies::uniform<NrElements>(5, 20).future().get())};
-#else
-        lue::Count const nr_rows{60};
-        lue::Count const nr_cols{40};
-        lue::Count const nr_rows_partition{5};
-        lue::Count const nr_cols_partition{5};
-        lue::Count const nr_time_steps{20};
-#endif
-
-        Shape const raster_shape{nr_rows, nr_cols};
-        Shape const partition_shape{nr_rows_partition, nr_cols_partition};
 
         lue::data_model::Clock const clock{lue::data_model::time::Unit::day, 1};
 
@@ -122,23 +226,70 @@ namespace {
             clock,
             static_cast<lue::data_model::Count>(nr_time_steps),
             {0, static_cast<lue::data_model::Count>(nr_time_steps)},
-            {static_cast<lue::data_model::Count>(raster_shape[0]),
-             static_cast<lue::data_model::Count>(raster_shape[1])},
+            {static_cast<lue::data_model::Count>(array_shape[0]),
+             static_cast<lue::data_model::Count>(array_shape[1])},
             space_box);
 
         view.add_layer<Element>(property_name);
 
-        return {view.object_id(), nr_time_steps, raster_shape, partition_shape};
+        return {view.object_id(), nr_time_steps, array_shape, partition_shape};
+    }
+
+
+    template<typename Element>
+    auto layout_variable_rasters(
+        std::string const& property_set_pathname,
+        lue::Count const nr_time_steps,
+        Shape const& array_shape,
+        lue::Count const nr_rasters) -> std::tuple<ObjectID, std::vector<std::string>>
+    {
+        auto const [dataset_pathname, phenomenon_name, property_set_name, _] =
+            lue::parse_array_pathname(std::format("{}/{}", property_set_pathname, "whatever"));
+
+        auto const [nr_rows, nr_cols] = array_shape;
+
+        lue::data_model::Clock const clock{lue::data_model::time::Unit::day, 1};
+
+        double const cell_size{10};
+        double const west{0};
+        double const south{0};
+        double const east{cell_size * static_cast<double>(nr_cols)};
+        double const north{cell_size * static_cast<double>(nr_rows)};
+        SpaceBox const space_box{west, south, east, north};
+
+        // The view grabs the dataset which must not go out of scope before the view has gone out of scope
+        DatasetPtr dataset_ptr =
+            std::make_shared<lue::data_model::Dataset>(lue::data_model::create_dataset(dataset_pathname));
+
+        VariableRasterView view = lue::data_model::variable::create_raster_view(
+            dataset_ptr,
+            phenomenon_name,
+            property_set_name,
+            clock,
+            static_cast<lue::data_model::Count>(nr_time_steps),
+            {0, static_cast<lue::data_model::Count>(nr_time_steps)},
+            {static_cast<lue::data_model::Count>(array_shape[0]),
+             static_cast<lue::data_model::Count>(array_shape[1])},
+            space_box);
+
+        std::string const property_basename = "property";
+        std::vector<std::string> property_names(nr_rasters);
+
+        for (lue::Count raster_idx = 0; raster_idx < nr_rasters; ++raster_idx)
+        {
+            std::string const property_name = std::format("{}-{}", property_basename, raster_idx);
+            view.add_layer<Element>(property_name);
+            property_names[raster_idx] = property_name;
+        }
+
+        return {view.object_id(), property_names};
     }
 
 }  // Anonymous namespace
 
 
-#if 0
 BOOST_AUTO_TEST_CASE(constant_raster)
 {
-    // TODO: make this work as variable rasters
-
     // Write a constant raster with integers and read it back in. Compare raster written with raster read.
     namespace ldm = lue::data_model;
 
@@ -151,20 +302,21 @@ BOOST_AUTO_TEST_CASE(constant_raster)
 
     using Element = lue::LargestIntegralElement;
 
-    auto const [object_id, raster_shape, partition_shape] = layout_constant_raster<Element>(array_pathname);
+    auto const [object_id, array_shape, partition_shape] = layout_constant_raster<Element>(array_pathname);
 
     // Create, write, read, and compare arrays
     Array<Element> array_written =
-        lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
+        lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
     hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id);
 
-    // TODO: See variable_raster test case
-    write_finished.get();
+#if !BOOST_OS_WINDOWS
+    write_finished.wait();
+#endif
 
     Array<Element> array_read = lue::from_lue<Element>(array_pathname, partition_shape, object_id);
+
     lue::test::check_arrays_are_equal(array_read, array_written);
 }
-#endif
 
 
 BOOST_AUTO_TEST_CASE(variable_raster)
@@ -182,196 +334,305 @@ BOOST_AUTO_TEST_CASE(variable_raster)
 
     using Element = lue::LargestIntegralElement;
 
-    auto const [object_id, nr_time_steps, raster_shape, partition_shape] =
+    auto const [object_id, nr_time_steps, array_shape, partition_shape] =
         layout_variable_raster<Element>(array_pathname);
 
     // Create, write, read, and compare arrays
-    for (lue::Index time_step = 0; time_step < nr_time_steps; ++time_step)
+    for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
     {
         Array<Element> array_written =
-            lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
-        hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id, time_step);
+            lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
 
-        // TODO:
-        // Waiting for the write to finish here fixes an error from occurring in ~5% of the cases:
+        hpx::future<void> write_finished =
+            lue::to_lue(array_written, array_pathname, object_id, time_step_idx);
 
-        // clang-format off
-        // 184: HDF5-DIAG: Error detected in HDF5 (1.10.10) thread 1:
-        // 184:   #000: ../../../src/H5F.c line 412 in H5Fopen(): unable to open file
-        // 184:     major: File accessibility
-        // 184:     minor: Unable to open file
-        // 184:   #001: ../../../src/H5Fint.c line 1698 in H5F_open(): file is already open for read-only
-        // 184:     major: File accessibility
-        // 184:     minor: Unable to open file
-
-        // HDF5-DIAG: Error detected in HDF5 (1.14.6):
-        //   #000: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 1044 in H5Dread(): can't synchronously read data
-        //     major: Dataset
-        // HDF5-DIAG: Error detected in HDF5 (1.14.6):
-        //   #000: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5F.c line 827 in H5Fopen(): unable to synchronously open file
-        //     major: File accessibility
-        //     minor: Unable to open file
-        //   #001: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5F.c line 788 in H5F__open_api_common(): unable to open file
-        //     major: File accessibility
-        //     minor: Unable to open file
-        //     minor: Read failed
-        //   #007: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 992 in H5D__read_api_common(): can't read data
-        //     major: Dataset
-        //     minor: Read failed
-        //   #008: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 2083 in H5VL_dataset_read(): can't reset VOL wrapper info
-        //     major: Virtual Object Layer
-        //     minor: Can't reset object
-        //   #009: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLint.c line 2406 in H5VL_reset_vol_wrapper(): no VOL object wrap context?
-        //     major: Virtual Object Layer
-        //     minor: Bad value
-        //   #002: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 3680 in H5VL_file_open(): open failed
-        //     major: Virtual Object Layer
-        //     minor: Can't open object
-        //   #003: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 3514 in H5VL__file_open(): open failed
-        //     major: Virtual Object Layer
-        //     minor: Can't open object
-        //   #004: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLnative_file.c line 128 in H5VL__native_file_open(): unable to open file
-        //     major: File accessibility
-        //     minor: Unable to open file
-        //   #005: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5Fint.c line 1925 in H5F_open(): file is already open for read-only
-        //     major: File accessibility
-        //     minor: Unable to open file
-        //   #006: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 1044 in H5Dread(): can't synchronously read data
-        //     major: Dataset
-        //     minor: Read failed
-        //   #007: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5D.c line 992 in H5D__read_api_common(): can't read data
-        //     major: Dataset
-        //     minor: Read failed
-        //   #008: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLcallback.c line 2083 in H5VL_dataset_read(): can't reset VOL wrapper info
-        //     major: Virtual Object Layer
-        //     minor: Can't reset object
-        //   #009: /usr/src/debug/hdf5/hdf5-hdf5_1.14.6/src/H5VLint.c line 2406 in H5VL_reset_vol_wrapper(): no VOL object wrap context?
-        //     major: Virtual Object Layer
-        //     minor: Bad value
-        // clang-format on
-        //
-        // The error suggests that to_lue can't open the dataset because from_lue is not ready reading from
-        // it.
-        //
-        // Waiting for to_lue to finish here prevents the issue. Weird thing is that moving these
-        // synchronization points elsewhere, like into to_lue or from_lue does not prevent the issue.
-        // See https://github.com/computationalgeography/lue/issues/945
-
-#ifndef BOOST_OS_WINDOWS
-        // write_finished.get();  // Also fine
-        lue::detail::to_lue_finished(lue::detail::normalize(dataset_pathname), time_step + 1).wait();
+#if !BOOST_OS_WINDOWS
+        write_finished.wait();
 #endif
 
         Array<Element> array_read =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step_idx);
 
         lue::test::check_arrays_are_equal(array_read, array_written);
     }
 }
 
 
-// TODO:
 BOOST_AUTO_TEST_CASE(multiple_read_write_constant_raster_same_file_1)
 {
-}
+    // 1. Create n arrays
+    // 2. Write n arrays
+    // 3. Read n arrays
+    // 4. Compare n arrays read with ones written
+    namespace ldm = lue::data_model;
 
+    std::string const dataset_pathname{
+        "lue_framework_io_lue_multiple_read_write_constant_raster_same_file_1.lue"};
+    std::string const phenomenon_name{"area"};
+    std::string const property_set_name{"area"};
 
-// TODO:
-BOOST_AUTO_TEST_CASE(multiple_read_write_constant_raster_same_file_2)
-{
+    auto const [array_shape, partition_shape] = layout_raster();
+    lue::Count const nr_properties = 5;
+
+    using Element = lue::LargestIntegralElement;
+
+    std::string const property_set_pathname{
+        std::format("{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name)};
+    auto const [object_id, property_names] =
+        layout_constant_rasters<Element>(property_set_pathname, array_shape, nr_properties);
+
+    // Create arrays
+    std::vector<Array<Element>> arrays_written(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        arrays_written[property_idx] =
+            lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
+    }
+
+    // Write arrays
+    std::vector<std::string> array_pathnames(nr_properties);
+    std::vector<hpx::future<void>> writes_finished(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        std::string const& property_name = property_names[property_idx];
+        std::string const array_pathname{std::format("{}/{}", property_set_pathname, property_name)};
+        array_pathnames[property_idx] = array_pathname;
+
+        writes_finished[property_idx] =
+            lue::to_lue(arrays_written[property_idx], array_pathnames[property_idx], object_id);
+    }
+
+#if !BOOST_OS_WINDOWS
+    hpx::wait_all(writes_finished);
+#endif
+
+    // Read arrays
+    std::vector<Array<Element>> arrays_read(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        arrays_read[property_idx] =
+            lue::from_lue<Element>(array_pathnames[property_idx], partition_shape, object_id);
+    }
+
+    // Compare arrays
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        lue::test::check_arrays_are_equal(arrays_read[property_idx], arrays_written[property_idx]);
+    }
 }
 
 
 BOOST_AUTO_TEST_CASE(multiple_read_write_variable_raster_same_file_1)
 {
-    // 1. Create stack of n arrays
-    // 2. Write arrays
-    // 3. Read arrays
-    // 4. Compare arrays read with ones written
+    // 1. Create n stacks of t arrays
+    // 2. Write n stacks of t arrays
+    // 3. Read n stacks of t arrays
+    // 4. Compare n stacks of t arrays read with ones written
     namespace ldm = lue::data_model;
 
     std::string const dataset_pathname{"lue_framework_io_lue_multiple_read_variable_raster_same_file_1.lue"};
     std::string const phenomenon_name{"area"};
     std::string const property_set_name{"area"};
-    std::string const property_name{"elevation"};
-    std::string const array_pathname{
-        std::format("{}/{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name, property_name)};
+
+    auto const [array_shape, partition_shape] = layout_raster();
+    lue::Count const nr_time_steps = 15;
+    lue::Count const nr_properties = 5;
 
     using Element = lue::LargestIntegralElement;
 
-    auto const [object_id, nr_time_steps, raster_shape, partition_shape] =
-        layout_variable_raster<Element>(array_pathname);
+    std::string const property_set_pathname{
+        std::format("{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name)};
+    auto const [object_id, property_names] =
+        layout_variable_rasters<Element>(property_set_pathname, nr_time_steps, array_shape, nr_properties);
 
-    // Create arrays
-    std::vector<Array<Element>> arrays_written(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    // Create stacks of arrays
+    std::vector<std::vector<Array<Element>>> array_stacks_written(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
     {
-        arrays_written[time_step] =
-            lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
+        array_stacks_written[property_idx] = std::vector<Array<Element>>(nr_time_steps);
+
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            array_stacks_written[property_idx][time_step_idx] =
+                lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
+        }
     }
 
     // Write arrays
-    std::vector<hpx::future<void>> writes_finished(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    std::vector<std::string> array_pathnames(nr_properties);
+    std::vector<std::vector<hpx::future<void>>> writes_finished(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
     {
-        writes_finished[time_step] =
-            lue::to_lue(arrays_written[time_step], array_pathname, object_id, time_step);
+        std::string const& property_name = property_names[property_idx];
+        std::string const array_pathname{std::format("{}/{}", property_set_pathname, property_name)};
+        array_pathnames[property_idx] = array_pathname;
+
+        writes_finished[property_idx] = std::vector<hpx::future<void>>(nr_time_steps);
+
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            writes_finished[property_idx][time_step_idx] = lue::to_lue(
+                array_stacks_written[property_idx][time_step_idx],
+                array_pathnames[property_idx],
+                object_id,
+                time_step_idx);
+        }
     }
 
-#ifndef BOOST_OS_WINDOWS
-    // TODO: See variable_raster test case
-    writes_finished.back().wait();
+#if !BOOST_OS_WINDOWS
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        hpx::wait_all(writes_finished[property_idx]);
+    }
 #endif
 
     // Read arrays
-    std::vector<Array<Element>> arrays_read(nr_time_steps);
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    std::vector<std::vector<Array<Element>>> arrays_read(nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
     {
-        arrays_read[time_step] =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+        arrays_read[property_idx] = std::vector<Array<Element>>(nr_time_steps);
+
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            arrays_read[property_idx][time_step_idx] = lue::from_lue<Element>(
+                array_pathnames[property_idx], partition_shape, object_id, time_step_idx);
+        }
     }
 
     // Compare arrays
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
     {
-        lue::test::check_arrays_are_equal(arrays_read[time_step], arrays_written[time_step]);
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            lue::test::check_arrays_are_equal(
+                arrays_read[property_idx][time_step_idx], array_stacks_written[property_idx][time_step_idx]);
+        }
+    }
+}
+
+
+BOOST_AUTO_TEST_CASE(multiple_read_write_constant_raster_same_file_2)
+{
+    // Do this n times:
+    // - Create an array
+    // - Write an array
+    // - Read an array
+    // - Compare the arrays
+
+    namespace ldm = lue::data_model;
+
+    std::string const dataset_pathname{"lue_framework_io_lue_multiple_read_constant_raster_same_file_2.lue"};
+    std::string const phenomenon_name{"area"};
+    std::string const property_set_name{"area"};
+
+    auto const [array_shape, partition_shape] = layout_raster();
+    lue::Count const nr_properties = 5;
+
+    using Element = lue::LargestIntegralElement;
+
+    std::string const property_set_pathname{
+        std::format("{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name)};
+    auto const [object_id, property_names] =
+        layout_constant_rasters<Element>(property_set_pathname, array_shape, nr_properties);
+
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
+    {
+        // Create array
+        Array<Element> const array_written =
+            lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
+
+        // Write array
+        std::string const& property_name = property_names[property_idx];
+        std::string const array_pathname{std::format("{}/{}", property_set_pathname, property_name)};
+        hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id);
+
+#if !BOOST_OS_WINDOWS
+        write_finished.wait();
+#endif
+
+        // Read array
+        Array<Element> const array_read = lue::from_lue<Element>(array_pathname, partition_shape, object_id);
+
+        // Compare arrays
+        lue::test::check_arrays_are_equal(array_read, array_written);
     }
 }
 
 
 BOOST_AUTO_TEST_CASE(multiple_read_write_variable_raster_same_file_2)
 {
-    // Iteratively write, read, and compare n arrays
+    // Do this n times:
+    // - Create a stack of t arrays
+    // - Write a stack of t arrays
+    // - Read a stack of t arrays
+    // - Compare the stack of t arrays
+
     namespace ldm = lue::data_model;
 
     std::string const dataset_pathname{"lue_framework_io_lue_multiple_read_variable_raster_same_file_2.lue"};
     std::string const phenomenon_name{"area"};
     std::string const property_set_name{"area"};
-    std::string const property_name{"elevation"};
-    std::string const array_pathname{
-        std::format("{}/{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name, property_name)};
+    // std::string const property_name{"elevation"};
+    // std::string const array_pathname{
+    //     std::format("{}/{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name, property_name)};
+
+    auto const [array_shape, partition_shape] = layout_raster();
+    lue::Count const nr_time_steps = 15;
+    lue::Count const nr_properties = 5;
 
     using Element = lue::LargestIntegralElement;
 
-    auto const [object_id, nr_time_steps, raster_shape, partition_shape] =
-        layout_variable_raster<Element>(array_pathname);
+    std::string const property_set_pathname{
+        std::format("{}/{}/{}", dataset_pathname, phenomenon_name, property_set_name)};
+    auto const [object_id, property_names] =
+        layout_variable_rasters<Element>(property_set_pathname, nr_time_steps, array_shape, nr_properties);
 
-    // Create, write, read, and compare arrays
-    for (lue::Index time_step = 0; time_step < static_cast<lue::Count>(nr_time_steps); ++time_step)
+    for (lue::Index property_idx = 0; property_idx < nr_properties; ++property_idx)
     {
-        Array<Element> array_written =
-            lue::value_policies::uniform<Element>(raster_shape, partition_shape, Element{0}, Element{10});
+        // Create stack of arrays
+        std::vector<Array<Element>> array_stacks_written(nr_time_steps);
 
-        hpx::future<void> write_finished = lue::to_lue(array_written, array_pathname, object_id, time_step);
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            array_stacks_written[time_step_idx] =
+                lue::value_policies::uniform<Element>(array_shape, partition_shape, Element{0}, Element{10});
+        }
 
-#ifndef BOOST_OS_WINDOWS
-        // TODO: See variable_raster test case
-        write_finished.wait();
+        // Write stack of arrays
+        std::vector<hpx::future<void>> writes_finished(nr_time_steps);
+        std::string const& property_name = property_names[property_idx];
+        std::string const array_pathname{std::format("{}/{}", property_set_pathname, property_name)};
+
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            writes_finished[time_step_idx] =
+                lue::to_lue(array_stacks_written[time_step_idx], array_pathname, object_id, time_step_idx);
+        }
+
+#if !BOOST_OS_WINDOWS
+        hpx::wait_all(writes_finished);
 #endif
 
-        Array<Element> array_read =
-            lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step);
+        // Read arrays
+        std::vector<Array<Element>> arrays_read(nr_time_steps);
 
-        lue::test::check_arrays_are_equal(array_read, array_written);
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            arrays_read[time_step_idx] =
+                lue::from_lue<Element>(array_pathname, partition_shape, object_id, time_step_idx);
+        }
+
+        // Compare arrays
+        for (lue::Index time_step_idx = 0; time_step_idx < nr_time_steps; ++time_step_idx)
+        {
+            lue::test::check_arrays_are_equal(
+                arrays_read[time_step_idx], array_stacks_written[time_step_idx]);
+        }
     }
 }

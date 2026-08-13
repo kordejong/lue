@@ -7,7 +7,7 @@ using namespace pybind11::literals;
 
 namespace lue::framework {
 
-    class PyProgressor: public Progressor, public pybind11::trampoline_self_life_support
+    class PyProgressor: public Progressor
     {
 
         public:
@@ -49,7 +49,7 @@ namespace lue::framework {
 
     void bind_progressor(pybind11::module& module)
     {
-        pybind11::class_<Progressor, PyProgressor, pybind11::smart_holder>(module, "Progressor")
+        pybind11::class_<Progressor, PyProgressor>(module, "Progressor")
             .def(pybind11::init<>())
             .def("preprocess", &Progressor::preprocess)
             .def("initialize", &Progressor::initialize)

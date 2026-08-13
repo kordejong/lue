@@ -14,7 +14,7 @@ namespace lue::framework {
         The `PYBIND11_OVERRIDE` calls intercept the virtual calls and redirects them to the Python
         implementations.
     */
-    class PyModel: public Model, public pybind11::trampoline_self_life_support
+    class PyModel: public Model
     {
 
         public:
@@ -56,7 +56,7 @@ namespace lue::framework {
 
     void bind_model(pybind11::module& module)
     {
-        pybind11::class_<Model, PyModel, pybind11::smart_holder>(module, "Model")
+        pybind11::class_<Model, PyModel>(module, "Model")
             .def(pybind11::init<>())
             .def("preprocess", &Model::preprocess)
             .def("initialize", &Model::initialize)

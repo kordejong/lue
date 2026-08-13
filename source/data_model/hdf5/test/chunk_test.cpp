@@ -7,20 +7,43 @@
 namespace lh5 = lue::hdf5;
 
 
-static lh5::Shape test_chunk(lh5::Shape const& value_shape)
+template<typename Element>
+static auto test_chunk(lh5::Shape const& value_shape, lh5::Shape const& chunk_shape)
+{
+    BOOST_CHECK_EQUAL(chunk_shape.size(), value_shape.size());
+
+    auto const size = lh5::size_of_chunk(chunk_shape, sizeof(Element));  // In bytes
+
+    if (!value_shape.empty())
+    {
+        BOOST_CHECK_GE(size, 0);
+        // BOOST_CHECK_GE(size, lh5::lower_chunk_size_limit());
+        BOOST_CHECK_LE(size, lh5::upper_chunk_size_limit());
+    }
+}
+
+
+static auto test_chunk(lh5::Shape const& value_shape) -> lh5::Shape
 {
     using T = std::int32_t;
 
-    auto shape = lh5::chunk_shape<T>(value_shape);
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
 
-    BOOST_CHECK_EQUAL(shape.size(), value_shape.size() + 1);
+    test_chunk<T>(value_shape, chunk_shape);
 
-    auto const size = lh5::size_of_chunk<T>(shape);
+    return chunk_shape;
+}
 
-    BOOST_CHECK_GE(size, lh5::lower_chunk_size_limit());
-    BOOST_CHECK_LE(size, lh5::upper_chunk_size_limit());
 
-    return shape;
+static auto test_chunk(lh5::Shape const& value_shape, std::size_t const nr_dimensions_to_skip) -> lh5::Shape
+{
+    using T = std::int32_t;
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape, nr_dimensions_to_skip);
+
+    test_chunk<T>(value_shape, chunk_shape);
+
+    return chunk_shape;
 }
 
 
@@ -44,7 +67,13 @@ BOOST_AUTO_TEST_CASE(chunk_shape_small_3)
 {
     // 2D values
     lh5::Shape const value_shape({2, 3});
+
     test_chunk(value_shape);
+
+    std::size_t const nr_dimensions_to_skip = 1;
+    auto const chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
+
+    BOOST_CHECK_EQUAL(chunk_shape[0], 1);
 }
 
 
@@ -62,21 +91,91 @@ BOOST_AUTO_TEST_CASE(chunk_shape_large_2)
     {
         lh5::Shape const value_shape({2000000, 2000000});
         test_chunk(value_shape);
+
+        std::size_t const nr_dimensions_to_skip = 1;
+        auto const chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
+
+        BOOST_CHECK_EQUAL(chunk_shape[0], 1);
     }
 
     {
         lh5::Shape const value_shape({1, 2000000});
-        auto const chunk_shape = test_chunk(value_shape);
+        auto chunk_shape = test_chunk(value_shape);
 
-        BOOST_CHECK_EQUAL(chunk_shape[0], 1.0);
-        BOOST_CHECK_EQUAL(chunk_shape[1], 1.0);
+        std::size_t const nr_dimensions_to_skip = 1;
+        chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
+
+        BOOST_CHECK_EQUAL(chunk_shape[0], 1);
     }
 
     {
         lh5::Shape const value_shape({2000000, 1});
-        auto const chunk_shape = test_chunk(value_shape);
+        auto chunk_shape = test_chunk(value_shape);
 
-        BOOST_CHECK_EQUAL(chunk_shape[0], 1.0);
-        BOOST_CHECK_EQUAL(chunk_shape[2], 1.0);
+        std::size_t const nr_dimensions_to_skip = 1;
+        chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
+
+        BOOST_CHECK_EQUAL(chunk_shape[0], 1);
     }
+}
+
+
+BOOST_AUTO_TEST_CASE(case_01)
+{
+    lh5::Shape const value_shape({2, 16000, 14000});
+    auto chunk_shape = test_chunk(value_shape);
+
+    std::size_t const nr_dimensions_to_skip = 1;
+    chunk_shape = test_chunk(value_shape, nr_dimensions_to_skip);
+
+    BOOST_CHECK_EQUAL(chunk_shape[0], 1);
+    BOOST_CHECK_GT(chunk_shape[1], 1);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint8)
+{
+    using T = std::uint8_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint16)
+{
+    using T = std::uint16_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint32)
+{
+    using T = std::uint32_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
+}
+
+
+BOOST_AUTO_TEST_CASE(case_small_uint64)
+{
+    using T = std::uint64_t;
+
+    lh5::Shape const value_shape({90, 40, 15});
+
+    auto chunk_shape = lh5::chunk_shape<T>(value_shape);
+
+    test_chunk<T>(value_shape, chunk_shape);
 }

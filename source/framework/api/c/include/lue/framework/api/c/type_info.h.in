@@ -15,30 +15,30 @@ extern "C" {
 
 typedef enum
 #ifdef LUE_C_SUPPORTS_ENUM_WITH_FIXED_UNDERLYING_TYPE
-    : uint8_t
+    :
+    uint8_t
 #endif
-{
-    LUE_DataModel_Array,
-    LUE_DataModel_Scalar,
-    LUE_DataModel_Literal,
+{ LUE_DataModel_Array,
+  LUE_DataModel_Scalar,
+  LUE_DataModel_Literal,
 } LUE_DataModel;
 
 
 typedef enum
 #ifdef LUE_C_SUPPORTS_ENUM_WITH_FIXED_UNDERLYING_TYPE
-    : uint8_t
+    :
+    uint8_t
 #endif
-{
-    LUE_ElementType_UInt8,
-    LUE_ElementType_UInt16,
-    LUE_ElementType_UInt32,
-    LUE_ElementType_UInt64,
-    LUE_ElementType_Int8,
-    LUE_ElementType_Int16,
-    LUE_ElementType_Int32,
-    LUE_ElementType_Int64,
-    LUE_ElementType_Float32,
-    LUE_ElementType_Float64,
+{ LUE_ElementType_UInt8,
+  LUE_ElementType_UInt16,
+  LUE_ElementType_UInt32,
+  LUE_ElementType_UInt64,
+  LUE_ElementType_Int8,
+  LUE_ElementType_Int16,
+  LUE_ElementType_Int32,
+  LUE_ElementType_Int64,
+  LUE_ElementType_Float32,
+  LUE_ElementType_Float64,
 } LUE_ElementType;
 
 
@@ -62,10 +62,10 @@ LUE_FCAPI_EXPORT LUE_ElementType lue_element_type_scalar(LUE_Scalar const* scala
 #define lue_element_type(X)                                                                                  \
     _Generic(                                                                                                \
         (X),                                                                                                 \
-        LUE_Array*: lue_element_type_array,                                                                  \
-        LUE_Field*: lue_element_type_field,                                                                  \
-        LUE_Literal*: lue_element_type_literal,                                                              \
-        LUE_Scalar*: lue_element_type_scalar)(X)
+        LUE_Array *: lue_element_type_array,                                                                 \
+        LUE_Field *: lue_element_type_field,                                                                 \
+        LUE_Literal *: lue_element_type_literal,                                                             \
+        LUE_Scalar *: lue_element_type_scalar)(X)
 
 
 #ifdef __cplusplus

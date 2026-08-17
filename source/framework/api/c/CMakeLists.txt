@@ -39,6 +39,16 @@ elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int64_t")
     set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_Int64")
 endif()
 
+if(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::uint32_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_UInt32")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::uint64_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_UInt64")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::int32_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_Int32")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::int64_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_Int64")
+endif()
+
 string(REPLACE "std::" "" LUE_BooleanElement ${LUE_FRAMEWORK_BOOLEAN_ELEMENT})
 
 configure_file(

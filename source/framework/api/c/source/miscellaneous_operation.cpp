@@ -16,6 +16,14 @@ auto lue_cast(LUE_Field* field, LUE_ElementType const element_type) -> LUE_Field
 }
 
 
+auto lue_cell_index(LUE_Field* field, LUE_Index const dimension_index) -> LUE_Field*
+{
+    lue::api::Field result = lue::api::cell_index(lue_as_cxx_field(field), dimension_index);
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
 auto lue_create_array(LUE_Rank const rank, LUE_Count const* array_shape_p, LUE_Scalar const* fill_value)
     -> LUE_Array*
 {
@@ -39,7 +47,7 @@ auto lue_create_box_kernel(LUE_Count const radius, LUE_Literal const* weight) ->
 
 
 #define CreateLiteral(type, type_name)                                                                       \
-    auto lue_create_literal_##type_name(type const value) -> LUE_Literal*                                    \
+    auto lue_create_literal_##type_name(type const value)->LUE_Literal*                                      \
     {                                                                                                        \
         lue::api::Literal result{value};                                                                     \
                                                                                                              \

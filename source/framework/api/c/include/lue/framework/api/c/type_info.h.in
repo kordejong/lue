@@ -42,9 +42,11 @@ typedef enum
 } LUE_ElementType;
 
 
-uint8_t const LUE_ElementType_Boolean = ${LUE_ELEMENT_TYPE_BOOLEAN};
+LUE_ElementType const LUE_ElementType_Boolean = ${LUE_ELEMENT_TYPE_BOOLEAN};
 
-uint8_t const LUE_ElementType_Count = ${LUE_ELEMENT_TYPE_COUNT};
+LUE_ElementType const LUE_ElementType_Count = ${LUE_ELEMENT_TYPE_COUNT};
+
+LUE_ElementType const LUE_ElementType_Index = ${LUE_ELEMENT_TYPE_INDEX};
 
 typedef ${LUE_BooleanElement} LUE_BooleanElement;
 

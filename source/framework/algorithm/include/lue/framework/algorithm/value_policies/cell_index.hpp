@@ -17,6 +17,7 @@ namespace lue {
     namespace value_policies {
 
         template<typename IndexElement, typename ConditionElement, Rank rank>
+            requires std::same_as<ConditionElement, BooleanElement>
         auto cell_index(PartitionedArray<ConditionElement, rank> const& condition, Index const dimension_idx)
             -> PartitionedArray<IndexElement, rank>
         {

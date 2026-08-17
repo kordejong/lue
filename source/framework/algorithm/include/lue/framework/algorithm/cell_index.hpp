@@ -1,11 +1,13 @@
 #pragma once
 #include "lue/framework/algorithm/policy.hpp"
+#include "lue/framework/configure.hpp"
 #include "lue/framework/partitioned_array_decl.hpp"
 
 
 namespace lue {
 
     template<typename Policies, Rank rank>
+        requires std::same_as<policy::InputElementT<Policies, 0>, BooleanElement>
     auto cell_index(
         Policies const& policies,
         PartitionedArray<policy::InputElementT<Policies, 0>, rank> const& condition,

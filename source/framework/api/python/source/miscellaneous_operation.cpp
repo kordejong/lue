@@ -99,6 +99,8 @@ namespace lue::api {
             "field"_a,
             "dtype"_a);
 
+        module.def("cell_index", cell_index, "condition"_a, "dimension_index"_a);
+
         module.def(
             "create_array",
             [](Shape<Count, 2> const& array_shape,

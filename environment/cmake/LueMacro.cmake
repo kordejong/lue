@@ -607,10 +607,14 @@ function(tif_to_figure)
         DEPENDS
             "${source_prefix}/${basename}.tif"
         COMMAND
-            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
-            "${source_prefix}/${basename}.tif"
-            "${destination_prefix}/${basename}"
-            pdf svg
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+                    "${source_prefix}/${basename}.tif"
+                    "${destination_prefix}/${basename}"
+                    pdf svg
         VERBATIM
     )
 
@@ -648,10 +652,14 @@ function(example_to_figure)
         DEPENDS
             "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
         COMMAND
-            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_import_example_data.py"
-            "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
-            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
-            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_import_example_data.py"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
         VERBATIM
     )
 
@@ -915,9 +923,12 @@ function(add_operation_example_python)
             ${argument_pathnames}
             ${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py
         COMMAND
-            ${CMAKE_COMMAND} -E env PYTHONPATH=$<TARGET_FILE_DIR:lue::py>/.. --
-                ${Python_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py"
-                ${argument_pathnames} ${result_pathnames}
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py"
+                    ${argument_pathnames} ${result_pathnames}
         VERBATIM
     )
 

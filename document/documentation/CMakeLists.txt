@@ -203,11 +203,13 @@ endforeach()
 add_custom_target(documentation
     VERBATIM
     COMMAND
-        ${CMAKE_COMMAND}
-            -E env "PYTHONPATH=${PROJECT_BINARY_DIR}/${LUE_INSTALL_PYTHON_PACKAGE_DIR}/..:$ENV{PYTHONPATH}"
-                ${JupyterBook_EXECUTABLE} build --builder html --all
-                    # --warningiserror --nitpick --keep-going
-                    ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_COMMAND} -E env
+            --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+            --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+            --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+            -- ${JupyterBook_EXECUTABLE} build --builder html --all
+                # --warningiserror --nitpick --keep-going
+                ${CMAKE_CURRENT_BINARY_DIR}
         DEPENDS
             doxygen_doc
             ${doc_preprocess_target_name}

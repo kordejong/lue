@@ -43,8 +43,12 @@ doing useful work.
   a specific language might slightly differ. Check the usage examples for inspiration.
 - The most relevant part of each usage example is the call of the operation. Some of the code surrounding
   such calls is atypical code developed specifically to make it easy to write usage examples. This code, from
-  the `lue_document` C++ library and the `lue.document` Python subpackage, should not be used in real-world
-  LUE code.
+  the `lue_document_c` C library, lue_document_cxx` C++ library and the `lue.document` Python subpackage,
+  should not be used in real-world LUE code.
+- The C++ and Python APIs are more mature than the C API.
+- C does not support overloading functions easily. In case of overloaded functions, the C API provides only
+  one of these functions. These overloads are the once used in the example code of the relevant reference
+  pages.
 ```
 
 ## Local operations

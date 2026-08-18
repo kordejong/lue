@@ -79,6 +79,21 @@ namespace lue::api {
             pybind11::kw_only(),
             "min_value"_a,
             "max_value"_a);
+        module.def(
+            "uniform",
+            [](Field const& other, Field const& min_value, Field const& max_value) -> Field
+            { return uniform(other, min_value, max_value); },
+            "other"_a,
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
+        module.def(
+            "uniform",
+            [](Field const& min_value, Field const& max_value) -> Field
+            { return uniform(min_value, max_value); },
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
     }
 
 }  // namespace lue::api

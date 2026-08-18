@@ -50,8 +50,11 @@ class Example: public lue::document::Example
             Field const elevation = from_gdal(elevation_array_pathname);
             Field const flow_direction = d8_flow_direction(elevation);
 
-            to_gdal(flow_direction, flow_direction_array_pathname);
+            auto written = to_gdal(flow_direction, flow_direction_array_pathname);
             // example]
+
+            written.get();
+            lue::document::write_value_scale(flow_direction_array_pathname, "flow_direction");
 
             return EXIT_SUCCESS;
         }

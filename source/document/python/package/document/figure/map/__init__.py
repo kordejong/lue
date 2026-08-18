@@ -6,17 +6,30 @@ import matplotlib.pyplot as plt
 import rasterio
 import rasterio.plot
 
-
 # https://matplotlib.org/stable/users/explain/colors/colormaps.html
 colour_map_by_value_scale = {
     "boolean": "Dark2",
+    "flow_direction": "cividis",
     "nominal": "Dark2",
     "ordinal": "viridis",
     "scalar": "viridis",
 }
 
+flow_direction_by_code = {
+    7: "↖",
+    8: "↑",
+    9: "↗",
+    4: "←",
+    5: "■",
+    6: "→",
+    1: "↙",
+    2: "↓",
+    3: "↘",
+}
+
 value_formatter_by_value_scale = {
     "boolean": lambda value: f"{value != 0}",
+    "flow_direction": lambda value: flow_direction_by_code[value],
     "nominal": lambda value: f"{value}",
     "ordinal": lambda value: f"{value}",
     "scalar": lambda value: f"{value:.2f}",

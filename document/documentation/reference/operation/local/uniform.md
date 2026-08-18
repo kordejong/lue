@@ -9,15 +9,15 @@
 .. py:function::
     uniform(array_shape, partition_shape, min_value, max_value) -> Field
     uniform(array_shape, min_value, max_value) -> Field
-    uniform(array, min_value, max_value) -> Field
+    uniform(other, min_value, max_value) -> Field
     uniform(min_value, max_value) -> Field
 
     Return a field with value(s) drawn from the uniform distribution
 
     :param Shape array_shape: Shape of the array
-    :param Array array: Array whose shape and partition shape will be used
     :param Shape partition_shape: Shape of the partitions. If not passed in a default partition shape will
         be used.
+    :param Field other: Array whose shape and partition shape will be used
     :param Field min_value: Minimum value of the distribution (value, scalar / arithmetic)
     :param Field max_value: Maximum value of the distribution (value, scalar / arithmetic)
     :return: New field with value(s) in the range [min_value, max_value] (integral values) or

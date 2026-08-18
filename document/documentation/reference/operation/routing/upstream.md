@@ -34,15 +34,11 @@ the input arrays.
 ```
 
 ```{code-block} c++
-auto const output_material = lue::value_policies::upstream(flow_direction, input_material);
-```
-
-```{code-block} java
 // TODO
 ```
 
 ```{code-block} python
-output_material = lfr.upstream(flow_direction, input_material)
+# TODO
 ```
 
 ````

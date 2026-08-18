@@ -35,17 +35,11 @@ array is likely to contain less no-data values than the input array.
 ```
 
 ```{code-block} c++
-auto const kernel = lue::box_kernel<BooleanElement, rank>(1, 1);
-auto const result = lue::value_policies::focal_mean(array, kernel);
-```
-
-```{code-block} java
 // TODO
 ```
 
 ```{code-block} python
-kernel = np.full((3, 3), 1, dtype=lfr.boolean_element_type)
-result = lfr.focal_mean(array, kernel)
+# TODO
 ```
 
 ````

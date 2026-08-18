@@ -56,4 +56,12 @@ namespace lue::document {
         return result;
     }
 
+
+    void write_value_scale(std::string const& pathname, std::string const& value_scale)
+    {
+        gdal::Raster raster = gdal::Raster{gdal::open_dataset(pathname, GDALAccess::GA_Update)};
+
+        raster.band(1).set_metadata("value_scale", value_scale, "lue");
+    }
+
 }  // namespace lue::document

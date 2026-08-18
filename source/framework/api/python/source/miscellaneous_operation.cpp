@@ -3,7 +3,6 @@
 #include "lue/framework.hpp"
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
-#include <format>
 
 
 using namespace pybind11::literals;

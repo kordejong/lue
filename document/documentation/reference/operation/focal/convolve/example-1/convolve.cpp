@@ -1,6 +1,5 @@
-#include "lue/framework/algorithm/value_policies/convolve.hpp"
+#include "lue/framework/api/cxx.hpp"
 #include "lue/document.hpp"
-#include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
 
 
@@ -48,23 +47,15 @@ class Example: public lue::document::Example
             auto const argument_kernel_pathname = argument<std::string>("argument_kernel");
             auto const result_array_pathname = argument<std::string>("result_array");
 
-            using namespace lue;
-            using namespace value_policies;
-
-            Rank const rank{2};
-            using Weight = float;
-            using Kernel = Kernel<Weight, rank>;
-            using FloatElement = FloatingPointElement<0>;
-            using FloatArray = PartitionedArray<FloatElement, rank>;
-
-            FloatArray const array = read_array<FloatElement, rank>(argument_array_pathname);
-            Kernel const kernel = read_kernel<Weight, rank>(argument_kernel_pathname);
+            using namespace lue::api;
 
             // [example
-            FloatArray const result = convolve(array, kernel);
-            // example]
+            Field const array = from_gdal(argument_array_pathname);
+            Kernel const kernel = lue::document::read_kernel(argument_kernel_pathname);
+            Field const result = convolve(array, kernel);
 
             to_gdal(result, result_array_pathname);
+            // example]
 
             return EXIT_SUCCESS;
         }

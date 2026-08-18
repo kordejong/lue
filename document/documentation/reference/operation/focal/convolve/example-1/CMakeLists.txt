@@ -16,8 +16,10 @@ add_operation_example(
         ${example_target_name}
     NR
         ${example_nr}
-    LINK_LIBRARIES
-        lue::framework_${operation_kind}_operation
+    C_LINK_LIBRARIES
+        lue::framework_api_c
+    CXX_LINK_LIBRARIES
+        lue::framework_api_cxx
     ARGUMENT_NAMES
         array/5x5-float32.tif
         kernel/3x3-float32.tif

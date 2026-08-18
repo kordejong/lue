@@ -32,7 +32,7 @@ target_sources(lue_py_framework_x
         source/extension.cpp
         source/field.cpp
         source/focal_operation.cpp
-        # source/io.cpp
+        source/io.cpp
         source/kernel.cpp
         source/literal.cpp
         source/local_operation.cpp

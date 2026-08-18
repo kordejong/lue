@@ -9,7 +9,7 @@ add_dependencies(${operation_target_name}
     ${operation_target_name}.figure
 )
 
-set(operaration_kind_names
+set(operation_kind_names
     focal
     io
     conversion
@@ -20,7 +20,7 @@ set(operaration_kind_names
     zonal
 )
 
-foreach(operation_kind_name ${operaration_kind_names})
+foreach(operation_kind_name ${operation_kind_names})
     add_subdirectory(${operation_kind_name})
 
     add_dependencies(${operation_target_name}

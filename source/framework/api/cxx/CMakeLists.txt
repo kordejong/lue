@@ -154,6 +154,7 @@ target_sources(lue_framework_api_cxx
         source/miscellaneous/create_kernel.cpp
         source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
+        source/routing/d8_flow_direction.cpp
         source/type_info.cpp
 )
 

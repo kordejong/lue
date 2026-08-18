@@ -3,12 +3,11 @@ from pathlib import Path
 
 import docopt
 
-import lue.document as ld
-import lue.framework as lfr
+import lue.framework_x as lfrx
 from lue import __version__ as version
 
 
-@lfr.runtime_scope
+@lfrx.runtime_scope
 def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
@@ -25,15 +24,13 @@ Options:
     argument_array_path = Path(arguments["<array>"])
     result_array_path = Path(arguments["<result>"])
 
-    # I/O
-    array = ld.read_array(argument_array_path)
-
     # [example
-    result = array + 1
-    # example]
+    array = lfrx.from_gdal(str(argument_array_path))
+    # TODO: Do something useful here
+    result = array
 
-    # I/O
-    lfr.to_gdal(result, str(result_array_path))
+    lfrx.to_gdal(result, str(result_array_path))
+    # example]
 
 
 if __name__ == "__main__":

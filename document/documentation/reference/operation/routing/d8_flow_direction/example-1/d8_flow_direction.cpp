@@ -1,7 +1,5 @@
-#include "lue/framework/algorithm/value_policies/d8_flow_direction.hpp"
-#include "lue/framework/algorithm/value_policies/add.hpp"
+#include "lue/framework/api/cxx.hpp"
 #include "lue/document.hpp"
-#include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
 
 
@@ -46,21 +44,14 @@ class Example: public lue::document::Example
             auto const elevation_array_pathname = argument<std::string>("elevation_array");
             auto const flow_direction_array_pathname = argument<std::string>("flow_direction_array");
 
-            using namespace lue;
-            using namespace value_policies;
-            Rank const rank{2};
-
-            using FloatElement = FloatingPointElement<0>;
-            using FloatArray = PartitionedArray<FloatElement, rank>;
-            using FlowDirectionArray = PartitionedArray<FlowDirectionElement, rank>;
-
-            FloatArray const elevation = read_array<FloatElement, rank>(elevation_array_pathname);
+            using namespace lue::api;
 
             // [example
-            FlowDirectionArray flow_direction = d8_flow_direction<FlowDirectionElement>(elevation);
-            // example]
+            Field const elevation = from_gdal(elevation_array_pathname);
+            Field const flow_direction = d8_flow_direction(elevation);
 
             to_gdal(flow_direction, flow_direction_array_pathname);
+            // example]
 
             return EXIT_SUCCESS;
         }

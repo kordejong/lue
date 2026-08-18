@@ -1,10 +1,10 @@
 add_library(lue_framework_api_c SHARED)
 add_library(lue::framework_api_c ALIAS lue_framework_api_c)
 
-target_compile_features(lue_framework_api_c
-    PUBLIC
-        c_std_${LUE_MIN_C_STANDARD}
-)
+# target_compile_features(lue_framework_api_c
+#     PUBLIC
+#         c_std_${LUE_MIN_C_STANDARD}
+# )
 
 set_target_properties(lue_framework_api_c
     PROPERTIES
@@ -78,14 +78,11 @@ target_sources(lue_framework_api_c
         source/literal.cpp
         source/local_operation.cpp
         source/miscellaneous_operation.cpp
+        source/routing_operation.cpp
         source/runtime.cpp
         source/scalar.cpp
         source/type_info.cpp
 )
-
-# set_property(TARGET lue_framework_api_c
-#     PROPERTY C_STANDARD 11
-# )
 
 target_link_libraries(lue_framework_api_c
     PRIVATE

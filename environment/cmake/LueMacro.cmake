@@ -731,6 +731,140 @@ function(examples_to_figures)
 endfunction()
 
 
+function(add_operation_example_c)
+    # Add a C example:
+    # - Create target for building executable for the example
+    # - Create target for generating results, by executing the example executable
+    # - Create targets for generating figures for all results
+    #
+    # All targets created are added as a dependency to the main target whose name is passed in
+    #
+    # NAME: Name of operation
+    # TARGET: Name of target to create for this example
+    # NR: Number of the example ([1, <nr_examples>])
+    # ARGUMENT_NAMES: Zero or more relative pathnames to arguments to read. These are assumed to be present
+    #     in ${CMAKE_CURRENT_BINARY_DIR}/argument
+    # RESULT_NAMES: Relative pathnames to results to write. These will be written to
+    #     ${CMAKE_CURRENT_BINARY_DIR}/result/c
+    # LINK_LIBRARIES: Libraries to link with the executable to resolve all undefined symbols
+    # DEPENDS: Zero or more target-level dependencies
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        LINK_LIBRARIES
+        DEPENDS
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
+
+    set(language c)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.c
+        INPUT ${operation_name}.c
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    if(dependencies)
+        add_dependencies(${target_name}
+            ${dependencies}
+        )
+    endif()
+
+    # Target for building the executable -----
+    set(executable_target_name ${operation_name}.example-${example_nr}.${language})
+
+    add_executable(${executable_target_name}
+        ${operation_name}.c
+    )
+
+    target_link_libraries(${executable_target_name}
+        PRIVATE
+            lue::document_c
+            ${link_libraries}
+            # HPX::wrap_main
+    )
+
+    # Target for creating results by executing the executable -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+        COMMAND
+            ${executable_target_name} ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
 function(add_operation_example_cxx)
     # Add a C++ example:
     # - Create target for building executable for the example
@@ -799,7 +933,7 @@ function(add_operation_example_cxx)
     endif()
 
     # Target for building the executable -----
-    set(executable_target_name ${operation_name}.example-${example_nr})
+    set(executable_target_name ${operation_name}.example-${example_nr}.${language})
 
     add_executable(${executable_target_name}
         ${operation_name}.cpp
@@ -807,7 +941,7 @@ function(add_operation_example_cxx)
 
     target_link_libraries(${executable_target_name}
         PRIVATE
-            lue::document
+            lue::document_cxx
             ${link_libraries}
             HPX::wrap_main
     )
@@ -975,7 +1109,8 @@ function(add_operation_example)
     set(multi_values
         ARGUMENT_NAMES
         RESULT_NAMES
-        LINK_LIBRARIES
+        C_LINK_LIBRARIES
+        CXX_LINK_LIBRARIES
         DEPENDS
     )
 
@@ -992,10 +1127,28 @@ function(add_operation_example)
     set(example_nr ${${prefix}_NR})
     set(argument_names ${${prefix}_ARGUMENT_NAMES})
     set(result_names ${${prefix}_RESULT_NAMES})
-    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(c_link_libraries ${${prefix}_C_LINK_LIBRARIES})
+    set(cxx_link_libraries ${${prefix}_CXX_LINK_LIBRARIES})
     set(dependencies ${${prefix}_DEPENDS})
 
     add_custom_target(${target_name})
+
+    add_operation_example_c(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.c
+        NR
+            ${example_nr}
+        LINK_LIBRARIES
+            ${c_link_libraries}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+        DEPENDS
+            ${dependencies}
+    )
 
     add_operation_example_cxx(
         NAME
@@ -1005,7 +1158,7 @@ function(add_operation_example)
         NR
             ${example_nr}
         LINK_LIBRARIES
-            ${link_libraries}
+            ${cxx_link_libraries}
         ARGUMENT_NAMES
             ${argument_names}
         RESULT_NAMES
@@ -1028,6 +1181,7 @@ function(add_operation_example)
     )
 
     add_dependencies(${target_name}
+        ${target_name}.c
         ${target_name}.cxx
         ${target_name}.python
     )

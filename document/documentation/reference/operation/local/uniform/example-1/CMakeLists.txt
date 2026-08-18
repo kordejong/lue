@@ -8,10 +8,10 @@ add_operation_example(
         ${example_target_name}
     NR
         ${example_nr}
-    LINK_LIBRARIES
-        lue::framework_${operation_kind}_operation
-        # TODO: move uniform to local operation lib
-        lue::framework_miscellaneous_operation
+    C_LINK_LIBRARIES
+        lue::framework_api_c
+    CXX_LINK_LIBRARIES
+        lue::framework_api_cxx
     RESULT_NAMES
         ${operation_name}-${example_nr}.tif
 )

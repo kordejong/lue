@@ -1,6 +1,8 @@
 #pragma once
 #include "lue/framework/api/cxx/as_field.hpp"
+#include "lue/framework/api/cxx/focal_operation.hpp"
 #include "lue/framework/api/cxx/io.hpp"
 #include "lue/framework/api/cxx/local_operation.hpp"
 #include "lue/framework/api/cxx/miscellaneous_operation.hpp"
 #include "lue/framework/api/cxx/routing_operation.hpp"
+#include "lue/framework/api/cxx/type_info.hpp"

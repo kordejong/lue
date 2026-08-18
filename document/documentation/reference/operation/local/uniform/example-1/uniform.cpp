@@ -1,4 +1,4 @@
-#include "lue/framework/algorithm/value_policies/uniform.hpp"
+#include "lue/framework/api/cxx.hpp"
 #include "lue/document.hpp"
 #include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
@@ -45,21 +45,17 @@ class Example: public lue::document::Example
             auto const result_array_pathname = argument<std::string>("result_array");
 
             using namespace lue;
-            using namespace lue::value_policies;
+            using namespace lue::api;
 
-            Rank const rank{2};
-            using Shape = Shape<Count, rank>;
+            // [example
             using Element = LargestUnsignedIntegralElement;
-            using Array = PartitionedArray<Element, rank>;
 
-            Shape const array_shape{6, 4};
             Element const min_value{1};
             Element const max_value{10};
-            // [example
-            Array const result = uniform(array_shape, min_value, max_value);
-            // example]
+            Field const result = uniform({6, 4}, min_value, max_value);
 
             to_gdal(result, result_array_pathname);
+            // example]
 
             return EXIT_SUCCESS;
         }

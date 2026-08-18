@@ -30,6 +30,12 @@ cell in the output array. No new no-data values are generated.
 ## Example
 
 ````{tab-set-code}
+```{literalinclude} open_simplex_noise/example-1/open_simplex_noise.c
+:language: c
+:start-after: [example
+:end-before: example]
+:dedent:
+```
 
 ```{literalinclude} open_simplex_noise/example-1/open_simplex_noise.cpp
 :language: c++
@@ -51,6 +57,7 @@ cell in the output array. No new no-data values are generated.
 | ![result](open_simplex_noise/example-1/result/cxx/open_simplex_noise-1.*) |
 
 Source code:
+[C](./open_simplex_noise/example-1/open_simplex_noise.c),
 [C++](./open_simplex_noise/example-1/open_simplex_noise.cpp),
 [Python](./open_simplex_noise/example-1/open_simplex_noise.py)
 

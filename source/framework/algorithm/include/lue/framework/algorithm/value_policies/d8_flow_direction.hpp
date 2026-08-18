@@ -6,7 +6,7 @@
 namespace lue {
     namespace policy::d8_flow_direction {
 
-        template<std::integral FlowDirectionElement, Arithmetic ElevationElement>
+        template<std::integral FlowDirectionElement, std::floating_point ElevationElement>
         using DefaultValuePoliciesBase = Policies<
             AllValuesWithinDomain<ElevationElement>,
             OutputsPolicies<OutputPolicies<
@@ -17,7 +17,7 @@ namespace lue {
                 FillHaloWithConstantValue<ElevationElement>>>>;
 
 
-        template<std::integral FlowDirectionElement, Arithmetic ElevationElement>
+        template<std::integral FlowDirectionElement, std::floating_point ElevationElement>
         class DefaultValuePolicies: public DefaultValuePoliciesBase<FlowDirectionElement, ElevationElement>
         {
 
@@ -45,7 +45,7 @@ namespace lue {
 
     namespace value_policies {
 
-        template<std::integral FlowDirectionElement, Arithmetic ElevationElement>
+        template<std::integral FlowDirectionElement, std::floating_point ElevationElement>
         auto d8_flow_direction(PartitionedArray<ElevationElement, 2> const& elevation)
             -> PartitionedArray<FlowDirectionElement, 2>
         {

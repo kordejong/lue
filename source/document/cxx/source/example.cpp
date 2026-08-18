@@ -1,4 +1,4 @@
-#include "lue/document/example.hpp"
+#include "lue/document/cxx/example.hpp"
 #include "lue/gdal.hpp"
 
 

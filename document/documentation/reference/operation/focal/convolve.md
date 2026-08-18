@@ -37,6 +37,12 @@ field is likely to contain less no-data values than the input field.
 ## Example
 
 ````{tab-set-code}
+```{literalinclude} convolve/example-1/convolve.c
+:language: c
+:start-after: [example
+:end-before: example]
+:dedent:
+```
 
 ```{literalinclude} convolve/example-1/convolve.cpp
 :language: c++
@@ -59,6 +65,7 @@ field is likely to contain less no-data values than the input field.
 | ![array](convolve/example-1/argument/array/5x5-float32.*) | ![kernel](convolve/example-1/argument/kernel/3x3-float32.*) | ![result](convolve/example-1/result/cxx/convolve-1.*) |
 
 Source code:
+[C](./convolve/example-1/convolve.c),
 [C++](./convolve/example-1/convolve.cpp),
 [Python](./convolve/example-1/convolve.py)
 

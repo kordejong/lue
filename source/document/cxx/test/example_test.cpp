@@ -1,5 +1,5 @@
 #define BOOST_TEST_MODULE lue document example test
-#include "lue/document/example.hpp"
+#include "lue/document/cxx/example.hpp"
 #include <boost/test/included/unit_test.hpp>
 #include <filesystem>
 

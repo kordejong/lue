@@ -4,11 +4,11 @@ from pathlib import Path
 import docopt
 
 import lue.document as ld
-import lue.framework as lfr
+import lue.framework_x as lfrx
 from lue import __version__ as version
 
 
-@lfr.runtime_scope
+@lfrx.runtime_scope
 def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
@@ -27,14 +27,13 @@ Options:
     argument_kernel_path = Path(arguments["<kernel>"])
     result_array_path = Path(arguments["<result>"])
 
-    array = ld.read_array(argument_array_path)
-    kernel = ld.read_kernel(argument_kernel_path)
-
     # [example
-    result = lfr.convolve(array, kernel)
-    # example]
+    array = lfrx.from_gdal(str(argument_array_path))
+    kernel = ld.read_kernel(argument_kernel_path)
+    result = lfrx.convolve(array, kernel)
 
-    lfr.to_gdal(result, str(result_array_path))
+    lfrx.to_gdal(result, str(result_array_path))
+    # example]
 
 
 if __name__ == "__main__":

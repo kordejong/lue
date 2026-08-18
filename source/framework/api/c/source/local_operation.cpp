@@ -117,7 +117,8 @@ auto lue_greater_than(LUE_Field const* field1, LUE_Field const* field2) -> LUE_F
 
 auto lue_greater_than_equal_to(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::greater_than_equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
+    lue::api::Field result =
+        lue::api::greater_than_equal_to(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
     return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
@@ -165,7 +166,8 @@ auto lue_logical_and(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Fi
 
 auto lue_logical_exclusive_or(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_exclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
+    lue::api::Field result =
+        lue::api::logical_exclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
     return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
@@ -173,7 +175,8 @@ auto lue_logical_exclusive_or(LUE_Field const* field1, LUE_Field const* field2) 
 
 auto lue_logical_inclusive_or(LUE_Field const* field1, LUE_Field const* field2) -> LUE_Field*
 {
-    lue::api::Field result = lue::api::logical_inclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
+    lue::api::Field result =
+        lue::api::logical_inclusive_or(lue_as_cxx_field(field1), lue_as_cxx_field(field2));
 
     return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }
@@ -280,6 +283,24 @@ auto lue_tan(LUE_Field const* field) -> LUE_Field*
 auto lue_trunc(LUE_Field const* field) -> LUE_Field*
 {
     lue::api::Field result = lue::api::trunc(lue_as_cxx_field(field));
+
+    return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
+}
+
+
+auto lue_uniform(
+    LUE_Rank const rank,
+    LUE_Count const* array_shape_p,
+    LUE_Field const* min_value,
+    LUE_Field const* max_value) -> LUE_Field*
+{
+    assert(rank == 2);
+
+    lue::Shape<lue::Count, 2> array_shape{};
+    std::copy(array_shape_p, array_shape_p + rank, array_shape.data());
+
+    lue::api::Field result =
+        lue::api::uniform(array_shape, lue_as_cxx_field(min_value), lue_as_cxx_field(max_value));
 
     return new LUE_Field{.instance = new lue::api::Field{std::move(result)}};
 }

@@ -1,9 +1,6 @@
-#include "lue/framework/algorithm/value_policies/open_simplex_noise.hpp"
-#include "lue/framework/algorithm/create_partitioned_array.hpp"
-#include "lue/framework/algorithm/value_policies/cast.hpp"
-#include "lue/framework/algorithm/value_policies/cell_index.hpp"
+#include "lue/framework/api/cxx.hpp"
+#include "lue/framework/configure.hpp"
 #include "lue/document.hpp"
-#include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
 
 
@@ -48,21 +45,14 @@ class Example: public lue::document::Example
             auto const result_array_pathname = argument<std::string>("result_array");
 
             using namespace lue;
-            using namespace lue::value_policies;
+            using namespace lue::api;
 
             // [example
-            Rank const rank{2};
-            using Shape = Shape<Count, rank>;
-            using FloatElement = FloatingPointElement<0>;
-            using BooleanArray = PartitionedArray<BooleanElement, rank>;
-            using FloatArray = PartitionedArray<FloatElement, rank>;
-
-            Shape const array_shape{600, 400};
-            BooleanArray const condition_array = create_partitioned_array<BooleanElement>(array_shape, 1);
-            FloatArray const x_coordinates = cast<FloatElement>(cell_index<IndexElement>(condition_array, 1));
-            FloatArray const y_coordinates = cast<FloatElement>(cell_index<IndexElement>(condition_array, 0));
+            Field const condition_array = as_field(create_array({600, 400}, BooleanElement{1}));
+            Field const x_coordinates = cast(cell_index(condition_array, 1), ElementType::Float32);
+            Field const y_coordinates = cast(cell_index(condition_array, 0), ElementType::Float32);
             int const seed = 5;
-            FloatArray const result = open_simplex_noise(x_coordinates, y_coordinates, seed);
+            Field const result = open_simplex_noise(x_coordinates, y_coordinates, seed);
 
             to_gdal(result, result_array_pathname);
             // example]

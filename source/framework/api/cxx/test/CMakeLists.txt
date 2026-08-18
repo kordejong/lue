@@ -64,6 +64,7 @@ set(miscellaneous_operation_names
 
 set(routing_operation_names
     routing/accu
+    routing/d8_flow_direction
 )
 
 set(names

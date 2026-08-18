@@ -2,14 +2,12 @@ import sys
 from pathlib import Path
 
 import docopt
-import numpy as np
 
-import lue.document as ld
-import lue.framework as lfr
+import lue.framework_x as lfrx
 from lue import __version__ as version
 
 
-@lfr.runtime_scope
+@lfrx.runtime_scope
 def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
@@ -25,18 +23,17 @@ Options:
     result_array_path = Path(arguments["<result>"])
 
     # [example
-    array_shape = (600, 400)
-    condition = lfr.create_array(array_shape, lfr.boolean_element_type, 1)
-    x_coordinates = lfr.cast(
-        lfr.cell_index(condition, 1), lfr.floating_point_element_types[0]
-    )
-    y_coordinates = lfr.cast(
-        lfr.cell_index(condition, 0), lfr.floating_point_element_types[0]
-    )
-    seed = 5
-    result = lfr.open_simplex_noise(x_coordinates, y_coordinates, seed)
+    boolean_type = lfrx.boolean_element_type
+    floating_point_type = lfrx.floating_point_element_types[0]
 
-    lfr.to_gdal(result, str(result_array_path))
+    condition = lfrx.as_field(
+        lfrx.create_array((600, 400), lfrx.create_scalar(1, boolean_type))
+    )
+    x_coordinates = lfrx.cast(lfrx.cell_index(condition, 1), floating_point_type)
+    y_coordinates = lfrx.cast(lfrx.cell_index(condition, 0), floating_point_type)
+    result = lfrx.open_simplex_noise(x_coordinates, y_coordinates, seed=5)
+
+    lfrx.to_gdal(result, str(result_array_path))
     # example]
 
 

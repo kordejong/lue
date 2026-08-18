@@ -2,14 +2,12 @@ import sys
 from pathlib import Path
 
 import docopt
-import numpy as np
 
-import lue.document as ld
-import lue.framework as lfr
+import lue.framework_x as lfrx
 from lue import __version__ as version
 
 
-@lfr.runtime_scope
+@lfrx.runtime_scope
 def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
@@ -24,15 +22,16 @@ Options:
     arguments = docopt.docopt(usage, sys.argv[1:], version=version)
     result_array_path = Path(arguments["<result>"])
 
-    array_shape = (6, 4)
-    min_value = 1
-    max_value = 10
-    dtype = lfr.unsigned_integral_element_types[-1]
     # [example
-    result = lfr.uniform(array_shape, dtype, min_value, max_value)
-    # example]
+    dtype = lfrx.unsigned_integral_element_types[-1]
+    result = lfrx.uniform(
+        (6, 4),
+        min_value=lfrx.as_field(lfrx.create_literal(1, dtype)),
+        max_value=lfrx.as_field(lfrx.create_literal(10, dtype)),
+    )
 
-    lfr.to_gdal(result, str(result_array_path))
+    lfrx.to_gdal(result, str(result_array_path))
+    # example]
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ namespace lue::api {
         bind_as_state(submodule);
 
         bind_focal_operations(submodule);
-        // bind_io(submodule);
+        bind_io(submodule);
         bind_local_operations(submodule);
         bind_miscellaneous_operations(submodule);
         bind_routing_operations(submodule);

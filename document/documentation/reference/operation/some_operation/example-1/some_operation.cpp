@@ -1,6 +1,5 @@
-#include "lue/framework/algorithm/value_policies/add.hpp"
+#include "lue/framework/api/cxx.hpp"
 #include "lue/document.hpp"
-#include "lue/framework.hpp"
 #include <hpx/hpx_main.hpp>
 
 
@@ -45,21 +44,16 @@ class Example: public lue::document::Example
             auto const argument_array_pathname = argument<std::string>("argument_array");
             auto const result_array_pathname = argument<std::string>("result_array");
 
-            using namespace lue;
-            using namespace value_policies;
-
-            Rank const rank{2};
-            using Element = float;
-            using Array = PartitionedArray<Element, rank>;
-
-            Array const array = read_array<Element, rank>(argument_array_pathname);
+            using namespace lue::api;
 
             // [example
-            // TODO
-            Array result = add(array, Element{1});
-            // example]
+            Field const array = from_gdal(argument_array_pathname);
+
+            // TODO: Do something useful here
+            Field const& result = array;
 
             to_gdal(result, result_array_pathname);
+            // example]
 
             return EXIT_SUCCESS;
         }

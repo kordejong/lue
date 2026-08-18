@@ -38,7 +38,7 @@ doing useful work.
 - Except when explicitly stated, all operations require the input arguments to be "compatible". In the case
   of rasters, this implies that each raster must cover the same area, have the same resolution, and have the
   same coordinate reference system. LUE won't implicitly convert arguments to become compatible. Operations
-  exist that help with such conversion, like {py:func}`resample`, for example.
+  exist that help with such conversion, like {py:func}`resample`.
 - The signatures of the operations are written in a language-agnostic manner. How to use each operation from
   a specific language might slightly differ. Check the usage examples for inspiration.
 - The most relevant part of each usage example is the call of the operation. Some of the code surrounding
@@ -73,10 +73,9 @@ argument array.
 
 Focal operations differ with respect to how they compute a result value given argument values.
 
-An example of a focal operation is the {py:func}`focal_maximum` operation, which assigns to each
-focal result element the maximum value in the values found in the neigbourhood around the corresponding focal
-argument cell.
-See [](reference-operation-focal) for an overview of all focal operations.
+An example of a focal operation is the {py:func}`focal_maximum` operation, which assigns to each focal result
+element the maximum value in the values found in the neighbourhood around the corresponding focal argument
+cell. See [](reference-operation-focal) for an overview of all focal operations.
 
 ## Zonal operations
 
@@ -95,12 +94,13 @@ See [](reference-operation-zonal) for an overview of all zonal operations.
 
 ## Global operations
 
-Global operations (AKA map operations) compute a single result value, given all cell values in the input argument array.
+Global operations (AKA map operations) compute a single result value, given all cell values in the input
+argument array.
 
 Global operations differ with respect to how they compute a result given all values.
 
-An example of a global operation is the {py:func}`mimimum` operation, which returns the minimum
-value of all element values in the argument.
+An example of a global operation is the {py:func}`minimum` operation, which returns the minimum value of all
+element values in the argument.
 
 See [](reference-operation-global) for an overview of all global operations.
 

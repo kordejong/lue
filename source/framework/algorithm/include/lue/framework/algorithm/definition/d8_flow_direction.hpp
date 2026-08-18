@@ -9,7 +9,7 @@
 namespace lue {
     namespace detail {
 
-        template<std::integral FlowDirectionElement, Arithmetic ElevationElement>
+        template<std::integral FlowDirectionElement, std::floating_point ElevationElement>
         class D8FlowDirection
         {
 
@@ -30,9 +30,8 @@ namespace lue {
                     // We are assuming a 3x3 kernel, containing only true weights
                     static_assert(rank<Kernel> == 2);
                     lue_hpx_assert(kernel.size() == 3);
-                    lue_hpx_assert(
-                        std::all_of(
-                            kernel.begin(), kernel.end(), [](auto const weight) { return bool{weight}; }));
+                    lue_hpx_assert(std::all_of(
+                        kernel.begin(), kernel.end(), [](auto const weight) { return bool{weight}; }));
 
                     lue_hpx_assert(window.extent(0) == kernel.size());
                     lue_hpx_assert(window.extent(1) == kernel.size());
@@ -156,8 +155,8 @@ namespace lue {
       @ingroup    routing_operation
     */
     template<typename Policies>
-        requires Arithmetic<policy::InputElementT<Policies, 0>> &&
-                 std::integral<policy::OutputElementT<Policies, 0>>
+        requires std::floating_point<policy::InputElementT<Policies, 0>> &&
+                     std::integral<policy::OutputElementT<Policies, 0>>
     auto d8_flow_direction(
         Policies const& policies, PartitionedArray<policy::InputElementT<Policies, 0>, 2> const& elevation)
         -> PartitionedArray<policy::OutputElementT<Policies, 0>, 2>

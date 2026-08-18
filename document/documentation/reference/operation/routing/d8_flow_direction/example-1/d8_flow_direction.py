@@ -3,12 +3,11 @@ from pathlib import Path
 
 import docopt
 
-import lue.document as ld
-import lue.framework as lfr
+import lue.framework as lfrx
 from lue import __version__ as version
 
 
-@lfr.runtime_scope
+@lfrx.runtime_scope
 def main() -> None:
     command = Path(sys.argv[0]).name
     usage = f"""\
@@ -25,13 +24,12 @@ Options:
     elevation_array_path = Path(arguments["<elevation>"])
     flow_direction_array_path = Path(arguments["<flow_direction>"])
 
-    elevation = ld.read_array(elevation_array_path)
-
     # [example
-    flow_direction = lfr.d8_flow_direction(elevation)
-    # example]
+    elevation = lfrx.from_gdal(str(elevation_array_path))
+    flow_direction = lfrx.d8_flow_direction(elevation)
 
-    lfr.to_gdal(flow_direction, str(flow_direction_array_path))
+    lfrx.to_gdal(flow_direction, str(flow_direction_array_path))
+    # example]
 
 
 if __name__ == "__main__":

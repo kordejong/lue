@@ -38,6 +38,12 @@ If `min_value` or `max_value` is no-data, no-data is written to the result.
 ## Example
 
 ````{tab-set-code}
+```{literalinclude} uniform/example-1/uniform.c
+:language: c
+:start-after: [example
+:end-before: example]
+:dedent:
+```
 
 ```{literalinclude} uniform/example-1/uniform.cpp
 :language: c++
@@ -59,6 +65,7 @@ If `min_value` or `max_value` is no-data, no-data is written to the result.
 | ![result](uniform/example-1/result/cxx/uniform-1.*) |
 
 Source code:
+[C](./uniform/example-1/uniform.c),
 [C++](./uniform/example-1/uniform.cpp),
 [Python](./uniform/example-1/uniform.py)
 

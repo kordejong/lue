@@ -26,7 +26,7 @@ target_sources(lue_document_c
             ${CMAKE_CURRENT_BINARY_DIR}/include
         FILES
             include/lue
-            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/document/c/export.hpp
+            ${CMAKE_CURRENT_BINARY_DIR}/include/lue/document/c/export.h
     PRIVATE
         source/example.cpp
         source/io.cpp

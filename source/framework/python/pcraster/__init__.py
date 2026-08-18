@@ -32,9 +32,8 @@ import os
 import pathlib
 from dataclasses import dataclass
 
-import numpy as np
-
 import lue.framework as lfr
+import numpy as np
 
 
 @dataclass(kw_only=True)
@@ -49,7 +48,7 @@ class BoundingBox:
     east: float = 0.0
 
 
-class Configuration(object):
+class Configuration:
     """
     Class for storing information that is required for LUE to be able to mimic PCRaster
 
@@ -121,19 +120,19 @@ def clone():
         def cellSize(self):
             return self.cell_size
 
-        setattr(Configuration, "cellSize", cellSize)
+        Configuration.cellSize = cellSize
     if not hasattr(Configuration, "nrRows"):
 
         def nrRows(self):
             return self.array_shape[0]
 
-        setattr(Configuration, "nrRows", nrRows)
+        Configuration.nrRows = nrRows
     if not hasattr(Configuration, "nrCols"):
 
         def nrCols(self):
             return self.array_shape[1]
 
-        setattr(Configuration, "nrCols", nrCols)
+        Configuration.nrCols = nrCols
 
     return configuration
 
@@ -624,7 +623,7 @@ def boolean(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.uint8, expression != 0)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def catchment(*args):
@@ -690,7 +689,7 @@ def directional(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.float32, expression)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def downstream(flow_direction, expression):
@@ -849,7 +848,7 @@ def ldd(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.uint8, expression)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def lddcreate(elevation, outflowdepth, corevolume, corearea, catchmentprecipitation):
@@ -990,7 +989,7 @@ def nominal(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.int32, expression)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def normal(expression):
@@ -1026,7 +1025,7 @@ def ordinal(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.int32, expression)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def path(*args):
@@ -1071,7 +1070,7 @@ def scalar(expression):
     elif lue_is_value(expression):
         return lfr.create_scalar(np.float32, expression)
 
-    raise RuntimeError("Unsupported argument: {}".format(expression))
+    raise RuntimeError(f"Unsupported argument: {expression}")
 
 
 def shift(*args):

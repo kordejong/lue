@@ -12,12 +12,11 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import tomllib
 from pathlib import Path
 
 import docopt
 import requests
-
+import tomllib
 
 logger = logging.getLogger(__name__)
 
@@ -113,14 +112,16 @@ def install_hpx_sources(source_prefix_path: Path, version: str) -> None:
             raise RuntimeError(f"Failed to download file {url}")
 
     # Unzip sources zip, in a temp directory. Then move it to the final location.
-    with tempfile.TemporaryDirectory() as temp_directory_pathname:
-        with contextlib.chdir(temp_directory_pathname):
-            with tarfile.open(zip_path) as tar:
-                tar_info = tar.next()
-                assert tar_info is not None
-                assert tar_info.type == tarfile.DIRTYPE
-                tar.extractall()
-                shutil.move(tar_info.name, source_prefix_path)
+    with (
+        tempfile.TemporaryDirectory() as temp_directory_pathname,
+        contextlib.chdir(temp_directory_pathname),
+        tarfile.open(zip_path) as tar,
+    ):
+        tar_info = tar.next()
+        assert tar_info is not None
+        assert tar_info.type == tarfile.DIRTYPE
+        tar.extractall()
+        shutil.move(tar_info.name, source_prefix_path)
 
 
 def configure_hpx_build(

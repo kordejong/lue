@@ -2,7 +2,7 @@ from ..core import json_to_data
 from . import worker
 
 
-class HPX(object):
+class HPX:
     def __init__(self, data):
         self.from_json(data)
 
@@ -30,7 +30,7 @@ class HPX(object):
         return result
 
 
-class Benchmark(object):
+class Benchmark:
     def __init__(self, data, cluster):
         """
         Class for storing information about the configuration of the
@@ -143,7 +143,7 @@ class Benchmark(object):
             )
 
     def __str__(self):
-        return "Benchmark(count={}, worker={})".format(self.count, self.worker)
+        return f"Benchmark(count={self.count}, worker={self.worker})"
 
     def from_json(self, data, cluster):
         self.scenario_name = data["scenario"] if "scenario" in data else "default"

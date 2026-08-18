@@ -7,17 +7,16 @@ import os.path
 import sys
 
 import docopt
-
 from lue import __version__ as lue_version
 from lue.command.scalability.experiment.shape import array_shape
 
 
 def main():
-    usage = """\
+    usage = f"""\
 Calculate array shape to use for scalability experiments
 
 Usage:
-    {command} <memory> <rank> <nr_arrays> <size_of_element> <nr_nodes>
+    {os.path.basename(sys.argv[0])} <memory> <rank> <nr_arrays> <size_of_element> <nr_nodes>
 
 Options:
     memory           Amount of memory to use per node [GiB == 2³⁰ bytes]
@@ -30,7 +29,7 @@ Options:
 Wikipedia:
     In the context of computer memory, gigabyte and GB are customarily
     used to mean 1024³ (2³⁰) bytes.
-""".format(command=os.path.basename(sys.argv[0]))
+"""
 
     arguments = docopt.docopt(usage, version=lue_version)
 
@@ -57,7 +56,7 @@ Wikipedia:
     assert all([isinstance(extent, float) for extent in array_shape_per_node])
 
     print(
-        """\
-shape (total): {}
-shape (node): {}""".format(array_shape_, array_shape_per_node)
+        f"""\
+shape (total): {array_shape_}
+shape (node): {array_shape_per_node}"""
     )

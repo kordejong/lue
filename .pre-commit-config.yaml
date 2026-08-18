@@ -13,17 +13,18 @@ exclude: |
     )$
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v5.0.0
+      rev: v6.0.0
       hooks:
           - id: trailing-whitespace
           - id: end-of-file-fixer
           # - id: check-yaml
           - id: check-added-large-files
     - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.15.10
+      rev: v0.16.3
       hooks:
-          # Run the linter.
+          # Order matters: fixing code must happen before formatting it
           - id: ruff-check
+            args: [--fix]
             # Skip game_of_life.py because a same-named script exists in quick_start ...
             exclude: |
                 (?x)^(
@@ -36,7 +37,6 @@ repos:
                   source/framework/case_study/.*|
                   source/framework/python/test/.*|
                 )$
-          # Run the formatter.
           - id: ruff-format
             files: |
                 (?x)^(
@@ -60,27 +60,27 @@ repos:
             additional_dependencies:
                 - types-python-dateutil==2.9.0.20260323
                 - types-requests==2.33.0.20260402
-    - repo: https://github.com/pycqa/isort
-      rev: 6.0.1
-      hooks:
-          - id: isort
-            files: |
-                (?x)^(
-                  .*\.py|
-                  .*\.py.in|
-                )$
+    # - repo: https://github.com/pycqa/isort
+    #   rev: 6.0.1
+    #   hooks:
+    #       - id: isort
+    #         files: |
+    #             (?x)^(
+    #               .*\.py|
+    #               .*\.py.in|
+    #             )$
     # TODO REQUIRES RUBY - repo: https://github.com/markdownlint/markdownlint
     # TODO REQUIRES RUBY   rev: v0.12.0
     # TODO REQUIRES RUBY   hooks:
     # TODO REQUIRES RUBY   - id: markdownlint
     - repo: https://github.com/codespell-project/codespell
-      rev: v2.4.1
+      rev: v2.4.3
       hooks:
           - id: codespell
             additional_dependencies:
                 - tomli
     - repo: https://github.com/crate-ci/typos
-      rev: v1.35.4
+      rev: v1.49.0
       hooks:
           - id: typos
             args: [] # Relevant: don't update files, just report
@@ -89,9 +89,9 @@ repos:
       hooks:
           # Keep clang-* versions in sync with environment/configuration/requirements-dev.txt
           - id: clang-format
-            args: [--version=21.1.6, --dry-run]
+            args: [--version=22.1.8, --dry-run]
           - id: clang-tidy
-            args: [--version=21.1.6, --quiet]
+            args: [--version=22.1.8, --quiet]
             # TODO: Update code and remove excluded directories from this list
             exclude: |
                 (?x)^(

@@ -117,11 +117,11 @@ def create_map(raster_path: Path, figure_path: Path, formats: list[str]) -> None
                     va="center",
                 )
                 annotation.set_bbox(
-                    dict(
-                        facecolor="#d8dee9",
-                        alpha=0.3,
-                        linewidth=0,
-                    )
+                    {
+                        "facecolor": "#d8dee9",
+                        "alpha": 0.3,
+                        "linewidth": 0,
+                    }
                 )
 
     if show_legend:

@@ -4,10 +4,8 @@ import typing
 from pathlib import Path
 
 import docopt
-import numpy as np
-
 import lue.framework as lfr
-
+import numpy as np
 
 Generation = typing.Any
 Shape = tuple[int, int]
@@ -104,12 +102,12 @@ def game_of_life(
 
 
 def parse_command_line() -> dict:
-    usage = """\
+    usage = f"""\
 Calculate the generations of alive cells according to the Game of Life
 cellular automaton
 
 Usage:
-    {command}
+    {Path(sys.argv[0]).name}
         [--partition_shape=<shape>]
         <array_shape> <nr_generations> <pathname>
 
@@ -120,7 +118,7 @@ Options:
     <pathname>                 Pathname of GeoTiffs, without extension
     --partition_shape=<shape>  Shape of the array partitions. If not provided,
                                a default shape will be used.
-""".format(command=Path(sys.argv[0]).name)
+"""
 
     def parse_shape(string: str) -> Shape:
         string = string.strip("[]")

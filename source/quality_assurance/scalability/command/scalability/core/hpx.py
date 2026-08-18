@@ -1,6 +1,6 @@
 def thread_binding(nr_threads: int) -> str:
     # Bind OS threads to the first processing unit of each core
-    return "thread:0-{}=core:0-{}.pu:0".format(nr_threads - 1, nr_threads - 1)
+    return f"thread:0-{nr_threads - 1}=core:0-{nr_threads - 1}.pu:0"
 
 
 def performance_counter_name_to_property_name(counter_name: str) -> str:

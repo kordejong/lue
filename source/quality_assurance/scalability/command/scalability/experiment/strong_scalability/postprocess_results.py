@@ -1,14 +1,12 @@
 import dateutil.parser
+import lue.data_model as ldm
 import matplotlib.pyplot as plt
 import numpy as np
-
-import lue.data_model as ldm
 
 from ...core import math, plot, process
 from .. import dataset, job
 from .configuration import Configuration
 from .experiment import Experiment
-
 
 # TODO perf counters
 # from tqdm import trange
@@ -56,7 +54,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
     lue_scaling = lue_dataset.benchmark.scaling
 
     def annotate_plot(axis, y_label):
-        axis.set_xlabel("workers ({})".format(worker_type))
+        axis.set_xlabel(f"workers ({worker_type})")
         axis.set_xticks(nr_workers)
         axis.set_ylabel(y_label)
         axis.grid()
@@ -64,7 +62,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
     def plot_duration(axis):
         if count == 1:
             duration = lue_measurement.duration.value[:][sort_idxs]
-            y_label = "duration ({})".format(time_point_units)
+            y_label = f"duration ({time_point_units})"
 
             def plot_actual(data):
                 axis.plot(
@@ -77,9 +75,7 @@ def post_process_raw_results(lue_dataset, result_prefix, plot_pathname, filetype
         else:
             duration = lue_scaling.mean_duration.value[:][sort_idxs]
             error = lue_scaling.std_duration.value[:][sort_idxs]
-            y_label = "duration ({}) ± stddev (count={})".format(
-                time_point_units, count
-            )
+            y_label = f"duration ({time_point_units}) ± stddev (count={count})"
 
             def plot_actual(data):
                 axis.errorbar(

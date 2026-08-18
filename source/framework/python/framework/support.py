@@ -46,7 +46,7 @@ class StaticModel(lfr.Model):
         self.initial()
 
 
-class StaticModelRunner(object):
+class StaticModelRunner:
     def __init__(self, model):
         self.model = model
 
@@ -91,7 +91,7 @@ class DynamicModel(lfr.Model):
     #     self._current_time_step = time_step
 
 
-class DynamicModelRunner(object):
+class DynamicModelRunner:
     def __init__(self, model, last_time_step, first_time_step=1):
         assert first_time_step == 1, first_time_step
 
@@ -109,7 +109,7 @@ class DynamicModelRunner(object):
         lfr.run_deterministic(self.model, progressor, self.last_time_step, rate_limit)
 
 
-class MonteCarloModel(object):  # (lfr.Model):
+class MonteCarloModel:  # (lfr.Model):
     def __init__(self):
         self.first_sample_nr = 0
         self.last_sample_nr = 0
@@ -217,7 +217,7 @@ class MonteCarloModel(object):  # (lfr.Model):
     #   #  return False
 
 
-class MonteCarloModelRunner(object):
+class MonteCarloModelRunner:
     @staticmethod
     def initialize_sample_directories(model, remove_existing_directories):
         for sample_nr in range(model.first_sample_nr, model.last_sample_nr + 1):

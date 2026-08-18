@@ -2,12 +2,10 @@
 import ast
 import os.path
 import sys
-import typing
 
 import docopt
-import numpy as np
-
 import lue.framework as lfr
+import numpy as np
 from lue import __version__ as lue_version
 
 
@@ -145,7 +143,7 @@ def pathnames_to_variable_names(pathnames: set[str]) -> dict[str, str]:
 def statement_to_statement_block(
     statement: str,
     *,
-    partition_shape: typing.Optional[tuple[int, int]],
+    partition_shape: tuple[int, int] | None,
     skip_clone_on_write: bool,
 ) -> list[str]:
     """
@@ -259,7 +257,7 @@ def execute_statement_block(statement_block: list[str]) -> None:
 def execute(
     statement: str,
     *,
-    partition_shape: typing.Optional[tuple[int, int]],
+    partition_shape: tuple[int, int] | None,
     skip_clone_on_write: bool,
 ) -> int:
     statement_block = statement_to_statement_block(

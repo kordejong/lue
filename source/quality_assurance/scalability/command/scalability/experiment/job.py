@@ -3,7 +3,6 @@ import shutil
 
 import lue.data_model as ldm
 
-
 ### def output_pathname(
 ###         job_script_pathname):
 ###
@@ -59,17 +58,11 @@ def program_configuration(
 
     configuration = (
         "--hpx:print-bind "
-        '--lue:count="{count}" '
-        '--lue:nr_workers="{nr_workers}" '
-        '--lue:array_shape="{array_shape}" '
-        '--lue:partition_shape="{partition_shape}" '
-        '--lue:result="{result_pathname}" '.format(
-            count=benchmark.count,
-            nr_workers=nr_workers,
-            array_shape=list(array_shape),
-            partition_shape=list(partition_shape),
-            result_pathname=result_pathname,
-        )
+        f'--lue:count="{benchmark.count}" '
+        f'--lue:nr_workers="{nr_workers}" '
+        f'--lue:array_shape="{list(array_shape)}" '
+        f'--lue:partition_shape="{list(partition_shape)}" '
+        f'--lue:result="{result_pathname}" '
     )
 
     #   '--hpx:attach-debugger=exception '
@@ -289,11 +282,9 @@ def create_slurm_script2(
         nr_tasks=nr_tasks,
         memory=memory_required_per_cluster_node,
         memory_binding=memory_binding,
-        sbatch_options="\n".join(
-            ["#SBATCH {}".format(option) for option in sbatch_options]
-        ),
+        sbatch_options="\n".join([f"#SBATCH {option}" for option in sbatch_options]),
         max_duration=(
-            "#SBATCH --time={}".format(max_duration) if max_duration is not None else ""
+            f"#SBATCH --time={max_duration}" if max_duration is not None else ""
         ),
         software_environment=software_environment,
         job_steps="\n".join(job_steps),
@@ -371,11 +362,9 @@ def create_slurm_script(
         cpus_per_task=cpus_per_task,
         output_filename=output_filename,
         partition_name=partition_name,
-        sbatch_options="\n".join(
-            ["#SBATCH {}".format(option) for option in sbatch_options]
-        ),
+        sbatch_options="\n".join([f"#SBATCH {option}" for option in sbatch_options]),
         max_duration=(
-            "#SBATCH --time={}".format(max_duration) if max_duration is not None else ""
+            f"#SBATCH --time={max_duration}" if max_duration is not None else ""
         ),
         software_environment=cluster.software_environment.configuration,
         job_steps="\n".join(job_steps),

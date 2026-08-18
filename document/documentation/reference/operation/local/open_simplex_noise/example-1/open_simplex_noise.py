@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 import docopt
-
 import lue.framework_x as lfrx
 from lue import __version__ as version
 

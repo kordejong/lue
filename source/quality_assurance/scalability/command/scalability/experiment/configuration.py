@@ -5,7 +5,7 @@ from .benchmark import Benchmark
 from .cluster import Cluster
 
 
-class Configuration(object):
+class Configuration:
     def __init__(self, data):
         self._from_json(data)
 

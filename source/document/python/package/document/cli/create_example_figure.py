@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 import docopt
-
 from lue import __version__ as version
 
 from ..figure import plot

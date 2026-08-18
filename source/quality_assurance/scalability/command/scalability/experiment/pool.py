@@ -1,4 +1,4 @@
-class WorkerRange(object):
+class WorkerRange:
     def __init__(self, data):
         self._from_json(data)
 
@@ -21,21 +21,17 @@ class WorkerRange(object):
 class MultipliedWorkerRange(WorkerRange):
     def __init__(self, data):
         self.from_json(data)
-        super(MultipliedWorkerRange, self).__init__(data)
+        super().__init__(data)
 
     def __str__(self):
-        return "MultipliedWorkerRange(min_size={}, max_size={}, multiplier={})".format(
-            self.min_size,
-            self.max_size,
-            self.multiplier,
-        )
+        return f"MultipliedWorkerRange(min_size={self.min_size}, max_size={self.max_size}, multiplier={self.multiplier})"
 
     def from_json(self, data):
         self.multiplier = data["multiplier"]
         assert self.multiplier > 1
 
     def to_json(self):
-        result = super(MultipliedWorkerRange, self).to_json()
+        result = super().to_json()
         result["multiplier"] = self.multiplier
 
         return result
@@ -67,23 +63,17 @@ class MultipliedWorkerRange(WorkerRange):
 class IncrementedWorkerRange(WorkerRange):
     def __init__(self, data):
         self.from_json(data)
-        super(IncrementedWorkerRange, self).__init__(data)
+        super().__init__(data)
 
     def __str__(self):
-        return (
-            "IncrementedWorkerRange(min_size={}, max_size={}, incrementor={})".format(
-                self.min_size,
-                self.max_size,
-                self.incrementor,
-            )
-        )
+        return f"IncrementedWorkerRange(min_size={self.min_size}, max_size={self.max_size}, incrementor={self.incrementor})"
 
     def from_json(self, data):
         self.incrementor = data["incrementor"]
         assert self.incrementor >= 1
 
     def to_json(self):
-        result = super(IncrementedWorkerRange, self).to_json()
+        result = super().to_json()
         result["incrementor"] = self.incrementor
 
         return result
@@ -123,13 +113,11 @@ class EmptyWorkerRange(WorkerRange):
     def __init__(self, data):
         self.from_json(data)
 
-        super(EmptyWorkerRange, self).__init__(
-            {"min_size": self.size, "max_size": self.size}
-        )
+        super().__init__({"min_size": self.size, "max_size": self.size})
         assert self.min_size == self.max_size == self.size
 
     def __str__(self):
-        return "EmptyWorkerRange(size={})".format(self.size)
+        return f"EmptyWorkerRange(size={self.size})"
 
     def from_json(self, data):
         self.size = data["size"]
@@ -149,7 +137,7 @@ class EmptyWorkerRange(WorkerRange):
         return self.size
 
 
-class Pool(object):
+class Pool:
     def __init__(self, data):
         if "multiplier" in data:
             self.range = MultipliedWorkerRange(data)

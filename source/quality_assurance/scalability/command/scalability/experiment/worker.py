@@ -1,7 +1,7 @@
 from . import pool
 
 
-class Worker(object):
+class Worker:
     def __init__(self, data, cluster, locality_per):
         """
         Class for storing information about the workers to be used
@@ -55,10 +55,7 @@ class Worker(object):
         assert 1 <= self.min_nr_threads <= self.max_nr_threads
 
     def __str__(self):
-        return "Worker(type={}, pool={})".format(
-            self.type,
-            self.pool,
-        )
+        return f"Worker(type={self.type}, pool={self.pool})"
 
     def from_json(self, data):
         self.type = data["type"]

@@ -3,10 +3,9 @@ import sys
 from pathlib import Path
 
 import docopt
-import numpy as np
-
 import lue.framework as lfr
 import lue.qa.scalability.instrument as lqi
+import numpy as np
 
 
 def initialize_generation(array_shape, partition_shape):
@@ -93,12 +92,12 @@ def parse_shape(string):
 
 
 def main():
-    usage = """\
+    usage = f"""\
 Calculate the generations of alive cells according to the Game of Life
 cellular automaton
 
 Usage:
-    {command}
+    {Path(sys.argv[0]).name}
         --lue:count=<count> --lue:nr_workers=<nr_workers>
         --lue:array_shape=<array_shape> --lue:partition_shape=<partition_shape>
         --lue:result=<result>
@@ -106,7 +105,7 @@ Usage:
 
 Options:
     <nr_generations>  Number of Game of Life generations to calculate
-""".format(command=Path(sys.argv[0]).name)
+"""
 
     # Filter out arguments meant for the HPX runtime
     argv = [arg for arg in sys.argv[1:] if not arg.startswith("--hpx")]

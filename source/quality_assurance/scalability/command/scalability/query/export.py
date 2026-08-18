@@ -1,9 +1,8 @@
 import csv
 from pathlib import Path
 
-import numpy as np
-
 import lue.data_model as ldm
+import numpy as np
 
 
 def export_duration_partition_shape(dataset: ldm.Dataset, csv_writer) -> None:

@@ -1,7 +1,5 @@
-import numpy as np
-
 import lue.data_model as ldm
-
+import numpy as np
 
 # Create a dataset
 dataset = ldm.create_dataset("planets.lue")

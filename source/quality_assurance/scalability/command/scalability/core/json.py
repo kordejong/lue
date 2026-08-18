@@ -1,7 +1,6 @@
 import json
 import os.path
 
-
 __all__ = [
     "json_to_data",
 ]

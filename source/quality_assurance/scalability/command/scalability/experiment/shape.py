@@ -156,13 +156,13 @@ def range_of_shapes(min_shape, max_nr_elements, multiplier, method):
     shapes = [shape(size, normalized_shape) for size in sizes]
 
     assert len(shapes) == 0 or nr_elements(shapes[-1]) <= max_nr_elements, (
-        "{}, {}".format(shapes, max_nr_elements)
+        f"{shapes}, {max_nr_elements}"
     )
 
     return shapes
 
 
-class Range(object):
+class Range:
     def __init__(self, data):
         self.from_json(data)
 
@@ -184,7 +184,7 @@ class Range(object):
         }
 
 
-class Shape(object):
+class Shape:
     def __init__(self, data):
         self.from_json(data)
 

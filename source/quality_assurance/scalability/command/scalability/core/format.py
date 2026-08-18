@@ -1,6 +1,5 @@
 import math
 
-
 # millnames = ['',' thousand',' Million',' Billion',' Trillion']
 #
 # def millify(n):
@@ -21,9 +20,9 @@ def format_duration(duration):
 
 def format_nr_workers(size: float) -> str:
     nr_workers = math.floor(size)
-    return "{:,}".format(int(nr_workers)) if nr_workers == size else ""
+    return f"{int(nr_workers):,}" if nr_workers == size else ""
 
 
 def format_partition_size(size: float) -> str:
     partition_size = math.floor(size)
-    return "{:,}".format(int(partition_size)) if partition_size == size else ""
+    return f"{int(partition_size):,}" if partition_size == size else ""

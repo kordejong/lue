@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 import docopt
-
 from lue import __version__ as lue_version
 from lue.command.scalability import (
     export_duration,

@@ -127,12 +127,14 @@ namespace lue::utility {
             auto const [nr_rows, nr_cols] = raster.shape();
             auto const [west, cell_width, row_rotation, north, col_rotation, cell_height] =
                 raster.geo_transform();
-            double const east = west + (nr_cols * cell_width);
-            double const south = north - (nr_rows * cell_height);
+            auto const east = west + (nr_cols * cell_width);
+            auto const south = north - (nr_rows * cell_height);
 
-            std::array<double, 4> space_box{west, south, east, north};
-
-            return std::vector<Coordinate>(space_box.begin(), space_box.end());
+            return {
+                static_cast<Coordinate>(west),
+                static_cast<Coordinate>(south),
+                static_cast<Coordinate>(east),
+                static_cast<Coordinate>(north)};
         }
 
 
@@ -169,12 +171,11 @@ namespace lue::utility {
 
                     if (space_boxes.size() % nr_elements_in_object_array != 0)
                     {
-                        throw std::runtime_error(
-                            std::format(
-                                "Expected a multiple of {} coordinates, but found {} ({})",
-                                nr_elements_in_object_array,
-                                space_boxes.size(),
-                                space_domain.id().pathname()));
+                        throw std::runtime_error(std::format(
+                            "Expected a multiple of {} coordinates, but found {} ({})",
+                            nr_elements_in_object_array,
+                            space_boxes.size(),
+                            space_domain.id().pathname()));
                     }
                 }
 
@@ -206,10 +207,9 @@ namespace lue::utility {
 
                         case data_model::SpaceDomainItemType::point:
                         {
-                            throw std::runtime_error(
-                                std::format(
-                                    "Importing stationary space points not supported yet ({})",
-                                    property_set.space_domain().id().pathname()));
+                            throw std::runtime_error(std::format(
+                                "Importing stationary space points not supported yet ({})",
+                                property_set.space_domain().id().pathname()));
                             // break;
                         }
 
@@ -239,10 +239,8 @@ namespace lue::utility {
                 }
                 case data_model::Mobility::mobile:
                 {
-                    throw std::runtime_error(
-                        std::format(
-                            "Importing mobile space items not supported yet ({})",
-                            property_set.id().pathname()));
+                    throw std::runtime_error(std::format(
+                        "Importing mobile space items not supported yet ({})", property_set.id().pathname()));
 
                     break;
                 }
@@ -269,12 +267,11 @@ namespace lue::utility {
 
             if (values.size() % nr_elements_in_object_array != 0)
             {
-                throw std::runtime_error(
-                    std::format(
-                        "Number of values is not a multiple of the number of elements "
-                        "in an object array ({} % {} != 0)",
-                        values.size(),
-                        nr_elements_in_object_array));
+                throw std::runtime_error(std::format(
+                    "Number of values is not a multiple of the number of elements "
+                    "in an object array ({} % {} != 0)",
+                    values.size(),
+                    nr_elements_in_object_array));
             }
 
             auto& property =
@@ -454,12 +451,11 @@ namespace lue::utility {
 
             if (values.size() % nr_elements_in_object_array != 0)
             {
-                throw std::runtime_error(
-                    std::format(
-                        "Number of values is not a multiple of the number of elements "
-                        "in an object array ({} % {} != 0)",
-                        values.size(),
-                        nr_elements_in_object_array));
+                throw std::runtime_error(std::format(
+                    "Number of values is not a multiple of the number of elements "
+                    "in an object array ({} % {} != 0)",
+                    values.size(),
+                    nr_elements_in_object_array));
             }
 
             auto const nr_object_arrays = values.size() / nr_elements_in_object_array;
@@ -961,20 +957,18 @@ namespace lue::utility {
         {
             if (property_set.time_domain().configuration() != time_configuration)
             {
-                throw std::runtime_error(
-                    std::format(
-                        "Existing time configuration at {} does not match "
-                        "the one in the JSON file",
-                        property_set.id().pathname()));
+                throw std::runtime_error(std::format(
+                    "Existing time configuration at {} does not match "
+                    "the one in the JSON file",
+                    property_set.id().pathname()));
             }
 
             if (property_set.time_domain().clock() != clock)
             {
-                throw std::runtime_error(
-                    std::format(
-                        "Existing clock at {} does not match "
-                        "the one in the JSON file",
-                        property_set.id().pathname()));
+                throw std::runtime_error(std::format(
+                    "Existing clock at {} does not match "
+                    "the one in the JSON file",
+                    property_set.id().pathname()));
             }
         }
 

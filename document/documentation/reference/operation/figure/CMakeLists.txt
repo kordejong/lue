@@ -21,6 +21,8 @@ foreach(operation_kind_name
         TARGET_NAME ${target_name}
         INPUTS
             operation.tex
+        INCLUDE_DIRECTORIES
+            ${CMAKE_BINARY_DIR}/environment/texmf/tex/latex/nord
     )
 
     add_custom_command(

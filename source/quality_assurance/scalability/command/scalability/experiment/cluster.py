@@ -1,11 +1,9 @@
-class Core(object):
+class Core:
     def __init__(self, data):
         self.from_json(data)
 
     def __str__(self):
-        return "Core(nr_threads={})".format(
-            self.nr_threads,
-        )
+        return f"Core(nr_threads={self.nr_threads})"
 
     def from_json(self, data):
         self.nr_threads = data["nr_threads"]
@@ -16,16 +14,12 @@ class Core(object):
         }
 
 
-class NUMANode(object):
+class NUMANode:
     def __init__(self, data):
         self.from_json(data)
 
     def __str__(self):
-        return "NUMANode(memory={}, nr_cores={}, core={})".format(
-            self.memory,
-            self.nr_cores,
-            self.core,
-        )
+        return f"NUMANode(memory={self.memory}, nr_cores={self.nr_cores}, core={self.core})"
 
     @property
     def nr_threads(self):
@@ -44,15 +38,12 @@ class NUMANode(object):
         }
 
 
-class Package(object):
+class Package:
     def __init__(self, data):
         self.from_json(data)
 
     def __str__(self):
-        return "Package(nr_numa_nodes={}, numa_node={})".format(
-            self._nr_numa_nodes,
-            self.numa_node.to_json(),
-        )
+        return f"Package(nr_numa_nodes={self._nr_numa_nodes}, numa_node={self.numa_node.to_json()})"
 
     @property
     def nr_numa_nodes(self):
@@ -81,15 +72,12 @@ class Package(object):
         }
 
 
-class ClusterNode(object):
+class ClusterNode:
     def __init__(self, data):
         self.from_json(data)
 
     def __str__(self):
-        return "ClusterNode(nr_packages={}, package={})".format(
-            self.nr_packages,
-            self.package,
-        )
+        return f"ClusterNode(nr_packages={self.nr_packages}, package={self.package})"
 
     @property
     def nr_numa_nodes(self):
@@ -118,7 +106,7 @@ class ClusterNode(object):
         }
 
 
-class Scheduler(object):
+class Scheduler:
     def __init__(self, data):
         self._from_json(data)
 
@@ -131,13 +119,13 @@ class Scheduler(object):
 
 class ShellScheduler(Scheduler):
     def __init__(self, data):
-        super(ShellScheduler, self).__init__(data)
+        super().__init__(data)
 
     def to_json(self):
-        return super(ShellScheduler, self).to_json()
+        return super().to_json()
 
 
-class SlurmSettings(object):
+class SlurmSettings:
     def __init__(self, data):
         self.from_json(data)
 
@@ -166,21 +154,21 @@ class SlurmSettings(object):
 
 class SlurmScheduler(Scheduler):
     def __init__(self, data):
-        super(SlurmScheduler, self).__init__(data)
+        super().__init__(data)
         self.from_json(data)
 
     def from_json(self, data):
         self.settings = SlurmSettings(data["settings"])
 
     def to_json(self):
-        result = super(SlurmScheduler, self).to_json()
+        result = super().to_json()
 
         result["settings"] = self.settings.to_json()
 
         return result
 
 
-class SoftwareEnvironment(object):
+class SoftwareEnvironment:
     def __init__(self, data):
         self.from_json(data)
 
@@ -209,7 +197,7 @@ class SoftwareEnvironment(object):
         if self.module_names:
             commands = ["module purge"]
 
-        commands += ["module load {}".format(name) for name in self.module_names]
+        commands += [f"module load {name}" for name in self.module_names]
 
         if self.venv:
             environment = self.venv["environment"]
@@ -218,7 +206,7 @@ class SoftwareEnvironment(object):
         return "\n".join(commands)
 
 
-class Cluster(object):
+class Cluster:
     def __init__(self, data):
         self.from_json(data)
 

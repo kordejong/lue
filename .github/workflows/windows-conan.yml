@@ -13,6 +13,7 @@ on:
       - "!.github/workflows/*"
       - ".github/workflows/windows-conan.yml"
       - "!environment/conda/*"
+      - "!document/*"
       - "!environment/easybuild/*"
   push:
     branches:
@@ -21,6 +22,7 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conan.yml"
+      - "!document/*"
       - "!environment/conda/*"
       - "!environment/easybuild/*"
   workflow_dispatch:

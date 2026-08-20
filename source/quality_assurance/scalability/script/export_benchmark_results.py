@@ -3,21 +3,19 @@ import os.path
 import sys
 
 import docopt
-
 from benchmark import export_results
 
-
-usage = """\
+usage = f"""\
 Export benchmark results
 
 Usage:
-    {command} <dataset> <csv_file>
+    {os.path.basename(sys.argv[0])} <dataset> <csv_file>
 
 Options:
     dataset    Pathname of dataset containing benchmark results
     csv_file   Pathname of CSV file to write output to
     -h --help  Show this screen
-""".format(command=os.path.basename(sys.argv[0]))
+"""
 
 
 if __name__ == "__main__":

@@ -149,10 +149,12 @@ target_sources(lue_framework_api_cxx
         source/local/where3.cpp
         source/miscellaneous/array_like.cpp
         source/miscellaneous/cast.cpp
+        source/miscellaneous/cell_index.cpp
         source/miscellaneous/create_array.cpp
         source/miscellaneous/create_kernel.cpp
         source/miscellaneous/create_scalar.cpp
         source/routing/accu.cpp
+        source/routing/d8_flow_direction.cpp
         source/type_info.cpp
 )
 

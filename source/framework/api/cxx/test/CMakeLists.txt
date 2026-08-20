@@ -57,12 +57,14 @@ set(local_operation_names
 set(miscellaneous_operation_names
     miscellaneous/array_like
     miscellaneous/cast
+    miscellaneous/cell_index
     miscellaneous/create_array
     miscellaneous/create_scalar
 )
 
 set(routing_operation_names
     routing/accu
+    routing/d8_flow_direction
 )
 
 set(names

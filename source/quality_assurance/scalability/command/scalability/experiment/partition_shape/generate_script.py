@@ -94,9 +94,7 @@ def generate_script_slurm(
         result_prefix=result_prefix,
     )
 
-    job_name = "{name}-{program_name}".format(
-        name=experiment.name, program_name=experiment.program_name
-    )
+    job_name = f"{experiment.name}-{experiment.program_name}"
     delimiter = "END_OF_SLURM_SCRIPT"
 
     commands = [
@@ -114,11 +112,11 @@ def generate_script_slurm(
             delimiter=delimiter,
         ),
         slurm_script,
-        "{delimiter}".format(delimiter=delimiter),
+        f"{delimiter}",
     ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script_shell(
@@ -146,7 +144,7 @@ def generate_script_shell(
 
             commands += [
                 # Create directory for the resulting json file
-                "mkdir -p {}".format(os.path.dirname(result_pathname)),
+                f"mkdir -p {os.path.dirname(result_pathname)}",
                 # Run the benchmark, resulting in a json file
                 f"{experiment.command_pathname} {experiment.command_arguments} "
                 f'--hpx:threads="{nr_threads}" '
@@ -165,7 +163,7 @@ def generate_script_shell(
             ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script(configuration_data):

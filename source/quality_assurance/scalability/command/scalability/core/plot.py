@@ -1,8 +1,7 @@
 import matplotlib.scale as mscale
-import matplotlib.ticker as ticker
 import matplotlib.transforms as mtransforms
 import numpy as np
-
+from matplotlib import ticker
 
 # https://www.nordtheme.com/
 

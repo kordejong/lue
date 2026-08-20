@@ -3,9 +3,8 @@ import os.path
 import tempfile
 
 import dateutil.parser
-import numpy as np
-
 import lue.data_model as ldm
+import numpy as np
 
 from ...core import process
 from .. import dataset, job
@@ -114,9 +113,7 @@ def benchmark_to_lue_json(benchmark_pathname, lue_json_pathname, epoch):
 
     if epoch_offset < 0:
         raise RuntimeError(
-            "epoch passed in is later than epoch from benchmark: {} > {}".format(
-                epoch, benchmark_epoch
-            )
+            f"epoch passed in is later than epoch from benchmark: {epoch} > {benchmark_epoch}"
         )
 
     # Benchmarks are sorted by benchmark epochs. Keep the information
@@ -243,7 +240,7 @@ def determine_epoch(result_prefix, cluster, benchmark, experiment):
             if epoch is None:
                 epoch = benchmark_start
             else:
-                epoch = epoch if epoch < benchmark_start else benchmark_start
+                epoch = min(benchmark_start, epoch)
 
     return epoch
 
@@ -380,7 +377,7 @@ def write_scalability_results(lue_dataset):
 
     for i in range(nr_arrays):
         duration_property = partition_property_set.add_property(
-            "duration_{}".format(i),
+            f"duration_{i}",
             np.dtype(np.uint64),
             (count,),
             "For an array and for each partition, the duration(s) it "
@@ -398,20 +395,20 @@ def write_scalability_results(lue_dataset):
 
         for i in range(nr_arrays):
             mean_duration_property = partition_property_set.add_property(
-                "mean_duration_{}".format(i),
+                f"mean_duration_{i}",
                 np.dtype(np.float64),
                 "For an array and for each partition, the mean duration "
-                "the {} experiments took.".format(count),
+                f"the {count} experiments took.",
             )
             mean_duration_property.value.expand(nr_partitions)[:] = mean_duration[
                 i * nr_partitions : (i + 1) * nr_partitions
             ]
 
             std_duration_property = partition_property_set.add_property(
-                "std_duration_{}".format(i),
+                f"std_duration_{i}",
                 np.dtype(np.float64),
                 "For an array and for each partition, the standard "
-                "deviation of the durations the {} experiments took.".format(count),
+                f"deviation of the durations the {count} experiments took.",
             )
             std_duration_property.value.expand(nr_partitions)[:] = std_duration[
                 i * nr_partitions : (i + 1) * nr_partitions

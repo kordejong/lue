@@ -1,7 +1,7 @@
 import os.path
 
 
-class Arguments(object):
+class Arguments:
     def __init__(self, json_dict):
         self.positionals = (
             json_dict["positionals"] if "positionals" in json_dict else []
@@ -13,17 +13,15 @@ class Arguments(object):
         result = []
 
         for positional in self.positionals:
-            result.append('"{}"'.format(positional))
+            result.append(f'"{positional}"')
 
         for key, value in self.options.items():
-            result.append(
-                '--{}="{}"'.format(key, value) if value else "--{}".format(key)
-            )
+            result.append(f'--{key}="{value}"' if value else f"--{key}")
 
         return result
 
 
-class Experiment(object):
+class Experiment:
     def __init__(self, data, name, description):
         # Name (kind) of the experiment
         self.name = name

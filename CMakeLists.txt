@@ -89,6 +89,8 @@ string(SUBSTRING ${LUE_GIT_SHA1} 0 7 LUE_GIT_SHORT_SHA1)
 
 include(Lue)
 
+add_subdirectory(environment)
+
 if(LUE_BUILD_DOCUMENTATION)
     add_subdirectory(document)
 endif()

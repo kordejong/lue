@@ -39,6 +39,16 @@ elseif(LUE_FRAMEWORK_COUNT_ELEMENT STREQUAL "std::int64_t")
     set(LUE_ELEMENT_TYPE_COUNT "LUE_ElementType_Int64")
 endif()
 
+if(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::uint32_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_UInt32")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::uint64_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_UInt64")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::int32_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_Int32")
+elseif(LUE_FRAMEWORK_INDEX_ELEMENT STREQUAL "std::int64_t")
+    set(LUE_ELEMENT_TYPE_INDEX "LUE_ElementType_Int64")
+endif()
+
 string(REPLACE "std::" "" LUE_BooleanElement ${LUE_FRAMEWORK_BOOLEAN_ELEMENT})
 
 configure_file(
@@ -68,14 +78,11 @@ target_sources(lue_framework_api_c
         source/literal.cpp
         source/local_operation.cpp
         source/miscellaneous_operation.cpp
+        source/routing_operation.cpp
         source/runtime.cpp
         source/scalar.cpp
         source/type_info.cpp
 )
-
-# set_property(TARGET lue_framework_api_c
-#     PROPERTY C_STANDARD 11
-# )
 
 target_link_libraries(lue_framework_api_c
     PRIVATE

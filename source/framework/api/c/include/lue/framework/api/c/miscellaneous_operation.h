@@ -1,5 +1,6 @@
 #pragma once
 #include "lue/framework/api/c/array.h"
+#include "lue/framework/api/c/define.h"
 #include "lue/framework/api/c/export.h"
 #include "lue/framework/api/c/field.h"
 #include "lue/framework/api/c/kernel.h"
@@ -15,13 +16,11 @@ extern "C" {
 #endif
 
 
-typedef size_t LUE_Rank;
-typedef ptrdiff_t LUE_Count;
-
-
 LUE_FCAPI_EXPORT LUE_Array* lue_array_like(LUE_Array* array, LUE_Scalar* fill_value);
 
 LUE_FCAPI_EXPORT LUE_Field* lue_cast(LUE_Field* field, LUE_ElementType element_type);
+
+LUE_FCAPI_EXPORT LUE_Field* lue_cell_index(LUE_Field* field, LUE_Index dimension_index);
 
 LUE_FCAPI_EXPORT LUE_Array* lue_create_array(
     LUE_Rank rank, LUE_Count const* array_shape, LUE_Scalar const* fill_value);

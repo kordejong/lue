@@ -277,7 +277,10 @@ namespace lue::utility {
 
 
     template<typename T>
-    void lue_to_gdal(data_model::Array const& array, gdal::Raster::Band& raster_band)
+    void lue_to_gdal(
+        data_model::Array const& array,
+        gdal::Raster::Band& raster_band,
+        std::map<std::string, std::string> const& tags)
     {
         if (array.has_no_data_value())
         {
@@ -312,48 +315,56 @@ namespace lue::utility {
                 raster_band.write_block({block_y, block_x}, values.data());
             }
         }
+
+        for (auto const& [key, value] : tags)
+        {
+            raster_band.set_metadata(key, value, "lue");
+        }
     }
 
 
-    void lue_to_gdal(data_model::Array const& array, gdal::Raster::Band& raster_band)
+    void lue_to_gdal(
+        data_model::Array const& array,
+        gdal::Raster::Band& raster_band,
+        std::map<std::string, std::string> const& tags)
     {
         hdf5::Datatype const memory_datatype{gdal_data_type_to_memory_data_type(raster_band.data_type())};
 
         if (memory_datatype == hdf5::native_uint8)
         {
-            lue_to_gdal<std::uint8_t>(array, raster_band);
+            lue_to_gdal<std::uint8_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint16)
         {
-            lue_to_gdal<std::uint16_t>(array, raster_band);
+            lue_to_gdal<std::uint16_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int16)
         {
-            lue_to_gdal<std::int16_t>(array, raster_band);
+            lue_to_gdal<std::int16_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint32)
         {
-            lue_to_gdal<std::uint32_t>(array, raster_band);
+            lue_to_gdal<std::uint32_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int32)
         {
-            lue_to_gdal<std::int32_t>(array, raster_band);
+            lue_to_gdal<std::int32_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_uint64)
         {
-            lue_to_gdal<std::uint64_t>(array, raster_band);
+            lue_to_gdal<std::uint64_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_int64)
         {
-            lue_to_gdal<std::int64_t>(array, raster_band);
+            lue_to_gdal<std::int64_t>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_float32)
         {
-            lue_to_gdal<float>(array, raster_band);
+            lue_to_gdal<float>(array, raster_band, tags);
         }
         else if (memory_datatype == hdf5::native_float64)
         {
-            lue_to_gdal<double>(array, raster_band);
+            lue_to_gdal<double>(array, raster_band, tags);
         }
         else
         {
@@ -368,6 +379,11 @@ namespace lue::utility {
         // Find information about where to read the raster from: phenomenon/property_set/property
         std::string const dataset_name{std::filesystem::path(raster_name).stem().string()};
 
+        if (metadata.object().empty())
+        {
+            throw std::runtime_error("Metadata is required to export to a raster");
+        }
+
         auto const& root_json = metadata.object();
         auto const datasets_json = json::object(root_json, "datasets");
         auto const dataset_json = json::object(datasets_json, "name", dataset_name);
@@ -380,15 +396,16 @@ namespace lue::utility {
 
         if (nr_bands == 0)
         {
-            return;
+            throw std::runtime_error("No bands found in the metadata");
         }
 
         std::string const driver_name{gdal::driver_name(raster_name)};
 
-        // If the constant raster view finds a raster with the property name
-        // requested, export it to a single GDAL raster
         if (data_model::constant::contains_raster(dataset, phenomenon_name, property_set_name))
         {
+            // If the constant raster view finds a raster with the property name requested, export it to a
+            // single GDAL raster
+
             using RasterView = data_model::constant::RasterView<data_model::Dataset*>;
             using RasterLayer = RasterView::Layer;
 
@@ -404,6 +421,13 @@ namespace lue::utility {
                         "Constant raster layer named {} is not part of property_set {}",
                         property_name,
                         property_set_name));
+            }
+
+            std::map<std::string, std::string> tags{};
+
+            if (json ::has_key(*it, "value_scale"))
+            {
+                tags["value_scale"] = json::string(*it, "value_scale");
             }
 
             RasterLayer layer{raster_view.layer(property_name)};
@@ -448,7 +472,7 @@ namespace lue::utility {
 
             gdal::Count band_nr{1};
             gdal::Raster::Band raster_band{raster.band(band_nr)};
-            lue_to_gdal(layer, raster_band);
+            lue_to_gdal(layer, raster_band, tags);
 
 
             // TODO
@@ -469,10 +493,11 @@ namespace lue::utility {
             //     lue_to_gdal(layer, raster_band);
             // }
         }
-        // If the variable raster view finds a raster layer with the property
-        // name requested, export it to a stack of GDAL rasters
         else if (data_model::variable::contains_raster(dataset, phenomenon_name, property_set_name))
         {
+            // If the variable raster view finds a raster layer with the property
+            // name requested, export it to a stack of GDAL rasters
+
             using RasterView = data_model::variable::RasterView<data_model::Dataset*>;
             // using RasterLayer = RasterView::Layer;
 

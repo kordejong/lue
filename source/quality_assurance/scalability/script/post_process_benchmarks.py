@@ -1,10 +1,7 @@
 #!/usr/bin/env python
-# -*- encoding: utf8 -*-
 # TODO Use the lue dataset for obtaining information, instead of the json files
-import matplotlib
-
 import lue
-
+import matplotlib
 
 # matplotlib.use("PDF")
 matplotlib.use("Agg")
@@ -16,17 +13,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-
-usage = """\
+usage = f"""\
 Post-process benchmark results
 
 Usage:
-    {command} <lue_file>
+    {os.path.basename(sys.argv[0])} <lue_file>
 
 Options:
     lue_file        Pathname to file containing benchmark results
     -h --help       Show this screen
-""".format(command=os.path.basename(sys.argv[0]))
+"""
 
 
 def post_process_strong_scaling_benchmarks(
@@ -150,9 +146,7 @@ def post_process_strong_scaling_benchmarks(
 
     # plt.setp(axes, xlabel="meh")
     figure.suptitle(
-        "{}\nStrong scaling experiment performed at {}, on {}".format(
-            name, time_point, system_name
-        )
+        f"{name}\nStrong scaling experiment performed at {time_point}, on {system_name}"
     )
 
     plt.savefig("benchmark.pdf")

@@ -7,5 +7,4 @@ import sys
 
 from lue.command.scalability.cli.array_shape import main
 
-
 sys.exit(main())

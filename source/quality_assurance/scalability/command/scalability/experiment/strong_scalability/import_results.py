@@ -3,9 +3,8 @@ import os.path
 import tempfile
 
 import dateutil.parser
-import numpy as np
-
 import lue.data_model as ldm
+import numpy as np
 
 from ...core import process
 from .. import dataset, job, util
@@ -135,9 +134,7 @@ def benchmark_to_lue_json(benchmark_pathname, lue_json_pathname, epoch):
 
     if epoch_offset < 0:
         raise RuntimeError(
-            "epoch passed in is later than epoch from benchmark: {} > {}".format(
-                epoch, benchmark_epoch
-            )
+            f"epoch passed in is later than epoch from benchmark: {epoch} > {benchmark_epoch}"
         )
 
     # Benchmarks are sorted by benchmark epochs. Keep the information
@@ -364,8 +361,8 @@ def write_scalability_results(lue_dataset):
             np.dtype(np.float64),
             shape=(),
             value_variability=ldm.ValueVariability.variable,
-            description="For a number of workers, the mean duration of the {} "
-            "experiments took.".format(count),
+            description=f"For a number of workers, the mean duration of the {count} "
+            "experiments took.",
         )
         mean_duration_property.value.expand(nr_durations)[:] = mean_duration
 
@@ -375,7 +372,7 @@ def write_scalability_results(lue_dataset):
             shape=(),
             value_variability=ldm.ValueVariability.variable,
             description="For a number of workers, the standard deviation of the "
-            "durations the {} experiments took.".format(count),
+            f"durations the {count} experiments took.",
         )
         std_duration_property.value.expand(nr_durations)[:] = std_duration
 
@@ -385,7 +382,7 @@ def write_scalability_results(lue_dataset):
             shape=(),
             value_variability=ldm.ValueVariability.variable,
             description="For a number of workers, the mean of the relative "
-            "speed-up of the {} experiments.".format(count),
+            f"speed-up of the {count} experiments.",
         )
         mean_relative_speed_up_property.value.expand(nr_durations)[:] = (
             mean_relative_speed_up
@@ -397,7 +394,7 @@ def write_scalability_results(lue_dataset):
             shape=(),
             value_variability=ldm.ValueVariability.variable,
             description="For a number of workers, the standard deviation of the "
-            "relative speed-ups of the {} experiments.".format(count),
+            f"relative speed-ups of the {count} experiments.",
         )
         std_relative_speed_up_property.value.expand(nr_durations)[:] = (
             std_relative_speed_up
@@ -409,7 +406,7 @@ def write_scalability_results(lue_dataset):
             shape=(),
             value_variability=ldm.ValueVariability.variable,
             description="For a number of workers, the mean of the relative "
-            "efficiency of the {} experiments.".format(count),
+            f"efficiency of the {count} experiments.",
         )
         mean_relative_efficiency_property.value.expand(nr_durations)[:] = (
             mean_relative_efficiency
@@ -421,7 +418,7 @@ def write_scalability_results(lue_dataset):
             shape=(),
             value_variability=ldm.ValueVariability.variable,
             description="For a number of workers, the standard deviation of the "
-            "relative efficiency of the {} experiments.".format(count),
+            f"relative efficiency of the {count} experiments.",
         )
         std_relative_efficiency_property.value.expand(nr_durations)[:] = (
             std_relative_efficiency

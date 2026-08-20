@@ -108,7 +108,7 @@ class DynamicFramework(lfr.DynamicModelRunner):
 
     def __init__(self, model, last_time_step=0, first_time_step=1):
         if hasattr(model, "dynamic"):
-            setattr(model, "dynamic", decorated_dynamic(model.dynamic))
+            model.dynamic = decorated_dynamic(model.dynamic)
 
         super().__init__(model, last_time_step, first_time_step)
         self.quiet = False
@@ -335,7 +335,7 @@ class FrameworkError(Exception):
         return self._msg
 
 
-def generateNameT(name: Union[str, os.PathLike[str]], timestep: int) -> str:
+def generateNameT(name: str | os.PathLike[str], timestep: int) -> str:
     """
     Return a filename based on the name and time step passed in.
 

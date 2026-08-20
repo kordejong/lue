@@ -80,6 +80,36 @@ static void cast_test(void)
 }
 
 
+static void cell_index_test(void)
+{
+    typedef LUE_BooleanElement InputElement;
+    LUE_Field* input_field = NULL;
+
+    {
+        LUE_Rank const rank = 2;
+        LUE_Count const array_shape[] = {60, 40};
+        InputElement const value = 1;
+        LUE_Literal* literal = lue_create_literal(value);
+        LUE_Scalar* scalar = lue_create_scalar(literal);
+        LUE_Array* array = lue_create_array(rank, array_shape, scalar);
+
+        input_field = lue_as_field(array);
+
+        lue_destruct(scalar);
+        lue_destruct(literal);
+    }
+
+    LUE_Field* output_field = lue_cell_index(input_field, 0);
+
+    CU_ASSERT_NOT_EQUAL(output_field, NULL);
+    CU_ASSERT_EQUAL(lue_data_model(output_field), LUE_DataModel_Array);
+    CU_ASSERT_EQUAL(lue_element_type(output_field), LUE_ElementType_Index);
+
+    lue_destruct(input_field);
+    lue_destruct(output_field);
+}
+
+
 static void create_array_test(void)
 {
     typedef float Element;
@@ -135,6 +165,7 @@ HPX_UNIT_TEST_SUITE(
     "miscellaneous_operation",
     CUNIT_CI_TEST(array_like_test),
     CUNIT_CI_TEST(cast_test),
+    CUNIT_CI_TEST(cell_index_test),
     CUNIT_CI_TEST(create_array_test),
     CUNIT_CI_TEST(create_literal_test),
     CUNIT_CI_TEST(create_scalar_test));

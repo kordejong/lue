@@ -2,6 +2,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 #include <format>
+#include <fstream>
 
 
 // Unused suitable color: "fillcolor": "#094d8e"

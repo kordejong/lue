@@ -3,11 +3,9 @@ import sys
 from pathlib import Path
 
 import docopt
-import numpy as np
-
 import lue.framework as lfr
+import numpy as np
 from lue import __version__ as lue_version
-
 
 # from lue.qa.scalability import perform_experiment_task
 # from lue.qa.scalability.core import json_to_data

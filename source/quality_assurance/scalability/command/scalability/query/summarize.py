@@ -2,12 +2,10 @@ import json
 import typing
 from pathlib import Path
 
+import lue.data_model as ldm
 import numpy as np
 
-import lue.data_model as ldm
-
 from ..experiment.cluster import Cluster
-
 
 MS_TO_S = 1 / 1000
 MS_TO_MIN = MS_TO_S / 60

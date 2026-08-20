@@ -7,5 +7,4 @@ import sys
 
 from lue.command.scalability.cli.scalability import main
 
-
 sys.exit(main())

@@ -1,7 +1,5 @@
-import numpy as np
-
 import lue.data_model as ldm
-
+import numpy as np
 
 nr_areas = 10
 rank = 2

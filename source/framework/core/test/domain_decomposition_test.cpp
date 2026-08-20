@@ -512,7 +512,7 @@ BOOST_AUTO_TEST_CASE(default_partition_shape_1d)
     {
         Count const nr_worker_threads{6};
         Shape const array_shape{5};
-        Shape const shape_we_want{1};
+        Shape const shape_we_want{5};
 
         Shape const shape_we_got{lue::default_partition_shape(array_shape, nr_worker_threads)};
 
@@ -643,7 +643,7 @@ BOOST_AUTO_TEST_CASE(default_partition_shape_2d)
     {
         Count const nr_worker_threads{6};
         Shape const array_shape{3, 3};
-        Shape const shape_we_want{1, 1};
+        Shape const shape_we_want{3, 3};
 
         Shape const shape_we_got{lue::default_partition_shape(array_shape, nr_worker_threads)};
 

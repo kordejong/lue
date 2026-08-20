@@ -1,0 +1,44 @@
+# `downstream`
+
+```{index} single: routing operation; downstream
+```
+
+## Signature
+
+```{eval-rst}
+.. py:function:: downstream(flow_direction, material) -> Field
+
+   Assign the value from each cell's downstream neighbour to the cell itself
+
+   :param Field flow_direction: Integral array
+   :param Field material: Arithmetic array
+   :return: New arithmetic array
+```
+
+## Description
+
+All material is transported upstream by one cell, according to the flow direction field.
+
+## No-data handling
+
+A no-data value in the material array is transported upstream. Also, a no-data value in the material array
+results in a no-data value in the output material array. The output array may contain more no-data values than
+the input arrays.
+
+## Example
+
+````{tab-set-code}
+
+```{code-block} c
+/* TODO */
+```
+
+```{code-block} c++
+// TODO
+```
+
+```{code-block} python
+# TODO
+```
+
+````

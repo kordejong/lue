@@ -2,6 +2,9 @@
 #include <pybind11/stl.h>
 
 
+using namespace pybind11::literals;
+
+
 namespace lue::api {
 
     void bind_local_operations(pybind11::module& module)
@@ -34,7 +37,13 @@ namespace lue::api {
         module.def("multiply", multiply);
         module.def("negate", negate);
         module.def("not_equal_to", not_equal_to);
-        module.def("open_simplex_noise", open_simplex_noise);
+        module.def(
+            "open_simplex_noise",
+            open_simplex_noise,
+            "x_coordinates"_a,
+            "y_coordinates"_a,
+            pybind11::kw_only(),
+            "seed"_a);
         module.def("pow", pow);
         module.def("round", round);
         module.def("sin", sin);
@@ -50,19 +59,41 @@ namespace lue::api {
             "where",
             [](Field const& condition_field, Field const& true_field, Field const& false_field) -> Field
             { return where(condition_field, true_field, false_field); });
-
         module.def(
             "uniform",
             [](Shape<Count, 2> const& array_shape,
                Shape<Count, 2> const& partition_shape,
                Field const& min_value,
                Field const& max_value) -> Field
-            { return uniform(array_shape, partition_shape, min_value, max_value); });
-
+            { return uniform(array_shape, partition_shape, min_value, max_value); },
+            "array_shape"_a,
+            "partition_shape"_a,
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
         module.def(
             "uniform",
             [](Shape<Count, 2> const& array_shape, Field const& min_value, Field const& max_value) -> Field
-            { return uniform(array_shape, min_value, max_value); });
+            { return uniform(array_shape, min_value, max_value); },
+            "array_shape"_a,
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
+        module.def(
+            "uniform",
+            [](Field const& other, Field const& min_value, Field const& max_value) -> Field
+            { return uniform(other, min_value, max_value); },
+            "other"_a,
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
+        module.def(
+            "uniform",
+            [](Field const& min_value, Field const& max_value) -> Field
+            { return uniform(min_value, max_value); },
+            pybind11::kw_only(),
+            "min_value"_a,
+            "max_value"_a);
     }
 
 }  // namespace lue::api

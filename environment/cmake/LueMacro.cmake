@@ -525,6 +525,7 @@ function(lue_configure_static_library_for_tests)
     )
 endfunction()
 
+
 function(lue_configure_python_test)
     set(prefix ARG)
     set(no_values "")
@@ -572,5 +573,691 @@ function(lue_configure_python_test)
         PROPERTY
             FIXTURES_REQUIRED
                 lue_py_test_fixture
+    )
+endfunction()
+
+
+function(tif_to_figure)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAME
+        TARGET
+        SOURCE_PREFIX
+        DESTINATION_PREFIX
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(basename ${ARG_BASENAME})
+    set(source_prefix ${ARG_SOURCE_PREFIX})
+    set(destination_prefix ${ARG_DESTINATION_PREFIX})
+
+    add_custom_command(
+        OUTPUT
+            "${destination_prefix}/${basename}.pdf"
+            "${destination_prefix}/${basename}.svg"
+        DEPENDS
+            "${source_prefix}/${basename}.tif"
+        COMMAND
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_create_example_figure.py"
+                    "${source_prefix}/${basename}.tif"
+                    "${destination_prefix}/${basename}"
+                    pdf svg
+        VERBATIM
+    )
+
+    add_custom_target(${ARG_TARGET}
+        DEPENDS
+            "${destination_prefix}/${basename}.pdf"
+            "${destination_prefix}/${basename}.svg"
+    )
+endfunction()
+
+
+function(example_to_figure)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAME
+        TARGET
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(basename ${ARG_BASENAME})
+
+    add_custom_command(
+        OUTPUT
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        DEPENDS
+            "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
+        COMMAND
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/$<$<BOOL:${LUE_GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/lue_import_example_data.py"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/${basename}.txt"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+                    "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        VERBATIM
+    )
+
+    add_custom_command(
+        OUTPUT "${basename}.lue"
+        DEPENDS
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+        COMMAND "$<TARGET_FILE:lue_translate>" import
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.lue"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.json"
+        VERBATIM
+    )
+
+    # TODO: Assuming we need to produce a tif, which may not be the case. Example data may end up in
+    #       something else. Generalize.
+    add_custom_command(
+        OUTPUT "${basename}.tif"
+        DEPENDS
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}.lue"
+            "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+        COMMAND "$<TARGET_FILE:lue_translate>" export
+            --meta "${CMAKE_CURRENT_BINARY_DIR}/${basename}-meta.json"
+            "${basename}.lue" "${CMAKE_CURRENT_BINARY_DIR}/${basename}.tif"
+        VERBATIM
+    )
+
+    tif_to_figure(
+        BASENAME
+            ${ARG_BASENAME}
+        TARGET
+            ${ARG_TARGET}
+        SOURCE_PREFIX
+            ${CMAKE_CURRENT_BINARY_DIR}
+        DESTINATION_PREFIX
+            ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endfunction()
+
+
+function(examples_to_figures)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        BASENAMES
+        TARGET
+    )
+    set(multi_values "")
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    add_custom_target(${ARG_TARGET})
+
+    foreach(basename ${ARG_BASENAMES})
+        set(target "${ARG_TARGET}.${basename}")
+
+        example_to_figure(
+            BASENAME ${basename}
+            TARGET ${target}
+        )
+
+        add_dependencies(${ARG_TARGET} ${target})
+    endforeach()
+endfunction()
+
+
+function(add_operation_example_c)
+    # Add a C example:
+    # - Create target for building executable for the example
+    # - Create target for generating results, by executing the example executable
+    # - Create targets for generating figures for all results
+    #
+    # All targets created are added as a dependency to the main target whose name is passed in
+    #
+    # NAME: Name of operation
+    # TARGET: Name of target to create for this example
+    # NR: Number of the example ([1, <nr_examples>])
+    # ARGUMENT_NAMES: Zero or more relative pathnames to arguments to read. These are assumed to be present
+    #     in ${CMAKE_CURRENT_BINARY_DIR}/argument
+    # RESULT_NAMES: Relative pathnames to results to write. These will be written to
+    #     ${CMAKE_CURRENT_BINARY_DIR}/result/c
+    # LINK_LIBRARIES: Libraries to link with the executable to resolve all undefined symbols
+    # DEPENDS: Zero or more target-level dependencies
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        LINK_LIBRARIES
+        DEPENDS
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
+
+    set(language c)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.c
+        INPUT ${operation_name}.c
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    if(dependencies)
+        add_dependencies(${target_name}
+            ${dependencies}
+        )
+    endif()
+
+    # Target for building the executable -----
+    set(executable_target_name ${operation_name}.example-${example_nr}.${language})
+
+    add_executable(${executable_target_name}
+        ${operation_name}.c
+    )
+
+    target_link_libraries(${executable_target_name}
+        PRIVATE
+            lue::document_c
+            ${link_libraries}
+            # HPX::wrap_main
+    )
+
+    # Target for creating results by executing the executable -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+        COMMAND
+            ${executable_target_name} ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
+function(add_operation_example_cxx)
+    # Add a C++ example:
+    # - Create target for building executable for the example
+    # - Create target for generating results, by executing the example executable
+    # - Create targets for generating figures for all results
+    #
+    # All targets created are added as a dependency to the main target whose name is passed in
+    #
+    # NAME: Name of operation
+    # TARGET: Name of target to create for this example
+    # NR: Number of the example ([1, <nr_examples>])
+    # ARGUMENT_NAMES: Zero or more relative pathnames to arguments to read. These are assumed to be present
+    #     in ${CMAKE_CURRENT_BINARY_DIR}/argument
+    # RESULT_NAMES: Relative pathnames to results to write. These will be written to
+    #     ${CMAKE_CURRENT_BINARY_DIR}/result/cxx
+    # LINK_LIBRARIES: Libraries to link with the executable to resolve all undefined symbols
+    # DEPENDS: Zero or more target-level dependencies
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        LINK_LIBRARIES
+        DEPENDS
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(link_libraries ${${prefix}_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
+
+    set(language cxx)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.cpp
+        INPUT ${operation_name}.cpp
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    if(dependencies)
+        add_dependencies(${target_name}
+            ${dependencies}
+        )
+    endif()
+
+    # Target for building the executable -----
+    set(executable_target_name ${operation_name}.example-${example_nr}.${language})
+
+    add_executable(${executable_target_name}
+        ${operation_name}.cpp
+    )
+
+    target_link_libraries(${executable_target_name}
+        PRIVATE
+            lue::document_cxx
+            ${link_libraries}
+            HPX::wrap_main
+    )
+
+    # Target for creating results by executing the executable -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+        COMMAND
+            ${executable_target_name} ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
+function(add_operation_example_python)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+
+    set(language python)
+
+    set(argument_prefix "${CMAKE_CURRENT_BINARY_DIR}/argument")
+    set(result_prefix "${CMAKE_CURRENT_BINARY_DIR}/result/${language}")
+
+    file(GENERATE
+        OUTPUT ${operation_name}.py
+        INPUT ${operation_name}.py
+    )
+
+    # Main target
+    add_custom_target(${target_name})
+
+    # Target for creating results by executing the script -----
+    foreach(name ${argument_names})
+        LIST(APPEND argument_pathnames ${argument_prefix}/${name})
+    endforeach()
+
+    foreach(name ${result_names})
+        LIST(APPEND result_pathnames ${result_prefix}/${name})
+        cmake_path(GET name STEM stem)
+        LIST(APPEND result_stems ${stem})
+    endforeach()
+
+    add_custom_command(
+        OUTPUT
+            ${result_pathnames}
+        DEPENDS
+            ${argument_pathnames}
+            ${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py
+        COMMAND
+            ${CMAKE_COMMAND} -E env
+                --modify PYTHONPATH=path_list_prepend:$<TARGET_FILE_DIR:lue::py>/..
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},tcmalloc>,$<PLATFORM_ID:Linux>>:${Tcmalloc_LIBRARY}>
+                --modify LD_PRELOAD=path_list_append:$<$<AND:$<STREQUAL:${HPX_WITH_MALLOC},jemalloc>,$<PLATFORM_ID:Linux>>:${Jemalloc_LIBRARY}>
+                -- ${Python_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/${operation_name}.py"
+                    ${argument_pathnames} ${result_pathnames}
+        VERBATIM
+    )
+
+    add_custom_target(
+        ${target_name}.result
+        DEPENDS
+            ${result_pathnames}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.result
+    )
+
+    # Targets for creating figures for the created results -----
+    foreach(stem ${result_stems})
+        string(REPLACE "/" "_" stem_target_name ${stem})
+
+        tif_to_figure(
+            BASENAME
+                ${stem}
+            TARGET
+                ${target_name}.${stem_target_name}.figure
+            SOURCE_PREFIX
+                ${result_prefix}
+            DESTINATION_PREFIX
+                ${result_prefix}
+        )
+
+        add_dependencies(${target_name}
+            ${target_name}.${stem_target_name}.figure
+        )
+    endforeach()
+endfunction()
+
+
+function(add_operation_example)
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        NAME
+        TARGET
+        NR
+    )
+    set(multi_values
+        ARGUMENT_NAMES
+        RESULT_NAMES
+        C_LINK_LIBRARIES
+        CXX_LINK_LIBRARIES
+        DEPENDS
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(operation_name ${${prefix}_NAME})
+    set(target_name ${${prefix}_TARGET})
+    set(example_nr ${${prefix}_NR})
+    set(argument_names ${${prefix}_ARGUMENT_NAMES})
+    set(result_names ${${prefix}_RESULT_NAMES})
+    set(c_link_libraries ${${prefix}_C_LINK_LIBRARIES})
+    set(cxx_link_libraries ${${prefix}_CXX_LINK_LIBRARIES})
+    set(dependencies ${${prefix}_DEPENDS})
+
+    add_custom_target(${target_name})
+
+    add_operation_example_c(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.c
+        NR
+            ${example_nr}
+        LINK_LIBRARIES
+            ${c_link_libraries}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+        DEPENDS
+            ${dependencies}
+    )
+
+    add_operation_example_cxx(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.cxx
+        NR
+            ${example_nr}
+        LINK_LIBRARIES
+            ${cxx_link_libraries}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+        DEPENDS
+            ${dependencies}
+    )
+
+    add_operation_example_python(
+        NAME
+            ${operation_name}
+        TARGET
+            ${target_name}.python
+        NR
+            ${example_nr}
+        ARGUMENT_NAMES
+            ${argument_names}
+        RESULT_NAMES
+            ${result_names}
+    )
+
+    add_dependencies(${target_name}
+        ${target_name}.c
+        ${target_name}.cxx
+        ${target_name}.python
+    )
+endfunction()
+
+
+function(link_example_arguments)
+    # PATHNAMES: Relative basenames (without extension) of pathnames of files to link to
+
+    set(prefix ARG)
+    set(no_values "")
+    set(single_values
+        TARGET
+    )
+    set(multi_values
+        PATHNAMES
+    )
+
+    cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${no_values}" "${single_values}" "${multi_values}")
+
+    if(${prefix}_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "Function called with unrecognized arguments: "
+            "${${prefix}_UNPARSED_ARGUMENTS}")
+    endif()
+
+    set(target_name ${${prefix}_TARGET})
+    set(pathnames ${${prefix}_PATHNAMES})
+
+    # Create links to arguments used by the example
+    foreach(pathname ${pathnames})
+        foreach(extension
+            pdf
+            svg
+            tif
+        )
+            # ../argument/array/5x5-float32 -> ../argument/array
+            cmake_path(GET pathname PARENT_PATH directory_pathname)
+
+            # ../argument/array/5x5-float32 -> argument/array/5x5-float32
+            string(REGEX REPLACE "^\.\./" "" link_base_pathname ${pathname})
+
+            # ../argument/array/5x5-float32 -> argument/array/5x5-float32.${extension}
+            set(target_link_pathname
+                ${link_base_pathname}.${extension}
+            )
+
+            # Path of file to link to, relative to ${CMAKE_CURRENT_BINARY_DIR}
+            # ../argument/array/5x5-float32 -> ../argument/array/5x5-float32.${extension}
+            set(source_file_pathname
+                ${pathname}.${extension}
+            )
+
+            # Path to file to link to, relative to
+            #     ${CMAKE_CURRENT_BINARY_DIR}/${directory_pathname}
+            set(relative_source_file_pathname ../../${source_file_pathname})
+
+            add_custom_command(
+                OUTPUT
+                    ${target_link_pathname}
+                DEPENDS
+                    ${source_file_pathname}
+                COMMAND
+                    ${CMAKE_COMMAND} -E make_directory argument/${directory_pathname}
+                COMMAND
+                    ${CMAKE_COMMAND} -E create_symlink
+                        ${relative_source_file_pathname}
+                        ${target_link_pathname}
+                VERBATIM
+            )
+            LIST(APPEND link_names ${target_link_pathname})
+        endforeach()
+    endforeach()
+
+    add_custom_target(${target_name}
+        DEPENDS
+            ${link_names}
     )
 endfunction()

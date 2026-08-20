@@ -1,8 +1,7 @@
 import json
 
-import numpy as np
-
 import lue.data_model as ldm
+import numpy as np
 
 from .benchmark import Benchmark
 from .cluster import Cluster

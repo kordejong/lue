@@ -1,0 +1,83 @@
+% https://www.overleaf.com/learn/latex/Writing_your_own_package
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{nord_colour}[2026/08/19 Colours from Nord theme]
+
+% \nordbackground can be set to either "light" or "dark". If it is not set, it is set to "light".
+
+\RequirePackage{ifthen}
+\RequirePackage{xcolor}
+
+\ifthenelse{\isundefined{\nordbackground}}
+{
+    \def\nordbackground{light}
+}
+
+% nord -------------------------------------------------------------------------
+% https://www.nordtheme.com/docs/swatches (.gpl)
+% nord: Polar Night: four dark colors
+\definecolor{nord0}{RGB}{46, 52, 64}  % Dark
+% \definecolor{nord0}{cmyk}{0.0706, 0.0471, 0.0, 0.749}  % Dark
+\definecolor{nord1}{RGB}{59, 66, 82}  % Lighter than nord0
+% \definecolor{nord1}{cmyk}{0.0902, 0.0627, 0.0, 0.6784}  % Lighter than nord0
+\definecolor{nord2}{RGB}{67, 76, 94}  % Lighter than nord1
+% \definecolor{nord2}{cmyk}{0.1059, 0.0706, 0.0, 0.6314}  % Lighter than nord1
+\definecolor{nord3}{RGB}{76, 86, 106}  % Lighter than nord2
+% \definecolor{nord3}{cmyk}{0.1176, 0.0784, 0.0, 0.5843}  % Lighter than nord2
+
+% nord: Snow Storm: three bright colors
+\definecolor{nord4}{RGB}{216, 222, 233}  % Bright
+% \definecolor{nord4}{cmyk}{0.0667, 0.0431, 0.0, 0.0863}  % Bright
+\definecolor{nord5}{RGB}{229, 233, 240}  % Lighter than nord4
+% \definecolor{nord5}{cmyk}{0.0431, 0.0275, 0.0, 0.0588}  % Lighter than nord4
+\definecolor{nord6}{RGB}{236, 239, 244}  % Lighter than nord5
+% \definecolor{nord6}{cmyk}{0.0314, 0.0196, 0.0, 0.0431}  % Lighter than nord5
+
+% nord: Frost: four bluish colors
+\definecolor{nord7}{RGB}{143, 188, 187}  % Calm, frozen polar water
+% \definecolor{nord7}{cmyk}{0.1765, 0.0, 0.0039, 0.2627}  % Calm, frozen polar water
+\definecolor{nord8}{RGB}{136, 192, 208}  % Bright, shiny, pure and clear ice
+% \definecolor{nord8}{cmyk}{0.2824, 0.0627, 0.0, 0.1843}  % Bright, shiny, pure and clear ice
+\definecolor{nord9}{RGB}{129, 161, 193}  % Darkened, arctic waters
+% \definecolor{nord9}{cmyk}{0.251, 0.1255, 0.0, 0.2431}  % Darkened, arctic waters
+\definecolor{nord10}{RGB}{94, 129, 172}  % Dark, deep arctic ocean
+% \definecolor{nord10}{cmyk}{0.3059, 0.1686, 0.0, 0.3255}  % Dark, deep arctic ocean
+
+% nord: Aurora: Five colorful components
+\definecolor{nord11}{RGB}{191, 97, 106}  % Redish
+% \definecolor{nord11}{cmyk}{0.0, 0.3686, 0.3333, 0.251}  % Redish
+\definecolor{nord12}{RGB}{208, 135, 112}  % Orange
+% \definecolor{nord12}{cmyk}{0.0, 0.2863, 0.3765, 0.1843}  % Orange
+\definecolor{nord13}{RGB}{235, 203, 139}  % Dark yellow
+% \definecolor{nord13}{cmyk}{0.0, 0.1255, 0.3765, 0.0784}  % Dark yellow
+\definecolor{nord14}{RGB}{163, 190, 140}  % Green
+% \definecolor{nord14}{cmyk}{0.1059, 0.0, 0.1961, 0.2549}  % Green
+\definecolor{nord15}{RGB}{180, 142, 173}  % Purple
+% \definecolor{nord15}{cmyk}{0.0, 0.149, 0.0275, 0.2941}  % Purple
+% nord -------------------------------------------------------------------------
+
+% \colorlet{neg col}{nord red}
+% \colorlet{pos col}{nord green}
+
+\colorlet{nord red}{nord11}
+\colorlet{nord green}{nord14}
+\colorlet{nord blue}{nord10}
+\colorlet{nord orange}{nord12}
+\colorlet{nord purple}{nord15}
+\colorlet{nord yellow}{nord13}
+\colorlet{nord gray}{nord3}
+
+\ifthenelse{\equal{\nordbackground}{light}}
+{
+    % Light background
+    \colorlet{nord fg}{nord0}  % Darkest gray
+    \colorlet{nord bg}{nord4}  % Lightest gray
+}
+{
+    % Dark background
+    \colorlet{nord fg}{nord4}  % Lightest gray
+    \colorlet{nord bg}{nord0}  % Darkest gray
+}
+
+\colorlet{nord pen}{nord fg}
+\colorlet{nord text}{nord fg}
+\colorlet{nord text on fill}{nord0}  % Darkest gray

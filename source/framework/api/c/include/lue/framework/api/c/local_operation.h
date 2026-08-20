@@ -1,6 +1,8 @@
 #pragma once
+#include "lue/framework/api/c/define.h"
 #include "lue/framework/api/c/export.h"
 #include "lue/framework/api/c/field.h"
+#include "lue/framework/api/c/scalar.h"
 
 
 #ifdef __cplusplus
@@ -62,6 +64,9 @@ LUE_FCAPI_EXPORT LUE_Field* lue_negate(LUE_Field const* field);
 
 LUE_FCAPI_EXPORT LUE_Field* lue_not_equal_to(LUE_Field const* field1, LUE_Field const* field2);
 
+LUE_FCAPI_EXPORT LUE_Field* lue_open_simplex_noise(
+    LUE_Field const* x_coordinates, LUE_Field const* y_coordinates, int seed);
+
 LUE_FCAPI_EXPORT LUE_Field* lue_round(LUE_Field const* field);
 
 LUE_FCAPI_EXPORT LUE_Field* lue_sin(LUE_Field const* field);
@@ -69,6 +74,9 @@ LUE_FCAPI_EXPORT LUE_Field* lue_sin(LUE_Field const* field);
 LUE_FCAPI_EXPORT LUE_Field* lue_tan(LUE_Field const* field);
 
 LUE_FCAPI_EXPORT LUE_Field* lue_trunc(LUE_Field const* field);
+
+LUE_FCAPI_EXPORT LUE_Field* lue_uniform(
+    LUE_Rank rank, LUE_Count const* array_shape, LUE_Field const* min_value, LUE_Field const* max_value);
 
 LUE_FCAPI_EXPORT LUE_Field* lue_where(
     LUE_Field const* field1, LUE_Field const* field2, LUE_Field const* field3 /* = nullptr */);

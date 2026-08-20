@@ -5,7 +5,7 @@ from .. import experiment, shape
 
 class Experiment(experiment.Experiment):
     def __init__(self, data):
-        super(Experiment, self).__init__(
+        super().__init__(
             data,
             "weak_scalability",
             data.get(
@@ -25,7 +25,7 @@ class Experiment(experiment.Experiment):
         self.partition = shape.Shape(data["partition"])
 
     def to_json(self):
-        result = super(Experiment, self).to_json()
+        result = super().to_json()
         result["array"] = self.array.to_json()
         result["partition"] = self.partition.to_json()
 
@@ -36,5 +36,5 @@ class Experiment(experiment.Experiment):
     ):
         return os.path.join(
             self.workspace_pathname(result_prefix, cluster_name, scenario_name),
-            "{}.{}".format(nr_workers, extension),
+            f"{nr_workers}.{extension}",
         )

@@ -12,6 +12,7 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conda.yml"
+      - "!document/*"
       - "!environment/conda/*"
       - "!environment/easybuild/*"
   push:
@@ -21,6 +22,7 @@ on:
       - "**"
       - "!.github/workflows/*"
       - ".github/workflows/windows-conda.yml"
+      - "!document/*"
       - "!environment/conda/*"
       - "!environment/easybuild/*"
   workflow_dispatch:
@@ -42,7 +44,7 @@ jobs:
               version: "17",
               msvc_toolset: "14",
             }
-        python_version: ["3.12"]
+        python_version: ["3.14"]
         architecture: ["amd64"]
 
     runs-on: ${{ matrix.os }}

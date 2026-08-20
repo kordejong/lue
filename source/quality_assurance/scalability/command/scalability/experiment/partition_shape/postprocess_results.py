@@ -1,8 +1,7 @@
 import dateutil.parser
+import lue.data_model as ldm
 import matplotlib.pyplot as plt
 import numpy as np
-
-import lue.data_model as ldm
 
 from ...core import math, plot, process
 from .. import dataset, job
@@ -52,9 +51,9 @@ def post_process_raw_results(
     def plot_duration(axis, array_idx, partition_sizes, partition_shapes):
         if count == 1:
             duration = lue_dataset.partition.partition.properties[
-                "duration_{}".format(array_idx)
+                f"duration_{array_idx}"
             ].value[:]
-            y_label = "duration ({})".format(time_point_units)
+            y_label = f"duration ({time_point_units})"
             axis.plot(
                 partition_sizes,
                 duration,
@@ -64,14 +63,12 @@ def post_process_raw_results(
             )
         else:
             duration = lue_dataset.partition.partition.properties[
-                "mean_duration_{}".format(array_idx)
+                f"mean_duration_{array_idx}"
             ].value[:]
             error = lue_dataset.partition.partition.properties[
-                "std_duration_{}".format(array_idx)
+                f"std_duration_{array_idx}"
             ].value[:]
-            y_label = "duration ({}) ± stddev (count={})".format(
-                time_point_units, count
-            )
+            y_label = f"duration ({time_point_units}) ± stddev (count={count})"
             axis.errorbar(
                 x=partition_sizes,
                 y=duration,
@@ -154,12 +151,7 @@ def post_process_raw_results(
         )
 
     figure.suptitle(
-        "{}, {}, {}\nPartition shape scalability experiment ({})".format(
-            name,
-            system_name,
-            time_point,
-            scenario_name,
-        )
+        f"{name}, {system_name}, {time_point}\nPartition shape scalability experiment ({scenario_name})"
     )
 
     for filetype in filetypes:

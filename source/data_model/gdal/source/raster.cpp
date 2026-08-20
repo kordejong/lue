@@ -89,6 +89,19 @@ namespace lue::gdal {
     }
 
 
+    void Raster::Band::set_metadata(
+        std::string const& key, std::string const& value, std::string const& domain)
+    {
+        gdal::set_metadata(*_band_ptr, key, value, domain);
+    }
+
+
+    auto Raster::Band::metadata(std::string const& key, std::string const& domain) -> std::string
+    {
+        return gdal::metadata(*_band_ptr, key, domain);
+    }
+
+
     Raster::Raster(DatasetPtr dataset_ptr):
 
         _dataset_ptr{std::move(dataset_ptr)}

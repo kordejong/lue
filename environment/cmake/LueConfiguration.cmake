@@ -169,7 +169,7 @@ if(LUE_BUILD_FRAMEWORK)
     )
 
     set(LUE_FRAMEWORK_SIGNED_INTEGRAL_ELEMENTS
-        std::int8_t std::int32_t std::int64_t CACHE STRING "Type(s) to use for representing signed integral values")
+        std::int8_t std::int16_t std::int32_t std::int64_t CACHE STRING "Type(s) to use for representing signed integral values")
     set_property(CACHE LUE_FRAMEWORK_SIGNED_INTEGRAL_ELEMENTS
         PROPERTY
             STRINGS
@@ -186,7 +186,7 @@ if(LUE_BUILD_FRAMEWORK)
     )
 
     set(LUE_FRAMEWORK_UNSIGNED_INTEGRAL_ELEMENTS
-        std::uint8_t std::uint32_t std::uint64_t CACHE STRING "Type(s) to use for representing signed integral values")
+        std::uint8_t std::uint16_t std::uint32_t std::uint64_t CACHE STRING "Type(s) to use for representing signed integral values")
     set_property(CACHE LUE_FRAMEWORK_UNSIGNED_INTEGRAL_ELEMENTS
         PROPERTY
             STRINGS

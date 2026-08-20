@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE lue framework api cxx local uniform
-#include "lue/framework/api/cxx/local/uniform.hpp"
 #include "unit_test.hpp"
+#include "lue/framework/api/cxx/local/uniform.hpp"
 
 
 BOOST_AUTO_TEST_CASE(uniform_element_element)
@@ -58,5 +58,58 @@ BOOST_AUTO_TEST_CASE(uniform_without_partition_shape)
         lue::api::Field result = lue::api::uniform(array_shape, min_value, max_value);
 
         BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
+    }
+}
+
+
+BOOST_AUTO_TEST_CASE(uniform_with_other)
+{
+    using Element = std::int32_t;
+    using Scalar = lue::Scalar<Element>;
+    using Array = lue::PartitionedArray<Element, 2>;
+
+    lue::api::Field const other = Array{};
+
+    {
+        lue::api::Field const min_value = Element{};
+        lue::api::Field const max_value = Element{};
+
+        lue::api::Field result = lue::api::uniform(other, min_value, max_value);
+
+        BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
+    }
+
+    {
+        lue::api::Field const min_value = Scalar{};
+        lue::api::Field const max_value = Scalar{};
+
+        lue::api::Field result = lue::api::uniform(other, min_value, max_value);
+
+        BOOST_CHECK(std::holds_alternative<Array>(result.variant()));
+    }
+}
+
+
+BOOST_AUTO_TEST_CASE(uniform_scalar)
+{
+    using Element = std::int32_t;
+    using Scalar = lue::Scalar<Element>;
+
+    {
+        lue::api::Field const min_value = Element{};
+        lue::api::Field const max_value = Element{};
+
+        lue::api::Field result = lue::api::uniform(min_value, max_value);
+
+        BOOST_CHECK(std::holds_alternative<Scalar>(result.variant()));
+    }
+
+    {
+        lue::api::Field const min_value = Scalar{};
+        lue::api::Field const max_value = Scalar{};
+
+        lue::api::Field result = lue::api::uniform(min_value, max_value);
+
+        BOOST_CHECK(std::holds_alternative<Scalar>(result.variant()));
     }
 }

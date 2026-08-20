@@ -7,7 +7,6 @@ import dateutil.parser
 import dateutil.relativedelta
 import docopt
 
-
 usage = """\
 Translate a benchmark result formatted as JSON into a LUE JSON file
 
@@ -84,9 +83,7 @@ def benchmark_to_lue_json(benchmark_pathname, lue_pathname, epoch=None):
 
     if epoch_offset < 0:
         raise RuntimeError(
-            "epoch passed in is later than epoch from benchmark: {} > {}".format(
-                epoch, benchmark_epoch
-            )
+            f"epoch passed in is later than epoch from benchmark: {epoch} > {benchmark_epoch}"
         )
 
     # Calculate number of seconds sinds the epoch

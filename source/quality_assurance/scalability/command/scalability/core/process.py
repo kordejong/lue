@@ -7,7 +7,7 @@ def execute_command(command: str) -> None:
     result = subprocess.call(shlex.split(command))
 
     if result != 0:
-        raise RuntimeError("Error executing {}".format(command))
+        raise RuntimeError(f"Error executing {command}")
 
 
 def lue_translate() -> str:
@@ -15,8 +15,8 @@ def lue_translate() -> str:
 
 
 def import_lue_json(lue_json_pathname: str, lue_dataset_pathname: str) -> None:
-    command = "{} import --add {} {}".format(
-        lue_translate(), lue_dataset_pathname, lue_json_pathname
+    command = (
+        f"{lue_translate()} import --add {lue_dataset_pathname} {lue_json_pathname}"
     )
     execute_command(command)
 
@@ -80,16 +80,9 @@ def create_dot_graph(lue_dataset_pathname: str, pdf_graph_pathname: str) -> None
         with tempfile.NamedTemporaryFile(suffix=".dot") as dot_graph_file:
             commands = []
             commands.append(
-                "{} export --meta {} {} {}".format(
-                    lue_translate(),
-                    dot_properties_file.name,
-                    lue_dataset_pathname,
-                    dot_graph_file.name,
-                )
+                f"{lue_translate()} export --meta {dot_properties_file.name} {lue_dataset_pathname} {dot_graph_file.name}"
             )
-            commands.append(
-                "dot -Tpdf -o {} {}".format(pdf_graph_pathname, dot_graph_file.name)
-            )
+            commands.append(f"dot -Tpdf -o {pdf_graph_pathname} {dot_graph_file.name}")
 
             for command in commands:
                 execute_command(command)

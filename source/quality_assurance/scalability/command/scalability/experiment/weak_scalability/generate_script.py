@@ -80,9 +80,7 @@ def generate_script_slurm_threads(
         result_prefix=result_prefix,
     )
 
-    job_name = "{name}-{program_name}".format(
-        name=experiment.name, program_name=experiment.program_name
-    )
+    job_name = f"{experiment.name}-{experiment.program_name}"
     delimiter = "END_OF_SLURM_SCRIPT"
 
     commands = [
@@ -100,11 +98,11 @@ def generate_script_slurm_threads(
             delimiter=delimiter,
         ),
         slurm_script,
-        "{delimiter}".format(delimiter=delimiter),
+        f"{delimiter}",
     ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script_slurm_numa_nodes(
@@ -163,12 +161,8 @@ def generate_script_slurm_numa_nodes(
             result_prefix=result_prefix,
         )
 
-        job_name = "{name}-{program_name}-{nr_workers}".format(
-            name=experiment.name,
-            program_name=experiment.program_name,
-            nr_workers=nr_workers,
-        )
-        delimiter = "END_OF_SLURM_SCRIPT_{}".format(nr_workers)
+        job_name = f"{experiment.name}-{experiment.program_name}-{nr_workers}"
+        delimiter = f"END_OF_SLURM_SCRIPT_{nr_workers}"
 
         commands += [
             "",
@@ -178,7 +172,7 @@ def generate_script_slurm_numa_nodes(
                 delimiter=delimiter,
             ),
             slurm_script,
-            "{delimiter}".format(delimiter=delimiter),
+            f"{delimiter}",
             "",
             # Prevent benchmarks to start at the same time point
             "sleep 3s",
@@ -186,7 +180,7 @@ def generate_script_slurm_numa_nodes(
         ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script_slurm_cluster_nodes(
@@ -258,22 +252,18 @@ def generate_script_slurm_cluster_nodes(
             job_steps=job_steps,
         )
 
-        job_name = "{name}-{program_name}-{nr_workers}".format(
-            name=experiment.name,
-            program_name=experiment.program_name,
-            nr_workers=nr_workers,
-        )
-        delimiter = "END_OF_SLURM_SCRIPT_{}".format(nr_workers)
+        job_name = f"{experiment.name}-{experiment.program_name}-{nr_workers}"
+        delimiter = f"END_OF_SLURM_SCRIPT_{nr_workers}"
 
         commands += [
             # Create a snippet of bash script that creates a SLURM script
             # for this partition. Note that this has to be done at runtime
             # because there is no directory structure yet for storing
             # SLURM scripts.
-            "# Number of cluster nodes: {}".format(nr_workers),
+            f"# Number of cluster nodes: {nr_workers}",
             # Create directory for storing SLURM script and benchmark
             # results
-            "mkdir -p {}".format(os.path.dirname(result_pathname)),
+            f"mkdir -p {os.path.dirname(result_pathname)}",
             # Submit SLURM script to scheduler
             "sbatch --job-name {job_name} {sbatch_options} << {delimiter}".format(
                 job_name=job_name,
@@ -281,7 +271,7 @@ def generate_script_slurm_cluster_nodes(
                 delimiter=delimiter,
             ),
             slurm_script,
-            "{delimiter}".format(delimiter=delimiter),
+            f"{delimiter}",
             "",
             # Prevent benchmarks to start at the same time point
             "sleep 3s",
@@ -289,7 +279,7 @@ def generate_script_slurm_cluster_nodes(
         ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script_slurm(
@@ -336,7 +326,7 @@ def generate_script_shell(
 
         commands += [
             # Create directory for the resulting json file
-            "mkdir -p {}".format(os.path.dirname(result_pathname)),
+            f"mkdir -p {os.path.dirname(result_pathname)}",
             # Run the benchmark, resulting in a json file
             f"{experiment.command_pathname} {experiment.command_arguments} "
             f'--hpx:threads="{nr_threads}" '
@@ -354,7 +344,7 @@ def generate_script_shell(
         ]
 
     job.write_script(commands, script_pathname)
-    print("bash {}".format(script_pathname))
+    print(f"bash {script_pathname}")
 
 
 def generate_script(configuration_data):

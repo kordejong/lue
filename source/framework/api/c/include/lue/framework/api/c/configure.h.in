@@ -1,3 +1,14 @@
 #pragma once
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #cmakedefine LUE_C_SUPPORT_ENUM_WITH_FIXED_UNDERLYING_TYPE
+
+
+#ifdef __cplusplus
+}
+#endif

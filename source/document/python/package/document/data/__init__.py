@@ -196,7 +196,7 @@ def import_kernel(
             "value"
         ][0]["no_data"] = element_string_to_number(no_data_value)
 
-    with open(json_path) as json_file:
+    with open(json_path, "w") as json_file:
         json.dump(json_dict, json_file, indent=4)
 
     json_dict = {

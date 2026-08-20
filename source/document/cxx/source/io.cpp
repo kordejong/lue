@@ -32,6 +32,7 @@ namespace lue::document {
 
         switch (raster.data_type())
         {
+#ifdef LUE_FRAMEWORK_WITH_FLOAT32_ELEMENT
             case GDT_Float32:
             {
                 Kernel<float, 2> kernel{from_gdal_shape<rank>(shape)};
@@ -39,6 +40,8 @@ namespace lue::document {
                 result = kernel;
                 break;
             }
+#endif
+#ifdef LUE_FRAMEWORK_WITH_FLOAT64_ELEMENT
             case GDT_Float64:
             {
                 Kernel<double, 2> kernel{from_gdal_shape<rank>(shape)};
@@ -46,6 +49,7 @@ namespace lue::document {
                 result = kernel;
                 break;
             }
+#endif
             default:
             {
                 // TODO: generalize

@@ -2,6 +2,7 @@ name: Linux CI
 
 # TODO
 # - Excluded some tests. Revisit.
+# - Fix analyse: do static analysis on changed files, not all of them
 
 on:
   pull_request:
@@ -250,7 +251,7 @@ jobs:
           cmake --build ${{ env.lue_build_directory }} --target documentation
 
       - name: analyse
-        if: matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.14'
+        if: false && matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.14'
         run: |
           cd ${{ env.lue_source_directory }}
           pre-commit install

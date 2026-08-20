@@ -17,7 +17,7 @@ int run_example(int const argc, char** argv)
     lue_initialize_example();
 
     // [example
-    typedef uint32_t Element;
+    typedef int32_t Element;
     LUE_Rank const rank = 2;
     LUE_Count const array_shape[] = {6, 4};
 

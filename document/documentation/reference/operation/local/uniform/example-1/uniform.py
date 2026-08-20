@@ -22,7 +22,7 @@ Options:
     result_array_path = Path(arguments["<result>"])
 
     # [example
-    dtype = lfrx.unsigned_integral_element_types[-1]
+    dtype = lfrx.signed_integral_element_types[-1]
     result = lfrx.uniform(
         (6, 4),
         min_value=lfrx.as_field(lfrx.create_literal(1, dtype)),

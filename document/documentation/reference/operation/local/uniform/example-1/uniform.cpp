@@ -48,7 +48,7 @@ class Example: public lue::document::Example
             using namespace lue::api;
 
             // [example
-            using Element = LargestUnsignedIntegralElement;
+            using Element = LargestSignedIntegralElement;
 
             Element const min_value{1};
             Element const max_value{10};

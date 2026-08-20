@@ -1,10 +1,10 @@
 add_library(lue_document_c SHARED)
 add_library(lue::document_c ALIAS lue_document_c)
 
-# target_compile_features(lue_document_c
-#     PUBLIC
-#         c_std_${LUE_MIN_C_STANDARD}
-# )
+target_compile_features(lue_document_c
+    PUBLIC
+        c_std_${LUE_MIN_C_STANDARD}
+)
 
 set_target_properties(lue_document_c
     PROPERTIES

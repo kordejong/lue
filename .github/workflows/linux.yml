@@ -79,7 +79,7 @@ jobs:
         with:
           path: ${{ env.lue_source_directory }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
           cache: "pip"
@@ -245,12 +245,12 @@ jobs:
           ${{ env.lue_consume_build_directory }}/lue_consume_framework_io
 
       - name: documentation
-        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.13'
+        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.14'
         run: |
           cmake --build ${{ env.lue_build_directory }} --target documentation
 
       - name: analyse
-        if: matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.13'
+        if: matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.14'
         run: |
           cd ${{ env.lue_source_directory }}
           pre-commit install
@@ -260,7 +260,7 @@ jobs:
       # NOTE: Secrets and variables are not passed to workflows that are triggered by a pull request from
       # a fork.
       - name: deploy
-        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.13'
+        if: github.repository == 'computationalgeography/lue' && github.ref == 'refs/heads/master' && matrix.compiler.cxx == 'g++-13' && matrix.python_version == '3.14'
         env:
           ftp_server: ${{ secrets.FTP_SERVER }}
           ftp_port: ${{ secrets.FTP_PORT }}
